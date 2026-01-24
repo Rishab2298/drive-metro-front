@@ -147,7 +147,7 @@ const PhoneInput = React.forwardRef(
               aria-expanded={open}
               disabled={disabled}
               className={cn(
-                "h-11 w-[120px] justify-between rounded-r-none border-r-0 bg-slate-50/50 px-3 font-normal hover:bg-slate-100/80",
+                "h-11 w-[120px] justify-between rounded-r-none border-r-0 bg-muted/50 px-3 font-normal hover:bg-muted",
                 "focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400",
                 "transition-all duration-200",
                 error && "border-red-300 focus:ring-red-500/20 focus:border-red-400"
@@ -155,25 +155,25 @@ const PhoneInput = React.forwardRef(
             >
               <span className="flex items-center gap-2 truncate">
                 <span className="text-xl leading-none">{country.flag}</span>
-                <span className="text-sm text-slate-600 font-medium">{country.dialCode}</span>
+                <span className="text-sm text-foreground font-medium">{country.dialCode}</span>
               </span>
               <ChevronsUpDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-40" />
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            className="w-[280px] p-0 shadow-xl border-slate-200/80 rounded-xl overflow-hidden"
+            className="w-[280px] p-0 shadow-xl border-border rounded-xl overflow-hidden"
             align="start"
           >
             <Command className="rounded-xl">
-              <div className="flex items-center border-b border-slate-100 px-3">
-                <Search className="mr-2 h-4 w-4 shrink-0 text-slate-400" />
+              <div className="flex items-center border-b border-border px-3">
+                <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
                 <CommandInput
                   placeholder="Search countries..."
-                  className="h-11 border-0 focus:ring-0 placeholder:text-slate-400"
+                  className="h-11 border-0 focus:ring-0 placeholder:text-muted-foreground"
                 />
               </div>
               <CommandList className="max-h-[280px]">
-                <CommandEmpty className="py-6 text-center text-sm text-slate-500">
+                <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
                   No country found
                 </CommandEmpty>
                 <CommandGroup heading="Popular" className="px-2 py-2">
@@ -185,19 +185,19 @@ const PhoneInput = React.forwardRef(
                       className={cn(
                         "flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer",
                         "transition-colors duration-150",
-                        currentCountryCode === c.code && "bg-purple-50"
+                        currentCountryCode === c.code && "bg-purple-50 dark:bg-purple-900/30"
                       )}
                     >
                       <span className="text-xl leading-none">{c.flag}</span>
-                      <span className="flex-1 text-sm font-medium text-slate-700">{c.name}</span>
-                      <span className="text-xs text-slate-400 font-mono">{c.dialCode}</span>
+                      <span className="flex-1 text-sm font-medium text-foreground">{c.name}</span>
+                      <span className="text-xs text-muted-foreground font-mono">{c.dialCode}</span>
                       {currentCountryCode === c.code && (
-                        <Check className="h-4 w-4 text-purple-600" />
+                        <Check className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                       )}
                     </CommandItem>
                   ))}
                 </CommandGroup>
-                <CommandGroup heading="All Countries" className="px-2 py-2 border-t border-slate-100">
+                <CommandGroup heading="All Countries" className="px-2 py-2 border-t border-border">
                   {others.map((c) => (
                     <CommandItem
                       key={c.code}
@@ -206,14 +206,14 @@ const PhoneInput = React.forwardRef(
                       className={cn(
                         "flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer",
                         "transition-colors duration-150",
-                        currentCountryCode === c.code && "bg-purple-50"
+                        currentCountryCode === c.code && "bg-purple-50 dark:bg-purple-900/30"
                       )}
                     >
                       <span className="text-xl leading-none">{c.flag}</span>
-                      <span className="flex-1 text-sm font-medium text-slate-700">{c.name}</span>
-                      <span className="text-xs text-slate-400 font-mono">{c.dialCode}</span>
+                      <span className="flex-1 text-sm font-medium text-foreground">{c.name}</span>
+                      <span className="text-xs text-muted-foreground font-mono">{c.dialCode}</span>
                       {currentCountryCode === c.code && (
-                        <Check className="h-4 w-4 text-purple-600" />
+                        <Check className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                       )}
                     </CommandItem>
                   ))}

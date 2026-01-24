@@ -13,7 +13,10 @@ import {
   User,
   Phone,
   Shield,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -112,6 +115,7 @@ export default function Onboarding() {
   const { user, isLoaded } = useUser();
   const { getToken } = useAuth();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
@@ -218,13 +222,13 @@ export default function Onboarding() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
-            <div className="w-12 h-12 rounded-full border-2 border-slate-200"></div>
+            <div className="w-12 h-12 rounded-full border-2 border-border"></div>
             <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-indigo-600 animate-spin"></div>
           </div>
-          <p className="text-sm text-slate-500 font-medium">Loading...</p>
+          <p className="text-sm text-muted-foreground font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -233,7 +237,7 @@ export default function Onboarding() {
   const currentStepData = steps[currentStep - 1];
 
   return (
-    <div className="min-h-screen flex bg-slate-50">
+    <div className="min-h-screen flex bg-background">
       {/* Sidebar */}
       <div className="hidden lg:flex w-95 bg-linear-to-b from-slate-900 via-slate-900 to-slate-800 text-white flex-col relative overflow-hidden">
         {/* Decorative elements */}
@@ -339,18 +343,32 @@ export default function Onboarding() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Mobile Header */}
-        <div className="lg:hidden bg-white border-b border-slate-200 px-4 py-4">
+        <div className="lg:hidden bg-card border-b border-border px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-linear-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <Building2 className="w-4 h-4 text-white" />
               </div>
-              <span className="font-semibold text-slate-900">DiveMetric</span>
+              <span className="font-semibold text-foreground">DiveMetric</span>
             </div>
-            <span className="text-xs font-mono text-slate-400">Step {currentStep} of {steps.length}</span>
+            <div className="flex items-center gap-3">
+              {/* Theme Toggle */}
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 rounded-lg bg-muted hover:bg-accent transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-foreground" />
+                ) : (
+                  <Moon className="w-4 h-4 text-foreground" />
+                )}
+              </button>
+              <span className="text-xs font-mono text-muted-foreground">Step {currentStep} of {steps.length}</span>
+            </div>
           </div>
           {/* Progress bar */}
-          <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+          <div className="h-1 bg-muted rounded-full overflow-hidden">
             <div
               className="h-full bg-linear-to-r from-indigo-500 to-purple-600 transition-all duration-500 ease-out"
               style={{ width: `${(currentStep / steps.length) * 100}%` }}
@@ -363,16 +381,36 @@ export default function Onboarding() {
           <div className="w-full max-w-xl">
             {/* Step Header */}
             <div className="mb-8">
-              <div className="flex items-center gap-2 text-sm text-indigo-600 font-medium mb-2">
-                <span className="inline-flex items-center justify-center w-6 h-6 bg-indigo-50 rounded-full text-xs font-semibold">
-                  {currentStep}
-                </span>
-                <span>Step {currentStep} of {steps.length}</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400 font-medium mb-2">
+                  <span className="inline-flex items-center justify-center w-6 h-6 bg-indigo-50 dark:bg-indigo-900/30 rounded-full text-xs font-semibold">
+                    {currentStep}
+                  </span>
+                  <span>Step {currentStep} of {steps.length}</span>
+                </div>
+                {/* Desktop Theme Toggle */}
+                <button
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-lg bg-muted hover:bg-accent border border-border transition-colors"
+                  aria-label="Toggle theme"
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <Sun className="w-4 h-4 text-foreground" />
+                      <span className="text-sm text-foreground">Light</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-4 h-4 text-foreground" />
+                      <span className="text-sm text-foreground">Dark</span>
+                    </>
+                  )}
+                </button>
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
                 {currentStepData.title}
               </h1>
-              <p className="text-slate-500 mt-2">
+              <p className="text-muted-foreground mt-2">
                 {currentStep === 1 && "Enter your Amazon DSP credentials and company information"}
                 {currentStep === 2 && "Tell us about the primary account owner"}
                 {currentStep === 3 && "How should we reach you?"}
@@ -381,8 +419,8 @@ export default function Onboarding() {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl">
-                <p className="text-sm text-red-600 font-medium">{error}</p>
+              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-xl">
+                <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
               </div>
             )}
 
@@ -398,13 +436,13 @@ export default function Onboarding() {
                         name="dspCode"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700 font-medium">
+                            <FormLabel className="text-foreground font-medium">
                               DSP ID
                             </FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="DSP12345"
-                                className="h-11 bg-white border-slate-200 focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-slate-400"
+                                className="h-11 bg-card border-border text-foreground focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-muted-foreground"
                                 {...field}
                                 onChange={(e) =>
                                   field.onChange(e.target.value.toUpperCase())
@@ -421,13 +459,13 @@ export default function Onboarding() {
                         name="stationCode"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-slate-700 font-medium">
+                            <FormLabel className="text-foreground font-medium">
                               Station Code
                             </FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="DLA4"
-                                className="h-11 bg-white border-slate-200 focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-slate-400"
+                                className="h-11 bg-card border-border text-foreground focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-muted-foreground"
                                 {...field}
                                 onChange={(e) =>
                                   field.onChange(e.target.value.toUpperCase())
@@ -445,13 +483,13 @@ export default function Onboarding() {
                       name="companyName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-700 font-medium">
+                          <FormLabel className="text-foreground font-medium">
                             Company Name
                           </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Your delivery service partner company"
-                              className="h-11 bg-white border-slate-200 focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-slate-400"
+                              className="h-11 bg-card border-border text-foreground focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-muted-foreground"
                               {...field}
                             />
                           </FormControl>
@@ -470,13 +508,13 @@ export default function Onboarding() {
                       name="ownerName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-700 font-medium">
+                          <FormLabel className="text-foreground font-medium">
                             Full Name
                           </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="John Smith"
-                              className="h-11 bg-white border-slate-200 focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-slate-400"
+                              className="h-11 bg-card border-border text-foreground focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-muted-foreground"
                               {...field}
                             />
                           </FormControl>
@@ -490,14 +528,14 @@ export default function Onboarding() {
                       name="ownerEmail"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-700 font-medium">
+                          <FormLabel className="text-foreground font-medium">
                             Email Address
                           </FormLabel>
                           <FormControl>
                             <Input
                               type="email"
                               placeholder="john@company.com"
-                              className="h-11 bg-white border-slate-200 focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-slate-400"
+                              className="h-11 bg-card border-border text-foreground focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-muted-foreground"
                               {...field}
                             />
                           </FormControl>
@@ -516,14 +554,14 @@ export default function Onboarding() {
                       name="contactEmail"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-700 font-medium">
+                          <FormLabel className="text-foreground font-medium">
                             Contact Email
                           </FormLabel>
                           <FormControl>
                             <Input
                               type="email"
                               placeholder="contact@company.com"
-                              className="h-11 bg-white border-slate-200 focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-slate-400"
+                              className="h-11 bg-card border-border text-foreground focus:border-indigo-400 focus:ring-indigo-400/20 transition-all placeholder:text-muted-foreground"
                               {...field}
                             />
                           </FormControl>
@@ -533,7 +571,7 @@ export default function Onboarding() {
                     />
 
                     <FormItem>
-                      <FormLabel className="text-slate-700 font-medium">
+                      <FormLabel className="text-foreground font-medium">
                         Phone Number
                       </FormLabel>
                       <FormField
@@ -571,7 +609,7 @@ export default function Onboarding() {
                       name="timezone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-700 font-medium">
+                          <FormLabel className="text-foreground font-medium">
                             Timezone
                           </FormLabel>
                           <Select
@@ -579,7 +617,7 @@ export default function Onboarding() {
                             defaultValue={field.value}
                           >
                             <FormControl>
-                              <SelectTrigger className="h-11 bg-white border-slate-200 focus:border-indigo-400 focus:ring-indigo-400/20 transition-all">
+                              <SelectTrigger className="h-11 bg-card border-border text-foreground focus:border-indigo-400 focus:ring-indigo-400/20 transition-all">
                                 <SelectValue placeholder="Select your timezone" />
                               </SelectTrigger>
                             </FormControl>
@@ -592,7 +630,7 @@ export default function Onboarding() {
                                 >
                                   <div className="flex items-center justify-between w-full gap-4">
                                     <span>{tz.label}</span>
-                                    <span className="text-xs text-slate-400 font-mono">
+                                    <span className="text-xs text-muted-foreground font-mono">
                                       {tz.offset}
                                     </span>
                                   </div>
@@ -614,7 +652,7 @@ export default function Onboarding() {
                       type="button"
                       variant="outline"
                       onClick={handleBack}
-                      className="h-11 px-6 border-slate-200 hover:bg-slate-50 transition-all"
+                      className="h-11 px-6 border-border hover:bg-muted transition-all"
                     >
                       <ArrowLeft className="w-4 h-4 mr-2" />
                       Back
@@ -654,11 +692,11 @@ export default function Onboarding() {
             </Form>
 
             {/* Help Link */}
-            <p className="text-center text-sm text-slate-400 mt-8">
+            <p className="text-center text-sm text-muted-foreground mt-8">
               Need assistance?{" "}
               <a
                 href="mailto:support@divemetric.com"
-                className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
+                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors"
               >
                 Contact support
               </a>
