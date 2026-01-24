@@ -549,6 +549,14 @@ const SEVERITY_COLORS = {
   poor: { bg: '#FCF0F0', text: '#996666', dot: '#C99191' }
 };
 
+// Severity labels for display (user-friendly terms)
+const SEVERITY_LABELS = {
+  poor: 'Severe',
+  fair: 'Concerning',
+  great: 'Good',
+  fantastic: 'Optimal'
+};
+
 // Get severity level based on metric key and value
 const getSeverityLevel = (key, value) => {
   const numValue = typeof value === 'number' ? value : parseFloat(value);
@@ -607,6 +615,29 @@ const getSeverityLevel = (key, value) => {
   }
 
   return null;
+};
+
+// Parse DVIC time "M:SS" format to seconds
+const parseDvicTimeToSeconds = (timeStr) => {
+  if (!timeStr || typeof timeStr !== 'string') return null;
+  const parts = timeStr.trim().split(':');
+  if (parts.length === 2) {
+    const mins = parseInt(parts[0], 10);
+    const secs = parseInt(parts[1], 10);
+    if (!isNaN(mins) && !isNaN(secs)) return mins * 60 + secs;
+  }
+  return null;
+};
+
+// Get severity for DVIC inspection times
+// 0-20s = poor (Severe), 20-60s = fair (Concerning), 60-90s = great (Good), 90s+ = fantastic (Optimal)
+const getDvicTimeSeverity = (timeValue) => {
+  const seconds = typeof timeValue === 'number' ? timeValue : parseDvicTimeToSeconds(timeValue);
+  if (seconds === null) return null;
+  if (seconds < 20) return 'poor';       // Severe
+  if (seconds < 60) return 'fair';       // Concerning
+  if (seconds < 90) return 'great';      // Good
+  return 'fantastic';                     // Optimal
 };
 
 // Parse historical/trailing data from driver object
@@ -1115,9 +1146,19 @@ const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount }) => {
 
   // Metric Row Component
   const MetricRow = ({ metricKey, value, label, indent, isTier }) => {
-    const severity = isTier ? getSeverityLevel('tier', value) : getSeverityLevel(metricKey, value);
+    // Check if DVIC time metric
+    const isDvicTime = metricKey?.toLowerCase().startsWith('dvictime');
+
+    // Get severity (use DVIC logic for times, standard for others)
+    const severity = isDvicTime
+      ? getDvicTimeSeverity(value)
+      : (isTier ? getSeverityLevel('tier', value) : getSeverityLevel(metricKey, value));
+
     const sevColor = severity ? SEVERITY_COLORS[severity] : null;
     const displayLabel = label || formatLabel(metricKey);
+
+    // Only highlight poor (Severe) and fair (Concerning) states
+    const shouldHighlight = severity === 'poor' || severity === 'fair';
 
     return (
       <div
@@ -1125,7 +1166,7 @@ const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount }) => {
         style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           padding: indent ? '11px 16px 11px 28px' : '13px 16px',
-          background: indent ? t.subtle : t.card,
+          background: shouldHighlight && !indent ? sevColor.bg : (indent ? t.subtle : t.card),
           borderBottom: `1px solid ${t.border}`,
           cursor: 'pointer', transition: 'background 0.15s'
         }}
@@ -1134,18 +1175,29 @@ const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount }) => {
           <span style={{
             fontSize: indent ? '12px' : '13px',
             fontWeight: indent ? '400' : '500',
-            color: indent ? t.muted : t.text
+            color: shouldHighlight ? sevColor.text : (indent ? t.muted : t.text)
           }}>{displayLabel}</span>
           <Info size={12} style={{ opacity: 0.4, color: t.muted }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {severity && !indent && (
+          {/* Severity dot - only for highlighted states */}
+          {shouldHighlight && !indent && (
             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: sevColor.dot }} />
+          )}
+          {/* Severity label badge - only for highlighted states */}
+          {shouldHighlight && !indent && (
+            <span style={{
+              fontSize: '10px', fontWeight: '600', color: sevColor.text,
+              padding: '2px 6px', background: sevColor.bg, borderRadius: '4px',
+              textTransform: 'uppercase', letterSpacing: '0.03em'
+            }}>
+              {SEVERITY_LABELS[severity]}
+            </span>
           )}
           <span style={{
             fontSize: isTier ? '12px' : '13px',
             fontWeight: '600',
-            color: sevColor ? sevColor.text : t.text,
+            color: shouldHighlight ? sevColor.text : (sevColor ? sevColor.text : t.text),
             padding: isTier ? '4px 10px' : '0',
             background: isTier && sevColor ? sevColor.bg : 'transparent',
             borderRadius: isTier ? '8px' : '0'
@@ -1776,6 +1828,11 @@ const ProcessingResults = () => {
           onClose={() => setPreviewDriver(null)}
           rankData={driverRanks[previewDriver.transporterId]}
           rankedCount={rankedCount}
+          scorecardInfo={{
+            dspId: data?.dspCode,
+            stationCode: data?.stationCode,
+            weekNumber: previewDriver?.weekNumber || previewDriver?.week,
+          }}
         />
       )}
     </div>

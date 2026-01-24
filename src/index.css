@@ -132,6 +132,48 @@
   --landing-border: #3A355C;
 }
 
+/* Scorecard Preview Modal Animations & Custom Styles */
+@keyframes severePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-severe-pulse {
+  animation: severePulse 2s ease-in-out infinite;
+}
+.animate-icon-pulse {
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+/* Gradient text utility */
+.text-gradient-brand {
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Profile card gradient */
+.bg-profile-gradient {
+  background: linear-gradient(135deg, #1E1B4B 0%, #312E81 40%, #4338CA 100%);
+}
+
+/* Severe row gradient */
+.bg-severe-gradient {
+  background: linear-gradient(90deg, #7F1D1D 0%, #991B1B 50%, #7F1D1D 100%);
+}
+
+/* Glass card effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

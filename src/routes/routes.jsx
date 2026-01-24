@@ -8,6 +8,7 @@ import SignIn from "../pages/public/signIn";
 import SignUp from "../pages/public/signUp";
 import ScorecardSamplesDemo from "../pages/public/ScorecardSamplesDemo";
 import ScorecardView from "../pages/public/scorecardView";
+import HowScoringWorks from "../pages/public/HowScoringWorks";
 import ClientDashboard from "../pages/client/clientDashboard";
 import GettingStarted from "../pages/client/gettingStarted";
 import Onboarding from "../pages/client/onboarding";
@@ -32,6 +33,7 @@ const routeConfig = [
   { path: "/sign-up", component: SignUp, wrapper: PublicRoute },
   { path: "/scorecard-samples", component: ScorecardSamplesDemo },
   { path: "/scorecard/:id", component: ScorecardView },
+  { path: "/how-scoring-works", component: HowScoringWorks },
   { path: "/onboarding", component: Onboarding, wrapper: ProtectedRoute },
   { path: "/getting-started", component: GettingStarted, wrapper: ProtectedRoute, layout: ClientAppLayout },
   { path: "/upload-scorecard", component: UploadScorecard, wrapper: ProtectedRoute, layout: ClientAppLayout },

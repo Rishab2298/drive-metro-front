@@ -119,7 +119,7 @@ const metricInfo = {
   dvic: {
     title: "DVIC Inspections",
     desc: "Vehicle inspections flagged as rushed (under 2 minutes).",
-    calc: "Count of rushed inspections. Target: 0",
+    calc: "Count of rushed inspections. Target: 90",
     tips: ["Take full time", "Check all items", "Report issues immediately"]
   }
 }

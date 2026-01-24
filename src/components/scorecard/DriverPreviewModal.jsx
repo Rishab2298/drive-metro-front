@@ -1,20 +1,18 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+// Driver Preview Modal Component - DiveMetric Design with Tabs
+import { useState } from 'react';
 import {
-  Loader2,
+  X,
   Shield,
   Package,
   MessageCircle,
   Wrench,
   Trophy,
-  ChevronDown,
   Info,
-  X,
-  ArrowLeft,
+  ChevronDown,
   StickyNote,
-  AlertTriangle,
   Sparkles,
   Lightbulb,
+  AlertTriangle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -28,11 +26,10 @@ import {
   getDvicTimeSeverity,
   formatValue,
   formatLabel,
+  getDriverName,
 } from '@/utils/scorecardUtils';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
-
-// Metric Detail Modal - Matches DriverPreviewModal style
+// Metric Detail Modal
 const MetricDetailModal = ({ data, onClose }) => {
   const getExplanation = (key) => {
     const keyLower = key.toLowerCase();
@@ -134,7 +131,7 @@ const MetricDetailModal = ({ data, onClose }) => {
   );
 };
 
-// Feedback Detail Modal - For viewing detailed feedback items
+// Feedback Detail Modal
 const FeedbackDetailModal = ({ data, onClose }) => {
   if (!data) return null;
 
@@ -223,7 +220,7 @@ const FeedbackCategoryRow = ({ category, onClick }) => (
     className="flex justify-between items-center py-4 px-4 pl-7 bg-severe-gradient border-l-[5px] border-red-500 cursor-pointer transition-all shadow-[0_4px_20px_rgba(220,38,38,0.35)] relative"
   >
     {/* Animated pulse border */}
-    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500 animate-severe-pulse" />
+    <div className="absolute left-0 top-0 bottom-0 w-1.25 bg-red-500 animate-severe-pulse" />
 
     <div className="flex items-center gap-3 flex-1">
       <div className="w-7 h-7 rounded-lg bg-linear-to-br from-red-500 to-red-600 flex items-center justify-center shadow-[0_4px_12px_rgba(239,68,68,0.5)] animate-icon-pulse">
@@ -245,7 +242,7 @@ const FeedbackCategoryRow = ({ category, onClick }) => (
   </div>
 );
 
-// Metric Row Component - Matches DriverPreviewModal styling with severity highlights
+// Metric Row Component
 const MetricRow = ({ metricKey, value, label, indent, isTier, onOpenMetricModal }) => {
   const isDvicTime = metricKey?.toLowerCase().startsWith('dvictime');
 
@@ -279,7 +276,7 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, onOpenMetricModal 
     >
       {/* Animated pulse indicator for severe items */}
       {isSevere && showSevereHighlight && (
-        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500 animate-severe-pulse" />
+        <div className="absolute left-0 top-0 bottom-0 w-1.25 bg-red-500 animate-severe-pulse" />
       )}
 
       <div className="flex items-center gap-2.5 flex-1">
@@ -352,7 +349,7 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, onOpenMetricModal 
   );
 };
 
-// Sub-section header - Matches DriverPreviewModal style
+// Sub-section header
 const SubSectionHeader = ({ title }) => (
   <div className="py-3 px-4 bg-linear-to-r from-slate-50 to-white border-y border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
     <span className="w-0.75 h-3 rounded-sm bg-linear-to-b from-indigo-500 to-violet-500" />
@@ -360,7 +357,7 @@ const SubSectionHeader = ({ title }) => (
   </div>
 );
 
-// Section Component - Matches DriverPreviewModal with collapsible sections
+// Section Component with optional subsections
 const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSectionTitle, subMetrics, additionalSubSections, expandedSections, toggleSection, onOpenMetricModal }) => {
   const isOpen = expandedSections[id];
   const sev = defaultSev || 'great';
@@ -437,116 +434,41 @@ const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSe
   );
 };
 
-const ScorecardView = () => {
-  const { id } = useParams();
-  const [scorecard, setScorecard] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+// Main Driver Preview Modal
+export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, scorecardInfo }) => {
+  const [view, setView] = useState('current');
   const [metricModal, setMetricModal] = useState(null);
   const [feedbackModal, setFeedbackModal] = useState(null);
-  const [view, setView] = useState('current');
   const [expandedSections, setExpandedSections] = useState({
     safety: true, delivery: true, customer: true, dvic: true, standing: true
   });
 
-  useEffect(() => {
-    const fetchScorecard = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/scorecard/${id}`);
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Scorecard not found');
-          }
-          throw new Error('Failed to load scorecard');
-        }
-        const data = await response.json();
-        setScorecard(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const historicalData = parseHistoricalData(driver);
+  const hasHistoricalData = historicalData.length > 0;
 
-    fetchScorecard();
-  }, [id]);
+  const categories = categorizeMetrics(driver, view === 'trailing', historicalData);
 
-  const historicalData = useMemo(() => {
-    if (!scorecard?.metrics) return null;
-    return parseHistoricalData(scorecard.metrics);
-  }, [scorecard]);
+  const standing = driver.overallStanding || driver.tier || 'N/A';
 
-  const hasHistoricalData = historicalData && historicalData.length > 0;
+  const rank = rankData?.rank || null;
+  const score = rankData?.score || null;
+  const packages = parseInt(driver.packagesDelivered) || 0;
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
-          <p className="text-sm text-slate-500">Loading scorecard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4 text-center max-w-md px-4">
-          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-            <AlertTriangle size={32} className="text-red-500" />
-          </div>
-          <h2 className="text-xl font-semibold text-slate-800">{error}</h2>
-          <p className="text-sm text-slate-500">
-            This scorecard link may have expired or is invalid.
-          </p>
-          <Link
-            to="/"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-800 text-white hover:bg-slate-900 transition-colors"
-          >
-            <ArrowLeft size={16} />
-            Go Home
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const { driver, dsp, metrics } = scorecard;
-  const standing = metrics?.overallStanding || metrics?.tier || 'N/A';
-  const packages = parseInt(metrics?.packagesDelivered) || 0;
-  const rank = scorecard.rank;
-  const score = scorecard.score;
-  const rankedCount = scorecard.rankedCount;
-  const categories = categorizeMetrics(metrics || {}, view === 'trailing', historicalData);
-
-  // Build scorecard info for header badges
-  const scorecardInfo = {
-    dspId: dsp?.dspCode,
-    stationCode: dsp?.stationCode,
-    weekNumber: scorecard?.weekNumber,
-    year: scorecard?.year
-  };
-
   return (
-    <div className="min-h-screen bg-slate-50 sm:py-6">
-      {/* Card Container - Centered with max width */}
-      <div className="max-w-md mx-auto sm:rounded-2xl sm:shadow-xl sm:border sm:border-slate-200 sm:overflow-hidden bg-white">
-        {/* Header with gradient accent - Matches DriverPreviewModal */}
-        <div
-          className="px-4 pt-5 pb-2  bg-white relative"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+
+      <div className="relative w-full max-w-md max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden bg-slate-50">
+        {/* Header with gradient accent */}
+        <div className="px-4 pt-5 pb-0 bg-white border-b-[3px] border-transparent bg-clip-padding"
+          style={{
+            borderImage: 'linear-gradient(135deg, #6366F1, #8B5CF6, #EC4899) 1'
+          }}
         >
-          {/* Gradient accent border - only spans card width */}
-          <div
-            className="absolute bottom-0 left-0 right-0 h-0.75"
-            style={{
-              background: 'linear-gradient(135deg, #6366F1, #8B5CF6, #EC4899)'
-            }}
-          />
           <div className="flex justify-between items-center mb-3">
             <div>
               <div className="text-xl font-extrabold text-gradient-brand tracking-tight">
@@ -572,19 +494,18 @@ const ScorecardView = () => {
                 </div>
               )}
             </div>
-            <Link
-              to="/"
+            <button
+              onClick={onClose}
               className="w-8 h-8 rounded-lg bg-linear-to-br from-slate-100 to-slate-200 flex items-center justify-center shadow-sm hover:from-red-500 hover:to-red-600 group transition-all"
             >
               <X size={16} className="text-slate-400 group-hover:text-white transition-colors" />
-            </Link>
+            </button>
           </div>
 
           {/* Profile Card - Dark Gradient Hero Section */}
           <div className="bg-profile-gradient rounded-2xl p-5 mb-3.5 shadow-[0_8px_32px_rgba(30,27,75,0.4)] relative overflow-hidden">
             {/* Subtle pattern overlay */}
-            <div
-              className="absolute inset-0 pointer-events-none"
+            <div className="absolute inset-0 pointer-events-none"
               style={{
                 backgroundImage: 'radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)'
               }}
@@ -593,15 +514,15 @@ const ScorecardView = () => {
             <div className="relative z-10">
               <div className="flex items-center gap-3.5 mb-4">
                 <div className="w-14 h-14 rounded-[14px] bg-linear-to-br from-white/95 to-slate-100/90 flex items-center justify-center text-lg font-extrabold text-indigo-700 shadow-[0_4px_20px_rgba(0,0,0,0.3)] border-2 border-white/30">
-                  {driver?.firstName?.[0] || '?'}
-                  {driver?.lastName?.[0] || ''}
+                  {driver.firstName?.[0] || driver.name?.[0] || '?'}
+                  {driver.lastName?.[0] || ''}
                 </div>
                 <div className="flex-1">
                   <div className="text-lg font-bold text-white tracking-tight drop-shadow-sm">
-                    {driver?.firstName} {driver?.lastName}
+                    {getDriverName(driver)}
                   </div>
                   <div className="text-xs text-indigo-200/90 mt-0.5 font-medium">
-                    {driver?.employeeId || 'No ID'}
+                    {driver.transporterId || 'No ID'}
                   </div>
                 </div>
                 <div className="py-1.5 px-3.5 bg-white/15 backdrop-blur-md rounded-full text-xs font-bold text-white border border-white/20 shadow-md">
@@ -651,7 +572,7 @@ const ScorecardView = () => {
           </div>
 
           {/* View Tabs */}
-          <div className="flex bg-slate-100 rounded-xl p-1 mb-4 border border-black/5 ">
+          <div className="flex bg-slate-100 rounded-xl p-1 mb-4 border border-black/5">
             {[
               { id: 'current', l: 'Current Week', icon: '📊' },
               { id: 'trailing', l: '6-Week Trailing', icon: '📈' }
@@ -676,198 +597,198 @@ const ScorecardView = () => {
         </div>
 
         {/* Scrollable Content */}
-        <div className="p-4 bg-slate-50 sm:bg-white">
-        {/* Note from DSP */}
-        {scorecard.dspNote && (
-          <div className="mb-3.5 p-4 bg-linear-to-br from-indigo-50 to-violet-100 rounded-[14px] border border-indigo-200/50 shadow-md">
-            <div className="flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-lg bg-linear-to-br from-indigo-500 to-violet-600 flex items-center justify-center shrink-0 shadow-lg">
-                <StickyNote size={16} className="text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-bold text-indigo-700 uppercase tracking-wide mb-1.5">
-                  Note from your DSP
+        <div className="p-4  max-h-[calc(90vh-380px)] overflow-y-auto">
+          {/* Note from DSP */}
+          {driver.dspNote && (
+            <div className="mb-3.5 p-4 bg-linear-to-br from-indigo-50 to-violet-100 rounded-[14px] border border-indigo-200/50 shadow-md">
+              <div className="flex items-start gap-3.5">
+                <div className="w-9 h-9 rounded-lg bg-linear-to-br from-indigo-500 to-violet-600 flex items-center justify-center shrink-0 shadow-lg">
+                  <StickyNote size={16} className="text-white" />
                 </div>
-                <div className="text-[13px] text-slate-700 leading-relaxed">
-                  {scorecard.dspNote}
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold text-indigo-700 uppercase tracking-wide mb-1.5">
+                    Note from your DSP
+                  </div>
+                  <div className="text-[13px] text-slate-700 leading-relaxed">
+                    {driver.dspNote}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Trailing View Notice */}
-        {view === 'trailing' && hasHistoricalData && (
-          <div className="mb-3.5 p-3.5 bg-linear-to-br from-indigo-50 to-violet-100 rounded-xl flex items-center gap-3.5 border border-indigo-200/50 shadow-md">
-            <div className="w-9 h-9 rounded-lg bg-linear-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg">
-              <span className="text-base">📊</span>
-            </div>
-            <div>
-              <div className="text-[13px] font-bold text-indigo-800">
-                6-Week Trailing Averages
+          {/* Trailing View Notice */}
+          {view === 'trailing' && hasHistoricalData && (
+            <div className="mb-3.5 p-3.5 bg-linear-to-br from-indigo-50 to-violet-100 rounded-xl flex items-center gap-3.5 border border-indigo-200/50 shadow-md">
+              <div className="w-9 h-9 rounded-lg bg-linear-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg">
+                <span className="text-base">📊</span>
               </div>
-              <div className="text-[11px] text-indigo-600 mt-0.5">
-                Showing averaged metrics from the past 6 weeks
+              <div>
+                <div className="text-[13px] font-bold text-indigo-800">
+                  6-Week Trailing Averages
+                </div>
+                <div className="text-[11px] text-indigo-600 mt-0.5">
+                  Showing averaged metrics from the past 6 weeks
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Safety Section */}
-        <Section
-          id="safety"
-          title="Driving Safety"
-          icon={Shield}
-          metrics={categories.safety}
-          defaultSev="fantastic"
-          subSection={!categories.isTrailing && categories.ppsBreakdown?.length > 0}
-          subSectionTitle="PPS Non-Compliance Breakdown"
-          subMetrics={categories.ppsBreakdown}
-          additionalSubSections={!categories.isTrailing && categories.safetyEvents?.length > 0
-            ? [{ title: 'Events (Per 100 Deliveries)', metrics: categories.safetyEvents }]
-            : undefined
-          }
-          expandedSections={expandedSections}
-          toggleSection={toggleSection}
-          onOpenMetricModal={setMetricModal}
-        />
+          {/* Safety Section */}
+          <Section
+            id="safety"
+            title="Driving Safety"
+            icon={Shield}
+            metrics={categories.safety}
+            defaultSev="fantastic"
+            subSection={!categories.isTrailing && categories.ppsBreakdown?.length > 0}
+            subSectionTitle="PPS Non-Compliance Breakdown"
+            subMetrics={categories.ppsBreakdown}
+            additionalSubSections={!categories.isTrailing && categories.safetyEvents?.length > 0
+              ? [{ title: 'Events (Per 100 Deliveries)', metrics: categories.safetyEvents }]
+              : undefined
+            }
+            expandedSections={expandedSections}
+            toggleSection={toggleSection}
+            onOpenMetricModal={setMetricModal}
+          />
 
-        {/* Delivery Section */}
-        <Section
-          id="delivery"
-          title="Delivery Quality"
-          icon={Package}
-          metrics={categories.delivery}
-          defaultSev="great"
-          subSection={!categories.isTrailing && categories.podBreakdown?.length > 0}
-          subSectionTitle="Photo-On-Delivery Rejects"
-          subMetrics={categories.podBreakdown}
-          expandedSections={expandedSections}
-          toggleSection={toggleSection}
-          onOpenMetricModal={setMetricModal}
-        />
+          {/* Delivery Section */}
+          <Section
+            id="delivery"
+            title="Delivery Quality"
+            icon={Package}
+            metrics={categories.delivery}
+            defaultSev="great"
+            subSection={!categories.isTrailing && categories.podBreakdown?.length > 0}
+            subSectionTitle="Photo-On-Delivery Rejects"
+            subMetrics={categories.podBreakdown}
+            expandedSections={expandedSections}
+            toggleSection={toggleSection}
+            onOpenMetricModal={setMetricModal}
+          />
 
-        {/* Customer Feedback Section */}
-        {(categories.customer?.length > 0 || categories.customerFeedbackBreakdown?.length > 0) && (
-          <div className="mb-3.5">
-            <button
-              onClick={() => toggleSection('customer')}
-              className={cn(
-                "w-full flex items-center justify-between p-3.5 border cursor-pointer transition-all bg-linear-to-br from-orange-50 to-orange-100/80 border-orange-200/50 shadow-md",
-                expandedSections.customer ? "rounded-t-[14px]" : "rounded-[14px]"
+          {/* Customer Feedback Section */}
+          {(categories.customer?.length > 0 || categories.customerFeedbackBreakdown?.length > 0) && (
+            <div className="mb-3.5">
+              <button
+                onClick={() => toggleSection('customer')}
+                className={cn(
+                  "w-full flex items-center justify-between p-3.5 border cursor-pointer transition-all bg-linear-to-br from-orange-50 to-orange-100/80 border-orange-200/50 shadow-md",
+                  expandedSections.customer ? "rounded-t-[14px]" : "rounded-[14px]"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-linear-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-md">
+                    <MessageCircle size={16} className="text-white" />
+                  </div>
+                  <span className="text-sm font-bold text-orange-700">Customer Feedback</span>
+                  <span className="text-[10px] font-bold text-white py-0.5 px-2 rounded-lg bg-orange-500">
+                    {(categories.customer?.length || 0) + (categories.customerFeedbackBreakdown?.length || 0)}
+                  </span>
+                </div>
+                <ChevronDown
+                  size={16}
+                  className={cn("text-orange-600 transition-transform duration-300", expandedSections.customer && "rotate-180")}
+                />
+              </button>
+              {expandedSections.customer && (
+                <div className="bg-white rounded-b-[14px] border border-slate-200 border-t-0 overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+                  {categories.customer?.map(({ key, value, label, type }) => (
+                    <MetricRow key={key} metricKey={key} value={value} label={label} isTier={type === 'tier'} onOpenMetricModal={setMetricModal} />
+                  ))}
+                  {!categories.isTrailing && categories.customerFeedbackBreakdown?.length > 0 && (
+                    <>
+                      <SubSectionHeader title="Negative Feedback Breakdown" />
+                      {categories.customerFeedbackBreakdown.map((category) => (
+                        <FeedbackCategoryRow
+                          key={category.key}
+                          category={category}
+                          onClick={() => setFeedbackModal(category)}
+                        />
+                      ))}
+                    </>
+                  )}
+                </div>
               )}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-linear-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-md">
-                  <MessageCircle size={16} className="text-white" />
+            </div>
+          )}
+
+          {/* DVIC Section */}
+          {!categories.isTrailing && (categories.dvic?.length > 0 || categories.dvicTimes?.length > 0) && (
+            <Section
+              id="dvic"
+              title="Vehicle Inspection Times (DVIC)"
+              icon={Wrench}
+              metrics={categories.dvic}
+              defaultSev="great"
+              subSection={categories.dvicTimes?.length > 0}
+              subSectionTitle="Inspection Times"
+              subMetrics={categories.dvicTimes}
+              expandedSections={expandedSections}
+              toggleSection={toggleSection}
+              onOpenMetricModal={setMetricModal}
+            />
+          )}
+
+          {/* Standing Section - Trailing View Only */}
+          {categories.isTrailing && categories.standing?.length > 0 && (
+            <Section
+              id="standing"
+              title="Overall Standing"
+              icon={Trophy}
+              metrics={categories.standing}
+              defaultSev="fantastic"
+              expandedSections={expandedSections}
+              toggleSection={toggleSection}
+              onOpenMetricModal={setMetricModal}
+            />
+          )}
+
+          {/* AI Feedback Section */}
+          {driver.aiFeedback && Array.isArray(driver.aiFeedback) && driver.aiFeedback.length > 0 && (
+            <div className="mb-3.5">
+              <div className="flex items-center gap-3 p-3.5 bg-linear-to-r from-violet-500 via-indigo-500 to-pink-500 rounded-t-[14px] shadow-lg">
+                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                  <Lightbulb size={16} className="text-white" />
                 </div>
-                <span className="text-sm font-bold text-orange-700">Customer Feedback</span>
-                <span className="text-[10px] font-bold text-white py-0.5 px-2 rounded-lg bg-orange-500">
-                  {(categories.customer?.length || 0) + (categories.customerFeedbackBreakdown?.length || 0)}
+                <span className="text-sm font-bold text-white">
+                  AI Feedback to Improve
                 </span>
+                <Sparkles size={14} className="text-white/80" />
               </div>
-              <ChevronDown
-                size={16}
-                className={cn("text-orange-600 transition-transform duration-300", expandedSections.customer && "rotate-180")}
-              />
-            </button>
-            {expandedSections.customer && (
-              <div className="bg-white rounded-b-[14px] border border-slate-200 border-t-0 overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
-                {categories.customer?.map(({ key, value, label, type }) => (
-                  <MetricRow key={key} metricKey={key} value={value} label={label} isTier={type === 'tier'} onOpenMetricModal={setMetricModal} />
-                ))}
-                {!categories.isTrailing && categories.customerFeedbackBreakdown?.length > 0 && (
-                  <>
-                    <SubSectionHeader title="Negative Feedback Breakdown" />
-                    {categories.customerFeedbackBreakdown.map((category) => (
-                      <FeedbackCategoryRow
-                        key={category.key}
-                        category={category}
-                        onClick={() => setFeedbackModal(category)}
-                      />
-                    ))}
-                  </>
+              <div className="bg-linear-to-b from-white to-violet-50 rounded-b-[14px] border border-slate-200 border-t-0 p-4 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+                <ul className="m-0 p-0 list-none">
+                  {driver.aiFeedback.map((feedback, index) => (
+                    <li key={index} className="text-[13px] text-slate-700 leading-relaxed mb-3 last:mb-0 flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-md shrink-0 bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-[10px] font-bold text-white shadow-md">
+                        {index + 1}
+                      </span>
+                      {feedback}
+                    </li>
+                  ))}
+                </ul>
+                {driver.aiFeedbackUpdatedAt && (
+                  <div className="mt-3.5 pt-3.5 border-t border-slate-200 text-[10px] text-slate-500 flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-violet-500" />
+                    <span className="font-semibold">Generated {new Date(driver.aiFeedbackUpdatedAt).toLocaleDateString()}</span>
+                  </div>
                 )}
               </div>
-            )}
-          </div>
-        )}
-
-        {/* DVIC Section */}
-        {!categories.isTrailing && (categories.dvic?.length > 0 || categories.dvicTimes?.length > 0) && (
-          <Section
-            id="dvic"
-            title="Vehicle Inspection Times (DVIC)"
-            icon={Wrench}
-            metrics={categories.dvic}
-            defaultSev="great"
-            subSection={categories.dvicTimes?.length > 0}
-            subSectionTitle="Inspection Times"
-            subMetrics={categories.dvicTimes}
-            expandedSections={expandedSections}
-            toggleSection={toggleSection}
-            onOpenMetricModal={setMetricModal}
-          />
-        )}
-
-        {/* Standing Section - Trailing View Only */}
-        {categories.isTrailing && categories.standing?.length > 0 && (
-          <Section
-            id="standing"
-            title="Overall Standing"
-            icon={Trophy}
-            metrics={categories.standing}
-            defaultSev="fantastic"
-            expandedSections={expandedSections}
-            toggleSection={toggleSection}
-            onOpenMetricModal={setMetricModal}
-          />
-        )}
-
-        {/* AI Feedback Section */}
-        {scorecard.aiFeedback && Array.isArray(scorecard.aiFeedback) && scorecard.aiFeedback.length > 0 && (
-          <div className="mb-3.5">
-            <div className="flex items-center gap-3 p-3.5 bg-linear-to-r from-violet-500 via-indigo-500 to-pink-500 rounded-t-[14px] shadow-lg">
-              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                <Lightbulb size={16} className="text-white" />
-              </div>
-              <span className="text-sm font-bold text-white">
-                AI Feedback to Improve
-              </span>
-              <Sparkles size={14} className="text-white/80" />
             </div>
-            <div className="bg-linear-to-b from-white to-violet-50 rounded-b-[14px] border border-slate-200 border-t-0 p-4 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
-              <ul className="m-0 p-0 list-none">
-                {scorecard.aiFeedback.map((feedback, index) => (
-                  <li key={index} className="text-[13px] text-slate-700 leading-relaxed mb-3 last:mb-0 flex items-start gap-3">
-                    <span className="w-5 h-5 rounded-md shrink-0 bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-[10px] font-bold text-white shadow-md">
-                      {index + 1}
-                    </span>
-                    {feedback}
-                  </li>
-                ))}
-              </ul>
-              {scorecard.aiFeedbackUpdatedAt && (
-                <div className="mt-3.5 pt-3.5 border-t border-slate-200 text-[10px] text-slate-500 flex items-center gap-1.5">
-                  <Sparkles size={12} className="text-violet-500" />
-                  <span className="font-semibold">Generated {new Date(scorecard.aiFeedbackUpdatedAt).toLocaleDateString()}</span>
-                </div>
-              )}
+          )}
+
+          {/* Footer */}
+          <div className="text-center pt-6 pb-3">
+            <div className="text-[10px] text-slate-400 font-medium flex items-center justify-center gap-2">
+              <span className="w-1 h-1 rounded-full bg-linear-to-r from-indigo-500 to-violet-500" />
+              Tap any metric for details
+              <span className="w-1 h-1 rounded-full bg-linear-to-r from-indigo-500 to-violet-500" />
+            </div>
+            <div className="text-[11px] mt-1.5 text-gradient-brand font-bold tracking-wide">
+              DiveMetric Analytics
             </div>
           </div>
-        )}
-
-        {/* Footer */}
-        <div className="text-center pt-6 pb-6">
-          <div className="text-[10px] text-slate-400 font-medium flex items-center justify-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-linear-to-r from-indigo-500 to-violet-500" />
-            Tap any metric for details
-            <span className="w-1 h-1 rounded-full bg-linear-to-r from-indigo-500 to-violet-500" />
-          </div>
-          <div className="text-[11px] mt-1.5 text-gradient-brand font-bold tracking-wide">
-            Powered by DiveMetric Analytics
-          </div>
-        </div>
         </div>
       </div>
 
@@ -890,4 +811,4 @@ const ScorecardView = () => {
   );
 };
 
-export default ScorecardView;
+export default DriverPreviewModal;
