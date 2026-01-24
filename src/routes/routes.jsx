@@ -3,7 +3,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import PublicRoute from "../components/PublicRoute";
 import ClientAppLayout from "../components/layouts/ClientAppLayout";
 
-import LandingPage from "../pages/public/landingPage";
+import LandingPage from "../pages/public/LandingPage";
 import SignIn from "../pages/public/signIn";
 import SignUp from "../pages/public/signUp";
 import ScorecardSamplesDemo from "../pages/public/ScorecardSamplesDemo";
