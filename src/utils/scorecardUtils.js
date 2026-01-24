@@ -719,9 +719,20 @@ export const categorizeMetrics = (driver, useHistorical = false, historicalData 
     if (typeof metricDef === 'string') {
       const value = getValue(metricDef);
       if (value !== null && value !== undefined && value !== '') {
+        // Skip FICO score if value is 0
+        if (metricDef.toLowerCase() === 'ficoscore' && (value === 0 || value === '0')) {
+          return;
+        }
         arr.push({ key: metricDef, value, label: METRIC_DISPLAY_NAMES[metricDef] || metricDef });
       }
     } else {
+      // Skip FICO score if value is 0
+      if (metricDef.key === 'ficoScore') {
+        const rawValue = getValue(metricDef.key, metricDef.fallback);
+        if (rawValue === 0 || rawValue === '0' || parseFloat(rawValue) === 0) {
+          return;
+        }
+      }
       const formattedValue = formatMetricValue(metricDef, dataSource);
       if (formattedValue !== null) {
         arr.push({

@@ -28,7 +28,7 @@ const wrapRoute = (Component, Wrapper, Layout) => {
 };
 
 const routeConfig = [
-  { path: "/", component: LandingPage, wrapper: PublicRoute },
+  { path: "/", component: SignIn, wrapper: PublicRoute },
   { path: "/sign-in", component: SignIn, wrapper: PublicRoute },
   { path: "/sign-up", component: SignUp, wrapper: PublicRoute },
   { path: "/scorecard-samples", component: ScorecardSamplesDemo },

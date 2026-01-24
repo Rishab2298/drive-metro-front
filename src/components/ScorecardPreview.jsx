@@ -77,14 +77,16 @@ export default function ScorecardPreview({ driver, isOpen, onClose }) {
               <Separator />
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    FICO Score
-                  </p>
-                  <p className="text-xl font-semibold">
-                    {metrics.ficoScore || 0}
-                  </p>
-                </div>
+                {metrics.ficoScore && parseFloat(metrics.ficoScore) !== 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      FICO Score
+                    </p>
+                    <p className="text-xl font-semibold">
+                      {metrics.ficoScore}
+                    </p>
+                  </div>
+                )}
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
                     Delivery Success Behaviors

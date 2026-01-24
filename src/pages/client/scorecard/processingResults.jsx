@@ -1783,7 +1783,9 @@ const ProcessingResults = () => {
                 <div className="flex items-center gap-3">
                   <div className="text-right hidden sm:block">
                     <p className="text-sm font-medium">{packages || '-'} pkgs</p>
-                    <p className="text-xs text-muted-foreground">FICO: {driver.ficoScore || '-'}</p>
+                    {driver.ficoScore && parseFloat(driver.ficoScore) !== 0 && (
+                      <p className="text-xs text-muted-foreground">FICO: {driver.ficoScore}</p>
+                    )}
                   </div>
                   <button
                     onClick={() => setPreviewDriver(driver)}
