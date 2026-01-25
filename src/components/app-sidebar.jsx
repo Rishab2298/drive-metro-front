@@ -4,18 +4,12 @@ import {
   LayoutDashboard,
   FileText,
   Users,
-  MessageSquare,
   Settings,
   CreditCard,
-  HelpCircle,
-  Mail,
-  Rocket,
-  UserPlus,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
-import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -127,18 +121,7 @@ const data = {
       ],
     },
   ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: HelpCircle,
-    },
-    {
-      title: "Contact Us",
-      url: "#",
-      icon: Mail,
-    },
-  ],
+  navSecondary: [],
   quickLinks: [
     
     {
@@ -186,7 +169,6 @@ export function AppSidebar({
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavProjects projects={data.quickLinks} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={userData} />
