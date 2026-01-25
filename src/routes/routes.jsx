@@ -29,7 +29,7 @@ const wrapRoute = (Component, Wrapper, Layout) => {
 };
 
 const routeConfig = [
-  { path: "/", component:  HomePage, wrapper: PublicRoute },
+  { path: "/", component:  HomePage , wrapper: PublicRoute },
   { path: "/home", component: HomePage, wrapper: PublicRoute },
   { path: "/sign-in", component: SignIn, wrapper: PublicRoute },
   { path: "/sign-up", component: SignUp, wrapper: PublicRoute },
