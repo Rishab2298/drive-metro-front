@@ -58,11 +58,11 @@ const AnimatedGrid = () => {
       {/* Animated scanning line */}
       <div className="absolute inset-0 overflow-hidden">
         <div
-          className="absolute h-px w-full bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent animate-grid-scan"
+          className="absolute h-px w-full bg-linear-to-r from-transparent via-indigo-500/50 to-transparent animate-grid-scan"
           style={{ top: '20%' }}
         />
         <div
-          className="absolute h-px w-full bg-gradient-to-r from-transparent via-violet-500/40 to-transparent animate-grid-scan-delayed"
+          className="absolute h-px w-full bg-linear-to-r from-transparent via-violet-500/40 to-transparent animate-grid-scan-delayed"
           style={{ top: '60%' }}
         />
       </div>
@@ -112,17 +112,17 @@ const CosmicBackground = ({ variant = 'hero', showGrid = true, showParticles = t
   return (
     <div className="absolute inset-0 overflow-hidden">
       {/* Base deep gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0F0A1F] via-[#1E1B4B] to-[#312E81]" />
+      <div className="absolute inset-0 bg-linear-to-br from-[#0F0A1F] via-[#1E1B4B] to-[#312E81]" />
 
       {/* Animated gradient orbs */}
-      <div className="absolute -top-1/4 -left-1/4 w-[1000px] h-[1000px] rounded-full bg-gradient-to-br from-indigo-600/40 to-violet-600/20 blur-[150px] animate-mesh-1" />
-      <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-violet-600/35 to-fuchsia-600/15 blur-[120px] animate-mesh-2" />
-      <div className="absolute -bottom-1/4 left-1/4 w-[900px] h-[900px] rounded-full bg-gradient-to-br from-blue-600/30 to-cyan-500/10 blur-[130px] animate-mesh-3" />
-      <div className="absolute bottom-1/3 right-1/3 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-pink-500/25 to-rose-500/10 blur-[100px] animate-pulse-glow" />
+      <div className="absolute -top-1/4 -left-1/4 w-[1000px] h-[1000px] rounded-full bg-linear-to-br from-indigo-600/40 to-violet-600/20 blur-[150px] animate-mesh-1" />
+      <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] rounded-full bg-linear-to-br from-violet-600/35 to-fuchsia-600/15 blur-[120px] animate-mesh-2" />
+      <div className="absolute -bottom-1/4 left-1/4 w-[900px] h-[900px] rounded-full bg-linear-to-br from-blue-600/30 to-cyan-500/10 blur-[130px] animate-mesh-3" />
+      <div className="absolute bottom-1/3 right-1/3 w-[600px] h-[600px] rounded-full bg-linear-to-br from-pink-500/25 to-rose-500/10 blur-[100px] animate-pulse-glow" />
 
       {variant === 'hero' && (
         <>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-indigo-500/20 to-violet-500/10 blur-[80px] animate-mesh-4" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-linear-to-br from-indigo-500/20 to-violet-500/10 blur-[80px] animate-mesh-4" />
         </>
       )}
 
@@ -130,7 +130,7 @@ const CosmicBackground = ({ variant = 'hero', showGrid = true, showParticles = t
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.2)_0%,transparent_60%)]" />
 
       {/* Top edge glow */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-indigo-500/50 to-transparent" />
 
       {/* Noise texture overlay */}
       <div
@@ -165,10 +165,10 @@ const GlassCard = ({ children, className = '', hover = true, glow = false, gradi
   >
     {/* Gradient border effect */}
     {gradient && (
-      <div className="absolute inset-0 rounded-2xl p-px bg-gradient-to-br from-indigo-500/50 via-violet-500/30 to-pink-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+      <div className="absolute inset-0 rounded-2xl p-px bg-linear-to-br from-indigo-500/50 via-violet-500/30 to-pink-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
     )}
     {/* Inner shine */}
-    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-transparent pointer-events-none" />
+    <div className="absolute inset-0 bg-linear-to-br from-white/[0.08] via-transparent to-transparent pointer-events-none" />
     {children}
   </div>
 );
@@ -181,13 +181,13 @@ const GradientBorderCard = ({ children, className = '', animated = true }) => (
     {/* Animated gradient border */}
     {animated && (
       <>
-        <div className="absolute -inset-[2px] bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 rounded-2xl opacity-0 group-hover:opacity-100 blur-md transition-all duration-500 animate-gradient-xy" />
-        <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 rounded-2xl opacity-40 group-hover:opacity-70 transition-opacity duration-500 animate-gradient-xy" />
+        <div className="absolute -inset-[2px] bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500 rounded-2xl opacity-0 group-hover:opacity-100 blur-md transition-all duration-500 animate-gradient-xy" />
+        <div className="absolute -inset-[1px] bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500 rounded-2xl opacity-40 group-hover:opacity-70 transition-opacity duration-500 animate-gradient-xy" />
       </>
     )}
 
     {/* Card content */}
-    <div className="relative bg-gradient-to-br from-[#1E1B4B]/90 to-[#312E81]/90 rounded-2xl border border-white/10 overflow-hidden backdrop-blur-sm">
+    <div className="relative bg-linear-to-br from-[#1E1B4B]/90 to-[#312E81]/90 rounded-2xl border border-white/10 overflow-hidden backdrop-blur-sm">
       {children}
     </div>
   </div>
@@ -273,12 +273,12 @@ const Header = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-xl blur-lg opacity-60 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110" />
-                <div className="relative bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
+                <div className="absolute inset-0 bg-linear-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-xl blur-lg opacity-60 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110" />
+                <div className="relative bg-linear-to-br from-indigo-500 via-violet-500 to-pink-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
                   <TrendingUp className="w-5 h-5 text-white" />
                 </div>
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-white via-indigo-200 to-white bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-linear-to-r from-white via-indigo-200 to-white bg-clip-text text-transparent">
                 DiveMetric
               </span>
             </Link>
@@ -292,8 +292,8 @@ const Header = () => {
                   className="relative px-4 py-2 text-sm font-medium text-indigo-200/70 hover:text-white transition-colors duration-300 group"
                 >
                   <span className="relative z-10">{link.name}</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-violet-500/10 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300" />
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-500 group-hover:w-full transition-all duration-300" />
+                  <div className="absolute inset-0 bg-linear-to-r from-indigo-500/10 to-violet-500/10 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300" />
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-linear-to-r from-indigo-500 to-violet-500 group-hover:w-full transition-all duration-300" />
                 </a>
               ))}
             </nav>
@@ -307,8 +307,8 @@ const Header = () => {
               </Link>
               <Link to="/sign-up">
                 <button className="group relative px-6 py-2.5 rounded-xl font-semibold text-white text-sm overflow-hidden shadow-lg shadow-indigo-500/25">
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 transition-all duration-300" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500 transition-all duration-300" />
+                  <div className="absolute inset-0 bg-linear-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_60%)]" />
                   <span className="relative flex items-center gap-2">
                     Get Started
@@ -351,7 +351,7 @@ const Header = () => {
               </button>
             </Link>
             <Link to="/sign-up" onClick={() => setIsMobileMenuOpen(false)}>
-              <button className="w-full py-3 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 shadow-lg shadow-indigo-500/25">
+              <button className="w-full py-3 text-sm font-semibold text-white rounded-xl bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500 shadow-lg shadow-indigo-500/25">
                 Get Started Free
               </button>
             </Link>
@@ -373,12 +373,12 @@ const HeroSection = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24">
         <div className="text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-500/10 to-violet-500/10 backdrop-blur-sm border border-indigo-500/20 mb-8 animate-fade-in-up shadow-lg shadow-indigo-500/10">
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-linear-to-r from-indigo-500/10 to-violet-500/10 backdrop-blur-sm border border-indigo-500/20 mb-8 animate-fade-in-up shadow-lg shadow-indigo-500/10">
             <div className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
             </div>
-            <span className="text-sm font-semibold bg-gradient-to-r from-indigo-200 to-violet-200 bg-clip-text text-transparent">
+            <span className="text-sm font-semibold bg-linear-to-r from-indigo-200 to-violet-200 bg-clip-text text-transparent">
               45-Day Free Trial — No Credit Card Required
             </span>
             <Sparkles className="w-4 h-4 text-amber-400" />
@@ -390,7 +390,7 @@ const HeroSection = () => {
               Elevate Driver
             </span>
             <span
-              className="block bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent animate-fade-in-up animate-gradient-x"
+              className="block bg-linear-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent animate-fade-in-up animate-gradient-x"
               style={{ animationDelay: '0.2s', backgroundSize: '200% 200%' }}
             >
               Performance
@@ -400,7 +400,7 @@ const HeroSection = () => {
           {/* Subheadline */}
           <p className="max-w-2xl mx-auto text-lg sm:text-xl text-indigo-200/80 mb-14 leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
             Transform raw delivery data into beautiful, actionable scorecards with{' '}
-            <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#A5B4FC] to-[#C4B5FD]">AI-powered insights</span>.
+            <span className="font-semibold text-transparent bg-clip-text bg-linear-to-r from-[#A5B4FC] to-[#C4B5FD]">AI-powered insights</span>.
             The smartest way to manage your DSP.
           </p>
 
@@ -408,8 +408,8 @@ const HeroSection = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-20 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             <Link to="/sign-up">
               <button className="group relative px-10 py-5 rounded-2xl font-bold text-white text-lg overflow-hidden shadow-2xl shadow-indigo-500/40 hover:shadow-indigo-500/60 transition-shadow duration-500">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 animate-gradient-x" style={{ backgroundSize: '200% 200%' }} />
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500 animate-gradient-x" style={{ backgroundSize: '200% 200%' }} />
+                <div className="absolute inset-0 bg-linear-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.3),transparent_60%)]" />
                 <span className="relative flex items-center gap-3">
                   <Sparkles className="w-5 h-5" />
@@ -420,7 +420,7 @@ const HeroSection = () => {
             </Link>
             <button className="group relative px-8 py-5 rounded-2xl font-semibold text-white text-lg overflow-hidden border border-white/20 hover:border-indigo-500/50 transition-all duration-500 hover:bg-white/5">
               <span className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:border-indigo-500/50 transition-all duration-300 shadow-lg">
+                <div className="w-12 h-12 rounded-xl bg-linear-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:border-indigo-500/50 transition-all duration-300 shadow-lg">
                   <Play className="w-5 h-5 text-white fill-white" />
                 </div>
                 Watch Demo
@@ -463,7 +463,7 @@ const HeroSection = () => {
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3">
           <span className="text-xs text-indigo-300/50 uppercase tracking-widest font-medium">Scroll to explore</span>
           <div className="w-6 h-10 rounded-full border-2 border-indigo-400/30 flex justify-center pt-2">
-            <div className="w-1.5 h-3 bg-gradient-to-b from-indigo-400 to-violet-500 rounded-full animate-bounce" />
+            <div className="w-1.5 h-3 bg-linear-to-b from-indigo-400 to-violet-500 rounded-full animate-bounce" />
           </div>
         </div>
       </div>
@@ -518,19 +518,19 @@ const FeaturesSection = () => {
       <CosmicBackground variant="section" showParticles={false} />
 
       {/* Section divider glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-20 bg-gradient-to-b from-indigo-500/10 to-transparent blur-2xl" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-linear-to-r from-transparent via-indigo-500/60 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-20 bg-linear-to-b from-indigo-500/10 to-transparent blur-2xl" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-500/10 to-violet-500/10 backdrop-blur-sm border border-indigo-500/20 mb-8 shadow-lg shadow-indigo-500/10">
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-linear-to-r from-indigo-500/10 to-violet-500/10 backdrop-blur-sm border border-indigo-500/20 mb-8 shadow-lg shadow-indigo-500/10">
             <Target className="w-4 h-4 text-indigo-400" />
             <span className="text-sm font-semibold text-indigo-300">Powerful Features</span>
           </div>
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-6 tracking-tight">
             Everything you need,<br />
-            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
               nothing you don&apos;t
             </span>
           </h2>
@@ -568,7 +568,7 @@ const FeaturesSection = () => {
                   <feature.icon className="w-7 h-7" style={{ color: feature.color }} />
                 </div>
 
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-indigo-200 transition-all duration-300">{feature.title}</h3>
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-linear-to-r group-hover:from-white group-hover:to-indigo-200 transition-all duration-300">{feature.title}</h3>
                 <p className="text-indigo-200/70 leading-relaxed flex-1">{feature.description}</p>
 
                 {/* Hover hint */}
@@ -602,13 +602,13 @@ const HowItWorksSection = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-violet-500/10 to-pink-500/10 backdrop-blur-sm border border-violet-500/20 mb-8 shadow-lg shadow-violet-500/10">
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-linear-to-r from-violet-500/10 to-pink-500/10 backdrop-blur-sm border border-violet-500/20 mb-8 shadow-lg shadow-violet-500/10">
             <Clock className="w-4 h-4 text-violet-400" />
             <span className="text-sm font-semibold text-violet-300">Simple Process</span>
           </div>
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-6 tracking-tight">
             From data to insight<br />
-            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
               in minutes
             </span>
           </h2>
@@ -618,8 +618,8 @@ const HowItWorksSection = () => {
         <div className="relative">
           {/* Connection Line */}
           <div className="hidden lg:block absolute top-1/2 left-0 right-0 -translate-y-1/2">
-            <div className="w-full h-1 bg-gradient-to-r from-[#6EE7B7]/30 via-[#FCD34D]/30 via-[#C4B5FD]/30 to-[#A5B4FC]/30 rounded-full" />
-            <div className="absolute inset-0 w-full h-1 bg-gradient-to-r from-[#6EE7B7] via-[#FCD34D] via-[#C4B5FD] to-[#A5B4FC] rounded-full opacity-50 blur-sm" />
+            <div className="w-full h-1 bg-linear-to-r from-[#6EE7B7]/30 via-[#FCD34D]/30 via-[#C4B5FD]/30 to-[#A5B4FC]/30 rounded-full" />
+            <div className="absolute inset-0 w-full h-1 bg-linear-to-r from-[#6EE7B7] via-[#FCD34D] via-[#C4B5FD] to-[#A5B4FC] rounded-full opacity-50 blur-sm" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -674,13 +674,13 @@ const MetricsShowcase = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Content */}
           <div>
-            <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-pink-500/10 to-rose-500/10 backdrop-blur-sm border border-pink-500/20 mb-8 shadow-lg shadow-pink-500/10">
+            <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-linear-to-r from-pink-500/10 to-rose-500/10 backdrop-blur-sm border border-pink-500/20 mb-8 shadow-lg shadow-pink-500/10">
               <BarChart3 className="w-4 h-4 text-pink-400" />
               <span className="text-sm font-semibold text-pink-300">Comprehensive Metrics</span>
             </div>
             <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 tracking-tight">
               Every metric that<br />
-              <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
                 matters, unified
               </span>
             </h2>
@@ -700,7 +700,7 @@ const MetricsShowcase = () => {
                   key={i}
                   className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-indigo-500/30 transition-all duration-300 group cursor-pointer"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/30">
+                  <div className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/30">
                     <item.icon className="w-5 h-5 text-white" />
                   </div>
                   <span className="text-indigo-100 font-medium">{item.text}</span>
@@ -714,7 +714,7 @@ const MetricsShowcase = () => {
             <div className="p-8">
               {/* Card Header */}
               <div className="flex items-center justify-between mb-8">
-                <span className="text-2xl font-black bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">DiveMetric</span>
+                <span className="text-2xl font-black bg-linear-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">DiveMetric</span>
                 <span className="px-4 py-1.5 bg-white/10 rounded-full text-xs font-semibold text-indigo-200 border border-white/10">
                   Week 24, 2024
                 </span>
@@ -737,14 +737,14 @@ const MetricsShowcase = () => {
 
                 <div className="relative z-10">
                   <div className="flex items-center gap-4 mb-5">
-                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-white/95 to-slate-100/90 flex items-center justify-center text-xl font-black text-indigo-700 shadow-xl border-2 border-white/30">
+                    <div className="w-16 h-16 rounded-xl bg-linear-to-br from-white/95 to-slate-100/90 flex items-center justify-center text-xl font-black text-indigo-700 shadow-xl border-2 border-white/30">
                       JD
                     </div>
                     <div className="flex-1">
                       <div className="text-xl font-bold text-white">John Driver</div>
                       <div className="text-sm text-indigo-200/70">ID: DRV-12345</div>
                     </div>
-                    <span className="px-4 py-2 bg-gradient-to-r from-emerald-500/20 to-emerald-400/20 backdrop-blur-md rounded-full text-sm font-bold text-emerald-300 border border-emerald-400/30 shadow-lg shadow-emerald-500/20">
+                    <span className="px-4 py-2 bg-linear-to-r from-emerald-500/20 to-emerald-400/20 backdrop-blur-md rounded-full text-sm font-bold text-emerald-300 border border-emerald-400/30 shadow-lg shadow-emerald-500/20">
                       Fantastic
                     </span>
                   </div>
@@ -835,13 +835,13 @@ const TestimonialsSection = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 backdrop-blur-sm border border-amber-500/20 mb-8 shadow-lg shadow-amber-500/10">
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-linear-to-r from-amber-500/10 to-orange-500/10 backdrop-blur-sm border border-amber-500/20 mb-8 shadow-lg shadow-amber-500/10">
             <Star className="w-4 h-4 text-amber-400" />
             <span className="text-sm font-semibold text-amber-300">Customer Stories</span>
           </div>
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-6 tracking-tight">
             Trusted by DSPs<br />
-            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
               everywhere
             </span>
           </h2>
@@ -866,7 +866,7 @@ const TestimonialsSection = () => {
               <p className="text-indigo-100 mb-8 leading-relaxed text-lg">&quot;{t.quote}&quot;</p>
 
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-500/30">
+                <div className="w-14 h-14 rounded-xl bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-500/30">
                   {t.author.split(' ').map(n => n[0]).join('')}
                 </div>
                 <div>
@@ -910,13 +910,13 @@ const PricingSection = () => {
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500/10 to-yellow-500/10 backdrop-blur-sm border border-amber-500/20 mb-8 shadow-lg shadow-amber-500/10">
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-linear-to-r from-amber-500/10 to-yellow-500/10 backdrop-blur-sm border border-amber-500/20 mb-8 shadow-lg shadow-amber-500/10">
             <Crown className="w-4 h-4 text-amber-400" />
             <span className="text-sm font-semibold text-amber-300">Simple Pricing</span>
           </div>
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-6 tracking-tight">
             One plan,<br />
-            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
               everything included
             </span>
           </h2>
@@ -929,7 +929,7 @@ const PricingSection = () => {
         <GradientBorderCard className="max-w-xl mx-auto">
           <div>
             {/* Header */}
-            <div className="relative bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 p-10 text-center overflow-hidden">
+            <div className="relative bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500 p-10 text-center overflow-hidden">
               {/* Shine effect */}
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.2),transparent_60%)]" />
 
@@ -951,7 +951,7 @@ const PricingSection = () => {
               {/* Premium Features */}
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                  <div className="w-8 h-8 rounded-lg bg-linear-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
                     <Crown className="w-4 h-4 text-white" />
                   </div>
                   <span className="font-bold text-white text-lg">Premium Features</span>
@@ -959,7 +959,7 @@ const PricingSection = () => {
                 <div className="space-y-3">
                   {premiumFeatures.map((feature, i) => (
                     <div key={i} className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors">
-                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shrink-0 shadow-md">
+                      <div className="w-6 h-6 rounded-full bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center shrink-0 shadow-md">
                         <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                       </div>
                       <span className="text-indigo-100 font-medium">{feature}</span>
@@ -974,7 +974,7 @@ const PricingSection = () => {
               {/* Free Features */}
               <div className="mb-10">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                  <div className="w-8 h-8 rounded-lg bg-linear-to-br from-emerald-400 to-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
                     <Infinity className="w-4 h-4 text-white" />
                   </div>
                   <span className="font-bold text-white text-lg">Always Free</span>
@@ -992,8 +992,8 @@ const PricingSection = () => {
               {/* CTA */}
               <Link to="/sign-up">
                 <button className="w-full group relative py-5 rounded-xl font-bold text-white text-lg overflow-hidden shadow-xl shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-shadow">
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 animate-gradient-x" style={{ backgroundSize: '200% 200%' }} />
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500 animate-gradient-x" style={{ backgroundSize: '200% 200%' }} />
+                  <div className="absolute inset-0 bg-linear-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_60%)]" />
                   <span className="relative flex items-center justify-center gap-3">
                     Start Your Free Trial
@@ -1048,13 +1048,13 @@ const FAQSection = () => {
 
       <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 backdrop-blur-sm border border-indigo-500/20 mb-8 shadow-lg shadow-indigo-500/10">
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-linear-to-r from-indigo-500/10 to-cyan-500/10 backdrop-blur-sm border border-indigo-500/20 mb-8 shadow-lg shadow-indigo-500/10">
             <MessageCircle className="w-4 h-4 text-indigo-400" />
             <span className="text-sm font-semibold text-indigo-300">FAQ</span>
           </div>
           <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 tracking-tight">
             Questions?<br />
-            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
               We&apos;ve got answers
             </span>
           </h2>
@@ -1068,7 +1068,7 @@ const FAQSection = () => {
                 className="w-full flex items-center justify-between p-6 text-left group"
               >
                 <span className="font-semibold text-white pr-4 text-lg group-hover:text-indigo-200 transition-colors">{faq.question}</span>
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 shadow-lg ${openIndex === i ? 'bg-gradient-to-r from-indigo-500 to-violet-500 rotate-180 shadow-indigo-500/30' : 'bg-white/10 group-hover:bg-white/15'}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 shadow-lg ${openIndex === i ? 'bg-linear-to-r from-indigo-500 to-violet-500 rotate-180 shadow-indigo-500/30' : 'bg-white/10 group-hover:bg-white/15'}`}>
                   <ChevronDown className="w-5 h-5 text-white" />
                 </div>
               </button>
@@ -1096,7 +1096,7 @@ const CTASection = () => {
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-8 tracking-tight">
           Ready to transform your<br />
-          <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
             driver performance?
           </span>
         </h2>
@@ -1106,8 +1106,8 @@ const CTASection = () => {
 
         <Link to="/sign-up">
           <button className="group relative px-12 py-6 rounded-2xl font-bold text-white text-xl overflow-hidden shadow-2xl shadow-indigo-500/40 hover:shadow-indigo-500/60 transition-shadow duration-500">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 animate-gradient-x" style={{ backgroundSize: '200% 200%' }} />
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500 animate-gradient-x" style={{ backgroundSize: '200% 200%' }} />
+            <div className="absolute inset-0 bg-linear-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.3),transparent_60%)]" />
             <span className="relative flex items-center gap-4">
               <Sparkles className="w-6 h-6" />
@@ -1171,12 +1171,12 @@ const Footer = () => {
           <div className="col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-6 group">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity" />
-                <div className="relative bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
+                <div className="absolute inset-0 bg-linear-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity" />
+                <div className="relative bg-linear-to-br from-indigo-500 via-violet-500 to-pink-500 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
                   <TrendingUp className="w-4 h-4 text-white" />
                 </div>
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-linear-to-r from-white to-indigo-200 bg-clip-text text-transparent">
                 DiveMetric
               </span>
             </Link>
@@ -1212,7 +1212,7 @@ const Footer = () => {
               <a
                 key={social}
                 href="#"
-                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-gradient-to-r hover:from-indigo-500/20 hover:to-violet-500/20 border border-white/10 hover:border-indigo-500/30 flex items-center justify-center text-indigo-200/50 hover:text-white transition-all duration-300"
+                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-linear-to-r hover:from-indigo-500/20 hover:to-violet-500/20 border border-white/10 hover:border-indigo-500/30 flex items-center justify-center text-indigo-200/50 hover:text-white transition-all duration-300"
               >
                 {social === 'twitter' && (
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

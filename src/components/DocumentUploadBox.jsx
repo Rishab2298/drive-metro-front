@@ -12,7 +12,100 @@ import {
   ChevronDown,
   Lock,
   Crown,
+  ExternalLink,
 } from 'lucide-react';
+
+// Generate dynamic Amazon DSP Dashboard URLs based on document type, station code, dsp code, and current week
+const getAmazonDashboardUrl = (docId, stationCode, dspCode) => {
+  if (!stationCode) return null;
+
+  // Get current week and year
+  const now = new Date();
+  const year = now.getFullYear();
+  const startOfYear = new Date(year, 0, 1);
+  const days = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000));
+  const week = Math.ceil((days + startOfYear.getDay() + 1) / 7);
+  const weekPadded = String(week).padStart(2, '0');
+  const timeParam = `${year}-W${weekPadded}`;
+
+  const urlConfigs = {
+    scorecard: {
+      baseUrl: 'https://logistics.amazon.com/performance',
+      pageId: 'dsp_supp_reports',
+      tabId: 'safety-dsp-weekly-tab',
+      timeFrame: 'Weekly',
+    },
+    'weekly-overview': {
+      baseUrl: 'https://logistics.amazon.com/performance',
+      pageId: 'dsp_dashboard_overview',
+      tabId: 'overview-dsp-weekly-tab',
+      timeFrame: 'Weekly',
+      hash: 'dsp-weekly-overview-driver-section-group',
+    },
+    'trailing-six-week': {
+      baseUrl: 'https://logistics.amazon.com/performance',
+      pageId: 'dsp_dashboard_overview',
+      tabId: 'overview-dsp-weekly-tab',
+      timeFrame: 'Weekly',
+      hash: 'dsp-weekly-overview-driver-section-group',
+    },
+    'negative-feedback': {
+      baseUrl: 'https://logistics.amazon.com/performance',
+      pageId: 'dsp_customer_delivery_feedback_negative',
+      tabId: 'customer-delivery-feedback-weekly-tab',
+      timeFrame: 'Weekly',
+    },
+    'pod-quality': {
+      baseUrl: 'https://logistics.amazon.com/performance',
+      pageId: 'dsp_supp_reports',
+      tabId: 'safety-dsp-weekly-tab',
+      timeFrame: 'Weekly',
+    },
+    'pps-daily': {
+      baseUrl: 'https://logistics.amazon.com/performance/interactive-report',
+      dashboardId: 'b6dae1dc-09f9-48c1-b9dc-9d04e402ac32',
+      useCompanyId: true,
+    },
+    dvic: {
+      baseUrl: 'https://logistics.amazon.com/performance',
+      pageId: 'dsp_supp_reports',
+      tabId: 'safety-dsp-weekly-tab',
+      timeFrame: 'Weekly',
+    },
+    'paw-print': {
+      baseUrl: 'https://logistics.amazon.com/performance/interactive-report',
+      dashboardId: 'c27da965-3178-411f-b485-ec9dcb1a335f',
+      useCompanyId: true,
+    },
+  };
+
+  const config = urlConfigs[docId];
+  if (!config) return null;
+
+  // Handle PPS Daily special case (interactive report)
+  if (config.useCompanyId) {
+    if (!dspCode) return null;
+    const params = new URLSearchParams({
+      dashboardId: config.dashboardId,
+      station: stationCode,
+      companyId: dspCode,
+    });
+    return `${config.baseUrl}?${params.toString()}`;
+  }
+
+  // Standard performance page URL
+  const params = new URLSearchParams({
+    pageId: config.pageId,
+    navMenuVariant: 'external',
+    station: stationCode,
+    tabId: config.tabId,
+    timeFrame: config.timeFrame,
+    to: timeParam,
+  });
+
+  const hash = config.hash ? `#${config.hash}` : '';
+  return `${config.baseUrl}?${params.toString()}${hash}`;
+};
 
 // Filename validation patterns for each document type
 // These patterns use placeholders that will be replaced with actual DSP info
@@ -355,6 +448,23 @@ export function DocumentUploadBox({
           >
             <ChevronDown className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
           </div>
+
+          {/* Amazon Dashboard Link Button */}
+          {(() => {
+            const amazonUrl = getAmazonDashboardUrl(id, dspInfo?.stationCode, dspInfo?.dspCode);
+            return amazonUrl ? (
+              <a
+                href={amazonUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="w-9 h-9 rounded-lg bg-violet-100 dark:bg-violet-500/20 border border-violet-200 dark:border-violet-500/30 flex items-center justify-center hover:bg-violet-200 dark:hover:bg-violet-500/30 hover:border-violet-300 dark:hover:border-violet-500/50 transition-all"
+                title="Open in Amazon DSP Dashboard"
+              >
+                <ExternalLink className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+              </a>
+            ) : null;
+          })()}
 
           {/* Upload Button in Header */}
           {isLocked ? (

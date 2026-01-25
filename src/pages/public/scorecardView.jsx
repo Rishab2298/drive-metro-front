@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   Loader2,
@@ -15,6 +15,9 @@ import {
   AlertTriangle,
   Sparkles,
   Lightbulb,
+  CheckCircle2,
+  Square,
+  CheckSquare,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -31,6 +34,36 @@ import {
 } from '@/utils/scorecardUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
+
+// Add anti-scraping meta tags to prevent indexing
+const useAntiScraping = () => {
+  useEffect(() => {
+    // Add robots meta tag
+    const robotsMeta = document.createElement('meta');
+    robotsMeta.name = 'robots';
+    robotsMeta.content = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
+    document.head.appendChild(robotsMeta);
+
+    // Add googlebot meta tag
+    const googlebotMeta = document.createElement('meta');
+    googlebotMeta.name = 'googlebot';
+    googlebotMeta.content = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
+    document.head.appendChild(googlebotMeta);
+
+    // Add AI crawlers meta tag
+    const aiMeta = document.createElement('meta');
+    aiMeta.name = 'robots';
+    aiMeta.content = 'noai, noimageai';
+    document.head.appendChild(aiMeta);
+
+    // Cleanup on unmount
+    return () => {
+      document.head.removeChild(robotsMeta);
+      document.head.removeChild(googlebotMeta);
+      document.head.removeChild(aiMeta);
+    };
+  }, []);
+};
 
 // Metric Detail Modal - Matches DriverPreviewModal style
 const MetricDetailModal = ({ data, onClose }) => {
@@ -246,12 +279,23 @@ const FeedbackCategoryRow = ({ category, onClick }) => (
 );
 
 // Metric Row Component - Matches DriverPreviewModal styling with severity highlights
-const MetricRow = ({ metricKey, value, label, indent, isTier, onOpenMetricModal }) => {
+const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, onOpenMetricModal }) => {
   const isDvicTime = metricKey?.toLowerCase().startsWith('dvictime');
+  const isPpsBreakdown = metricKey?.toLowerCase().startsWith('pps') && metricKey?.toLowerCase() !== 'ppscompliancerate';
+  const isSafetyEvent = ['distractionsrate', 'speedingeventrate', 'seatbeltoffrate', 'followingdistancerate', 'signalviolationsrate'].includes(metricKey?.toLowerCase());
 
-  const severity = isDvicTime
+  // Check if PPS breakdown has any non-compliance (value contains "/" and first number > 0)
+  const hasPpsNonCompliance = isPpsBreakdown && typeof value === 'string' && value.includes('/') && parseInt(value.split('/')[0]) > 0;
+
+  // Get base severity
+  let severity = isDvicTime
     ? getDvicTimeSeverity(value)
     : (isTier ? getSeverityLevel('tier', value) : getSeverityLevel(metricKey, value));
+
+  // Force severity to 'poor' for PPS breakdown items with non-compliance
+  if (hasPpsNonCompliance) {
+    severity = 'poor';
+  }
 
   const sevColor = severity ? SEVERITY_COLORS[severity] : null;
   const displayLabel = label || formatLabel(metricKey);
@@ -259,8 +303,11 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, onOpenMetricModal 
   const isSevere = severity === 'poor';
   const isConcerning = severity === 'fair';
 
-  const showSevereHighlight = shouldHighlight && (!indent || isDvicTime);
-  const showSevereIcon = isSevere && (!indent || isDvicTime);
+  // Force highlight for PPS breakdown with issues, safety events with poor/fair severity, or explicit forceHighlight prop
+  const shouldForceHighlight = forceHighlight || hasPpsNonCompliance || (isSafetyEvent && shouldHighlight);
+
+  const showSevereHighlight = shouldHighlight && (!indent || isDvicTime || shouldForceHighlight);
+  const showSevereIcon = isSevere && (!indent || isDvicTime || shouldForceHighlight);
 
   // Get tier-specific color for tier badges
   const tierColor = isTier && value ? TIER_COLORS[value] || TIER_COLORS['N/A'] : null;
@@ -448,6 +495,11 @@ const ScorecardView = () => {
   const [expandedSections, setExpandedSections] = useState({
     safety: true, delivery: true, customer: true, dvic: true, standing: true
   });
+  const [isAcknowledging, setIsAcknowledging] = useState(false);
+  const [acknowledgeError, setAcknowledgeError] = useState(null);
+
+  // Apply anti-scraping meta tags
+  useAntiScraping();
 
   useEffect(() => {
     const fetchScorecard = async () => {
@@ -470,6 +522,32 @@ const ScorecardView = () => {
 
     fetchScorecard();
   }, [id]);
+
+  // Handle acknowledgement
+  const handleAcknowledge = useCallback(async () => {
+    if (scorecard?.acknowledgedAt || isAcknowledging) return;
+
+    setIsAcknowledging(true);
+    setAcknowledgeError(null);
+
+    try {
+      const response = await fetch(`${API_URL}/api/scorecard/${id}/acknowledge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to acknowledge scorecard');
+      }
+
+      const data = await response.json();
+      setScorecard(prev => ({ ...prev, acknowledgedAt: data.acknowledgedAt }));
+    } catch (err) {
+      setAcknowledgeError(err.message);
+    } finally {
+      setIsAcknowledging(false);
+    }
+  }, [id, scorecard?.acknowledgedAt, isAcknowledging]);
 
   const historicalData = useMemo(() => {
     if (!scorecard?.metrics) return null;
@@ -857,8 +935,73 @@ const ScorecardView = () => {
           </div>
         )}
 
+        {/* Acknowledgement Section */}
+        <div className="mt-6 mb-4">
+          {scorecard.acknowledgedAt ? (
+            // Already acknowledged
+            <div className="p-4 bg-gradient-to-br from-emerald-50 to-green-100 rounded-xl border border-emerald-200/50 shadow-md">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg">
+                  <CheckCircle2 size={20} className="text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-bold text-emerald-800">
+                    Scorecard Acknowledged
+                  </div>
+                  <div className="text-xs text-emerald-600 mt-0.5">
+                    Confirmed on {new Date(scorecard.acknowledgedAt).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            // Not yet acknowledged - show checkbox
+            <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-100 rounded-xl border border-amber-200/50 shadow-md">
+              <button
+                onClick={handleAcknowledge}
+                disabled={isAcknowledging}
+                className="w-full flex items-start gap-3 text-left group"
+              >
+                <div className={cn(
+                  "w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all shrink-0 mt-0.5",
+                  isAcknowledging
+                    ? "bg-amber-200 border-amber-300"
+                    : "border-amber-400 group-hover:border-amber-500 group-hover:bg-amber-100"
+                )}>
+                  {isAcknowledging ? (
+                    <Loader2 size={14} className="text-amber-600 animate-spin" />
+                  ) : (
+                    <Square size={14} className="text-amber-400 group-hover:text-amber-500" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-semibold text-amber-900 group-hover:text-amber-950 transition-colors">
+                    I acknowledge that I have thoroughly reviewed this scorecard
+                  </div>
+                  <div className="text-xs text-amber-700 mt-1">
+                    By checking this box, you confirm that you have read and understood all performance metrics and feedback provided in this scorecard.
+                  </div>
+                </div>
+              </button>
+              {acknowledgeError && (
+                <div className="mt-3 p-2 bg-red-100 rounded-lg text-xs text-red-700 flex items-center gap-2">
+                  <AlertTriangle size={14} />
+                  {acknowledgeError}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Footer */}
-        <div className="text-center pt-6 pb-6">
+        <div className="text-center pt-4 pb-6">
           <div className="text-[10px] text-slate-400 font-medium flex items-center justify-center gap-2">
             <span className="w-1 h-1 rounded-full bg-linear-to-r from-indigo-500 to-violet-500" />
             Tap any metric for details

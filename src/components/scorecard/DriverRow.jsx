@@ -3,6 +3,7 @@ import { useState } from 'react';
 import {
   Check,
   Eye,
+  BadgeCheck,
   MoreHorizontal,
   Share2,
   StickyNote,
@@ -160,6 +161,20 @@ export const DriverRow = ({
           <p className="font-semibold text-foreground truncate">
             {driverName}
           </p>
+          {driver.acknowledgedAt && (
+            <div
+              className="flex items-center justify-center w-5 h-5 rounded-md bg-emerald-100 dark:bg-emerald-900/30 shrink-0"
+              title={`Acknowledged on ${new Date(driver.acknowledgedAt).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}`}
+            >
+              <BadgeCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+          )}
           {driver.dspNote && (
             <div
               className="flex items-center justify-center w-5 h-5 rounded-md bg-amber-100 dark:bg-amber-900/30 shrink-0"

@@ -129,6 +129,13 @@ const MasterScorecardDetail = () => {
             {rankedCount > 0 && (
               <p className="text-sm text-muted-foreground">
                 {rankedCount} drivers ranked (500+ packages) · {totalDrivers - rankedCount} not yet eligible
+                {data?.drivers && (
+                  <span className="ml-2">
+                    · <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                      {data.drivers.filter(d => d.acknowledgedAt).length} acknowledged
+                    </span>
+                  </span>
+                )}
               </p>
             )}
           </div>

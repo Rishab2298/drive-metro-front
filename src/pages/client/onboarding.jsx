@@ -327,7 +327,7 @@ export default function Onboarding() {
           {/* Trial info and Security badge */}
           <div className="mt-auto pt-8 border-t border-slate-800 space-y-4">
             {/* Free trial badge */}
-            <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+            <div className="p-4 rounded-xl bg-linear-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
               <p className="text-sm font-semibold text-white mb-1">45-Day Free Trial</p>
               <p className="text-xs text-slate-400">Full access to all premium features. No credit card required.</p>
             </div>

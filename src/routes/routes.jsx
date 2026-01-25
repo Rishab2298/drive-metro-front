@@ -3,11 +3,12 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import PublicRoute from "../components/PublicRoute";
 import ClientAppLayout from "../components/layouts/ClientAppLayout";
 
-import LandingPage from "../pages/public/LandingPage";
+import HomePage from "../pages/public/HomePage";
 import SignIn from "../pages/public/signIn";
 import SignUp from "../pages/public/signUp";
 import ScorecardSamplesDemo from "../pages/public/ScorecardSamplesDemo";
 import ScorecardView from "../pages/public/scorecardView";
+import SampleScorecard from "../pages/public/SampleScorecard";
 import HowScoringWorks from "../pages/public/HowScoringWorks";
 import ClientDashboard from "../pages/client/clientDashboard";
 import GettingStarted from "../pages/client/gettingStarted";
@@ -28,11 +29,13 @@ const wrapRoute = (Component, Wrapper, Layout) => {
 };
 
 const routeConfig = [
-  { path: "/", component: SignIn, wrapper: PublicRoute },
+  { path: "/", component:  HomePage, wrapper: PublicRoute },
+  { path: "/home", component: HomePage, wrapper: PublicRoute },
   { path: "/sign-in", component: SignIn, wrapper: PublicRoute },
   { path: "/sign-up", component: SignUp, wrapper: PublicRoute },
   { path: "/scorecard-samples", component: ScorecardSamplesDemo },
   { path: "/scorecard/:id", component: ScorecardView },
+  { path: "/sample-scorecard", component: SampleScorecard },
   { path: "/how-scoring-works", component: HowScoringWorks },
   { path: "/onboarding", component: Onboarding, wrapper: ProtectedRoute },
   { path: "/getting-started", component: GettingStarted, wrapper: ProtectedRoute, layout: ClientAppLayout },
