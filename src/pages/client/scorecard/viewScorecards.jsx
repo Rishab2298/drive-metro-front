@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/clerk-react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Loader2,
@@ -12,8 +10,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
+import { useMasterScorecards } from '@/hooks/useScorecard';
 
 // Standing badge colors
 const STANDING_COLORS = {
@@ -26,38 +23,10 @@ const STANDING_COLORS = {
 };
 
 const ViewScorecards = () => {
-  const { getToken } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [data, setData] = useState(null);
 
-  useEffect(() => {
-    const fetchMasterScorecards = async () => {
-      try {
-        const token = await getToken();
-        const response = await fetch(`${API_URL}/api/master-scorecards`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch scorecards');
-        }
-
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        console.error('Error fetching master scorecards:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMasterScorecards();
-  }, [getToken]);
+  // Use TanStack Query hook - handles loading, error, and caching automatically
+  const { data, isLoading: loading, error } = useMasterScorecards();
 
   // Format date range
   const formatDateRange = (weekStart, weekEnd) => {
@@ -91,7 +60,7 @@ const ViewScorecards = () => {
             <span className="text-red-600 dark:text-red-400 text-xl">!</span>
           </div>
           <h2 className="text-lg font-semibold text-foreground">Unable to load scorecards</h2>
-          <p className="text-sm text-muted-foreground">{error}</p>
+          <p className="text-sm text-muted-foreground">{error?.message || 'An error occurred'}</p>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium text-sm"
