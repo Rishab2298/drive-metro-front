@@ -245,14 +245,14 @@ const HeroSection = () => {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 dark:bg-emerald-400" />
             </div>
             <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-200">
-              Trusted by 200+ Amazon DSPs
+              Trusted by 200+ DSPs
             </span>
           </div>
 
           {/* Main Headline */}
           <div className="relative mb-6">
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight">
-              <span className="text-slate-900 dark:text-white">Turn Amazon Data into</span>
+              <span className="text-slate-900 dark:text-white">Turn Scorecard Data into</span>
               <br />
               <span className="bg-linear-to-r from-indigo-600 via-violet-600 to-pink-600 dark:from-indigo-400 dark:via-violet-400 dark:to-pink-400 bg-clip-text text-transparent">
                 Driver Excellence
@@ -318,20 +318,18 @@ const HeroSection = () => {
 };
 
 // ============================================
-// TRUSTED BY SECTION
+// KEY FEATURES SECTION - Infinite Scroll
 // ============================================
 const TrustedBySection = () => {
-  const clients = [
-    'FastTrack DSP',
-    'Elite Delivery',
-    'Metro Express',
-    'Prime Fleet',
-    'Swift Carriers',
-    'Urban Logistics',
-    'NextDay Delivery',
-    'Apex Logistics',
-    'Rapid Route',
-    'Summit DSP',
+  const features = [
+    { icon: Upload, label: 'Easy Report Upload' },
+    { icon: Brain, label: 'AI-Powered Analysis' },
+    { icon: Send, label: 'Automated Coaching' },
+    { icon: BarChart3, label: 'Performance Tracking' },
+    { icon: Smartphone, label: 'Driver Mobile Access' },
+    { icon: TrendingUp, label: 'Trend Insights' },
+    { icon: Target, label: 'Goal Setting' },
+    { icon: Mail, label: 'Email Reports' },
   ];
 
   return (
@@ -349,24 +347,26 @@ const TrustedBySection = () => {
       <div className="relative z-10 w-full">
         <AnimatedSection>
           <p className="text-center text-xs text-slate-500 dark:text-slate-500 uppercase tracking-[0.2em] mb-8 font-medium">
-            Trusted by leading Delivery Service Partners
+            Everything you need to manage driver performance
           </p>
 
-          {/* Full width scrolling logos */}
+          {/* Infinite scrolling features */}
           <div className="relative overflow-hidden">
             {/* Fade edges */}
             <div className="absolute left-0 top-0 bottom-0 w-32 bg-linear-to-r from-slate-50 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
             <div className="absolute right-0 top-0 bottom-0 w-32 bg-linear-to-l from-slate-50 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
 
-            <div className="flex animate-marquee gap-12 items-center">
-              {[...clients, ...clients].map((client, i) => (
+            <div className="flex animate-marquee gap-6 items-center">
+              {[...features, ...features].map((feature, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 whitespace-nowrap group"
+                  className="flex items-center gap-3 px-5 py-3 rounded-full bg-white/60 dark:bg-white/5 border border-slate-200 dark:border-white/10 whitespace-nowrap group hover:border-indigo-300 dark:hover:border-indigo-500/30 transition-colors"
                 >
-                  <div className="w-2 h-2 rounded-full bg-linear-to-r from-indigo-500 to-violet-500 opacity-40 group-hover:opacity-100 transition-opacity" />
-                  <span className="text-slate-600 dark:text-slate-500 font-medium text-lg group-hover:text-slate-900 dark:group-hover:text-slate-300 transition-colors">
-                    {client}
+                  <div className="w-8 h-8 rounded-lg bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20">
+                    <feature.icon className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-slate-700 dark:text-slate-300 font-medium text-sm">
+                    {feature.label}
                   </span>
                 </div>
               ))}
@@ -381,7 +381,7 @@ const TrustedBySection = () => {
           100% { transform: translateX(-50%); }
         }
         .animate-marquee {
-          animation: marquee 30s linear infinite;
+          animation: marquee 25s linear infinite;
         }
       `}</style>
     </section>
@@ -389,94 +389,124 @@ const TrustedBySection = () => {
 };
 
 // ============================================
-// PROBLEM/SOLUTION SECTION
+// SOLUTION SECTION - With DiveMetric
 // ============================================
 const ProblemSolutionSection = () => {
+  const stats = [
+    { value: '15', unit: 'min', label: 'Weekly management time' },
+    { value: '35', unit: '%', label: 'Average performance boost' },
+    { value: '6', unit: '+', label: 'Report types processed' },
+  ];
+
+  const checklistItems = [
+    'One upload processes all report types instantly',
+    'AI generates personalized coaching for each driver',
+    'Drivers get mobile scorecards via SMS & Email',
+    'Severity alerts highlight who needs attention',
+    'Track trends and maintain Fantastic+ status',
+  ];
+
   return (
     <section className="relative py-24 overflow-hidden">
       {/* Background handled by GlobalBackground */}
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AnimatedSection className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-100 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 mb-6">
-            <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-            <span className="text-sm font-semibold text-rose-700 dark:text-rose-300">The Problem</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">
-            Managing Driver Performance is
-            <span className="text-rose-600 dark:text-rose-400"> Overwhelming</span>
-          </h2>
-          <p className="max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-400">
-            DSP managers waste hours every week hunting through scattered Amazon reports
-          </p>
-        </AnimatedSection>
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Left - Stats Showcase */}
+          <AnimatedSection>
+            <div className="relative">
+              {/* Decorative glow */}
+              <div className="absolute -inset-4 bg-linear-to-r from-indigo-500/20 via-violet-500/20 to-pink-500/20 rounded-3xl blur-2xl opacity-60" />
 
-        {/* Before/After Comparison */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-16">
-          {/* Before - Without DiveMetric */}
-          <AnimatedSection delay={0.1}>
-            <div className="relative h-full">
-              <div className="absolute -inset-1 bg-linear-to-r from-rose-500/20 to-orange-500/20 rounded-2xl blur-lg" />
-              <div className="relative h-full bg-white dark:bg-slate-900/80 rounded-2xl border border-rose-200 dark:border-rose-500/20 p-8 shadow-lg dark:shadow-none">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-500/20 flex items-center justify-center">
-                    <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">Without DiveMetric</h3>
-                    <p className="text-sm text-slate-500">The old way</p>
-                  </div>
+              <div className="relative bg-white dark:bg-slate-900/80 rounded-3xl border border-slate-200 dark:border-white/10 p-8 sm:p-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-100 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 mb-6">
+                  <Zap className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">With DiveMetric</span>
                 </div>
 
-                <div className="space-y-4">
-                  {[
-                    { icon: FileText, text: 'Manually download 6+ different report types' },
-                    { icon: Timer, text: '4+ hours every week searching for data' },
-                    { icon: AlertTriangle, text: 'Miss critical driver performance issues' },
-                    { icon: Users, text: 'Drivers never see their scorecards' },
-                    { icon: MessageCircle, text: 'No personalized coaching or feedback' },
-                    { icon: TrendingUp, text: 'Struggle to maintain Fantastic+ status' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/30">
-                      <item.icon className="w-5 h-5 text-rose-600 dark:text-rose-400 mt-0.5 shrink-0" />
-                      <span className="text-slate-700 dark:text-slate-300 text-sm">{item.text}</span>
+                <div className="grid grid-cols-3 gap-4 sm:gap-6">
+                  {stats.map((stat, i) => (
+                    <div key={i} className="text-center">
+                      <div className="flex items-baseline justify-center gap-0.5">
+                        <span className="text-4xl sm:text-5xl font-black bg-linear-to-br from-indigo-600 via-violet-600 to-pink-600 dark:from-indigo-400 dark:via-violet-400 dark:to-pink-400 bg-clip-text text-transparent">
+                          {stat.value}
+                        </span>
+                        <span className="text-xl sm:text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                          {stat.unit}
+                        </span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        {stat.label}
+                      </p>
                     </div>
                   ))}
+                </div>
+
+                {/* Divider */}
+                <div className="my-8 h-px bg-linear-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent" />
+
+                {/* Mini visual */}
+                <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-white/5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-linear-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">Performance Tracking</p>
+                      <p className="text-xs text-slate-500">Real-time driver insights</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    {[40, 65, 45, 80, 60, 90, 75].map((h, i) => (
+                      <div
+                        key={i}
+                        className="w-1.5 rounded-full bg-linear-to-t from-indigo-500 to-violet-500"
+                        style={{ height: `${h * 0.4}px` }}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </AnimatedSection>
 
-          {/* After - With DiveMetric */}
+          {/* Right - Content & Checklist */}
           <AnimatedSection delay={0.2}>
-            <div className="relative h-full">
-              <div className="absolute -inset-1 bg-linear-to-r from-emerald-500/20 to-cyan-500/20 rounded-2xl blur-lg" />
-              <div className="relative h-full bg-white dark:bg-slate-900/80 rounded-2xl border border-emerald-200 dark:border-emerald-500/20 p-8 shadow-lg dark:shadow-none">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">With DiveMetric</h3>
-                    <p className="text-sm text-slate-500">The smart way</p>
-                  </div>
-                </div>
+            <div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">
+                Stop chasing data.
+                <br />
+                <span className="bg-linear-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent">
+                  Start leading.
+                </span>
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">
+                DiveMetric transforms hours of manual work into minutes of actionable insights.
+              </p>
 
-                <div className="space-y-4">
-                  {[
-                    { icon: Upload, text: 'One upload processes all report types instantly' },
-                    { icon: Zap, text: '15 minutes to manage your entire fleet' },
-                    { icon: Eye, text: 'Severity alerts highlight drivers who need attention' },
-                    { icon: Smartphone, text: 'Drivers get mobile scorecards via SMS/Email' },
-                    { icon: Brain, text: 'AI generates personalized coaching notes' },
-                    { icon: Trophy, text: 'DSPs average 35% performance improvement' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30">
-                      <item.icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
-                      <span className="text-slate-700 dark:text-slate-300 text-sm">{item.text}</span>
+              {/* Checklist */}
+              <div className="space-y-4">
+                {checklistItems.map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 group">
+                    <div className="w-6 h-6 rounded-full bg-linear-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shrink-0 mt-0.5 shadow-md shadow-emerald-500/20 group-hover:scale-110 transition-transform">
+                      <CheckCircle2 className="w-4 h-4 text-white" />
                     </div>
-                  ))}
-                </div>
+                    <span className="text-slate-700 dark:text-slate-300 font-medium">
+                      {item}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <div className="mt-10">
+                <Link
+                  to="/register"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 text-white font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all"
+                >
+                  Get Started Free
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             </div>
           </AnimatedSection>
@@ -592,7 +622,7 @@ const FeaturesSection = () => {
                       <Upload className="w-8 h-8 text-slate-400 dark:text-slate-500 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" />
                     </div>
                     <p className="text-sm text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-400 transition-colors">
-                      Drop your Amazon reports here
+                      Drop your Scorecard reports here
                     </p>
                     <div className="flex flex-wrap justify-center gap-2 mt-4 max-w-xs mx-auto">
                       {supportedReports.slice(0, 4).map((report, i) => (
@@ -887,7 +917,7 @@ const HowItWorksSection = () => {
     {
       step: '01',
       title: 'Upload Reports',
-      description: 'Drag and drop your Amazon reports - we support all major formats including scorecards, weekly overviews, and feedback reports.',
+      description: 'Drag and drop your Scorecard reports - we support all major formats including scorecards, weekly overviews, and feedback reports.',
       icon: Upload,
       color: '#6EE7B7',
     },
@@ -984,7 +1014,7 @@ const BenefitsSection = () => {
       icon: Trophy,
       title: 'Earn More',
       subtitle: 'Maximize Your Bonus Potential',
-      description: 'Keep your DSP at Fantastic+ status to earn maximum Amazon bonuses. Our clients see an average 35% improvement in overall performance scores.',
+      description: 'Keep your DSP at Fantastic+ status to earn maximum Scorecard bonuses. Our clients see an average 35% improvement in overall performance scores.',
       metric: '35%',
       metricLabel: 'Avg. Performance Boost',
       color: '#FCD34D',
@@ -993,7 +1023,7 @@ const BenefitsSection = () => {
       icon: Clock,
       title: 'Save Time',
       subtitle: 'Eliminate Manual Work',
-      description: 'What used to take 4+ hours every week now takes 15 minutes. Upload, generate, and distribute scorecards to your entire fleet instantly.',
+      description: 'What used to take 4+ hours every week now takes 15 minutes. Upload, generate, and distribute scorecards to your entire team instantly.',
       metric: '4hrs',
       metricLabel: 'Saved Weekly',
       color: '#6EE7B7',
@@ -1087,7 +1117,7 @@ const MetricsShowcase = () => {
               </span>
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
-              DiveMetric consolidates data from multiple Amazon reports into beautiful,
+              DiveMetric consolidates data from multiple Scorecard reports into beautiful,
               mobile-optimized scorecards that drivers actually want to read.
             </p>
 
@@ -1254,7 +1284,7 @@ const TestimonialsSection = () => {
     {
       quote: "Our driver satisfaction scores went up 35% after implementing DiveMetric. They appreciate the personalized feedback and knowing exactly where they stand.",
       author: "Jennifer Martinez",
-      role: "Fleet Manager",
+      role: "Team Manager",
       company: "Metro Logistics",
       metric: "35% satisfaction increase",
     },
@@ -1449,7 +1479,7 @@ const FAQSection = () => {
   const faqs = [
     {
       question: 'What file formats does DiveMetric support?',
-      answer: 'DiveMetric supports CSV, XLSX (Excel), and PDF files from Amazon logistics systems including DSP Scorecards, Weekly Overviews, 6-Week Trailing Reports, Customer Feedback, POD Quality, PPS Daily, and DVIC reports.',
+      answer: 'DiveMetric supports CSV, XLSX (Excel), and PDF files from Scorecard Privuders including DSP Scorecards, Weekly Overviews, 6-Week Trailing Reports, Customer Feedback, POD Quality, PPS Daily, and DVIC reports.',
     },
     {
       question: 'How do drivers access their scorecards?',
