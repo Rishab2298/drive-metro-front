@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
-import { useTheme } from 'next-themes';
+import Header from '@/components/public/Header';
+import Footer from '@/components/public/Footer';
 import {
-  Menu,
-  X,
   ArrowRight,
   ChevronDown,
   Upload,
@@ -19,7 +18,6 @@ import {
   CheckCircle2,
   Star,
   Sparkles,
-  Play,
   FileText,
   Brain,
   Crown,
@@ -41,6 +39,7 @@ import {
   PieChart,
   MailCheck,
   MousePointerClick,
+  Calendar,
 } from 'lucide-react';
 
 // ============================================
@@ -203,137 +202,6 @@ const AnimatedSection = ({ children, className = '', delay = 0 }) => {
 };
 
 // ============================================
-// HEADER COMPONENT
-// ============================================
-const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { setTheme } = useTheme();
-
-  // Set dark mode as default
-  useEffect(() => {
-    setTheme('dark');
-  }, [setTheme]);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const navLinks = [
-    { name: 'Features', href: '#features' },
-    { name: 'How It Works', href: '#how-it-works' },
-    { name: 'Benefits', href: '#benefits' },
-    { name: 'Pricing', href: '#pricing' },
-  ];
-
-  return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'py-3' : 'py-5'}`}>
-      <div className={`mx-4 md:mx-8 transition-all duration-500 rounded-2xl ${
-        isScrolled
-          ? 'bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-indigo-500/5'
-          : ''
-      }`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-linear-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-xl blur-lg opacity-50 group-hover:opacity-80 transition-all duration-500" />
-                <div className="relative bg-linear-to-br from-indigo-500 via-violet-500 to-pink-500 p-2.5 rounded-xl shadow-lg">
-                  <TrendingUp className="w-5 h-5 text-white" />
-                </div>
-              </div>
-              <span className="text-xl font-bold text-slate-900 dark:text-white">
-                DiveMetric
-              </span>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1">
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="relative px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-300 group"
-                >
-                  <span className="relative z-10">{link.name}</span>
-                  <div className="absolute inset-0 bg-slate-100 dark:bg-white/5 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300" />
-                </a>
-              ))}
-            </nav>
-
-            {/* CTA Buttons */}
-            <div className="hidden md:flex items-center gap-3">
-              <Link to="/sign-in">
-                <button className="px-5 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-xl hover:bg-slate-100 dark:hover:bg-white/5">
-                  Sign In
-                </button>
-              </Link>
-              <Link to="/sign-up">
-                <button className="group relative px-6 py-2.5 rounded-xl font-semibold text-white text-sm overflow-hidden shadow-lg shadow-indigo-500/20">
-                  <div className="absolute inset-0 bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500" />
-                  <div className="absolute inset-0 bg-linear-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <span className="relative flex items-center gap-2">
-                    Start Free Trial
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </span>
-                </button>
-              </Link>
-            </div>
-
-            {/* Mobile: Menu Button */}
-            <div className="md:hidden flex items-center">
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
-              >
-                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      <motion.div
-        initial={false}
-        animate={isMobileMenuOpen ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
-        className="md:hidden overflow-hidden"
-      >
-        <div className="mx-4 mt-2 p-4 bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl">
-          <nav className="flex flex-col gap-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.name}
-              </a>
-            ))}
-          </nav>
-          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-slate-200 dark:border-white/10">
-            <Link to="/sign-in" onClick={() => setIsMobileMenuOpen(false)}>
-              <button className="w-full py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all">
-                Sign In
-              </button>
-            </Link>
-            <Link to="/sign-up" onClick={() => setIsMobileMenuOpen(false)}>
-              <button className="w-full py-3 text-sm font-semibold text-white rounded-xl bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500">
-                Start Free Trial
-              </button>
-            </Link>
-          </div>
-        </div>
-      </motion.div>
-    </header>
-  );
-};
-
-// ============================================
 // HERO SECTION
 // ============================================
 const HeroSection = () => {
@@ -412,12 +280,12 @@ const HeroSection = () => {
                 </span>
               </button>
             </Link>
-            <button className="group flex items-center gap-3 px-6 py-4 rounded-xl font-semibold text-slate-700 dark:text-white text-lg border border-slate-300 dark:border-white/20 hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-300">
+            <Link to="/contact" className="group flex items-center gap-3 px-6 py-4 rounded-xl font-semibold text-slate-700 dark:text-white text-lg border border-slate-300 dark:border-white/20 hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-300">
               <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-white/10 flex items-center justify-center group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-colors">
-                <Play className="w-4 h-4 text-slate-700 dark:text-white fill-slate-700 dark:fill-white" />
+                <Calendar className="w-4 h-4 text-slate-700 dark:text-white" />
               </div>
-              Watch Demo
-            </button>
+              Book a Demo Session
+            </Link>
           </div>
 
           {/* Quick stats */}
@@ -1729,10 +1597,10 @@ const CTASection = () => {
                       </span>
                     </button>
                   </Link>
-                  <button className="group flex items-center gap-3 px-8 py-5 rounded-2xl font-semibold text-white text-lg border-2 border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-300">
-                    <Play className="w-5 h-5 text-white fill-white" />
-                    Watch 2-Min Demo
-                  </button>
+                  <Link to="/contact" className="group flex items-center gap-3 px-8 py-5 rounded-2xl font-semibold text-white text-lg border-2 border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-300">
+                    <Calendar className="w-5 h-5 text-white" />
+                    Book a Demo
+                  </Link>
                 </div>
 
                 {/* Trust indicators */}
@@ -1756,118 +1624,6 @@ const CTASection = () => {
         </AnimatedSection>
       </div>
     </section>
-  );
-};
-
-// ============================================
-// FOOTER COMPONENT
-// ============================================
-const Footer = () => {
-  const footerLinks = {
-    Product: [
-      { name: 'Features', href: '#features' },
-      { name: 'Pricing', href: '#pricing' },
-      { name: 'How It Works', href: '#how-it-works' },
-    ],
-    Company: [
-      { name: 'About', href: '#' },
-      { name: 'Blog', href: '#' },
-      { name: 'Careers', href: '#' },
-    ],
-    Resources: [
-      { name: 'Help Center', href: '#' },
-      { name: 'Documentation', href: '#' },
-      { name: 'API', href: '#' },
-    ],
-    Legal: [
-      { name: 'Privacy', href: '#' },
-      { name: 'Terms', href: '#' },
-    ],
-  };
-
-  return (
-    <footer className="relative bg-slate-100 dark:bg-slate-950 border-t border-slate-200 dark:border-white/5">
-      <div
-        className="absolute inset-0 opacity-[0.015] dark:opacity-[0.02]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(99, 102, 241, 0.5) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(99, 102, 241, 0.5) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px',
-        }}
-      />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
-          {/* Brand */}
-          <div className="col-span-2">
-            <Link to="/" className="flex items-center gap-3 mb-4 group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-linear-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity" />
-                <div className="relative bg-linear-to-br from-indigo-500 via-violet-500 to-pink-500 p-2 rounded-xl">
-                  <TrendingUp className="w-4 h-4 text-white" />
-                </div>
-              </div>
-              <span className="text-lg font-bold text-slate-900 dark:text-white">
-                DiveMetric
-              </span>
-            </Link>
-            <p className="text-slate-600 dark:text-slate-500 text-sm mb-4 leading-relaxed max-w-xs">
-              Transforming last-mile delivery performance through intelligent scorecards and AI-powered insights.
-            </p>
-          </div>
-
-          {/* Links */}
-          {Object.entries(footerLinks).map(([title, links]) => (
-            <div key={title}>
-              <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-4">{title}</h4>
-              <ul className="space-y-2">
-                {links.map((link) => (
-                  <li key={link.name}>
-                    <a href={link.href} className="text-slate-600 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white text-sm transition-colors">
-                      {link.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* Bottom */}
-        <div className="pt-8 border-t border-slate-200 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-slate-500 dark:text-slate-600 text-sm">
-            &copy; {new Date().getFullYear()} DiveMetric. All rights reserved.
-          </p>
-          <div className="flex items-center gap-3">
-            {['twitter', 'linkedin', 'github'].map((social) => (
-              <a
-                key={social}
-                href="#"
-                className="w-9 h-9 rounded-lg bg-slate-200 dark:bg-white/5 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 border border-slate-300 dark:border-white/5 hover:border-indigo-300 dark:hover:border-indigo-500/30 flex items-center justify-center text-slate-600 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-white transition-all duration-300"
-              >
-                {social === 'twitter' && (
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                )}
-                {social === 'linkedin' && (
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                  </svg>
-                )}
-                {social === 'github' && (
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                  </svg>
-                )}
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-    </footer>
   );
 };
 

@@ -10,6 +10,7 @@ import ScorecardSamplesDemo from "../pages/public/ScorecardSamplesDemo";
 import ScorecardView from "../pages/public/scorecardView";
 import SampleScorecard from "../pages/public/SampleScorecard";
 import HowScoringWorks from "../pages/public/HowScoringWorks";
+import ContactPage from "../pages/public/ContactPage";
 import ClientDashboard from "../pages/client/clientDashboard";
 import GettingStarted from "../pages/client/gettingStarted";
 import Onboarding from "../pages/client/onboarding";
@@ -37,6 +38,7 @@ const routeConfig = [
   { path: "/scorecard/:id", component: ScorecardView },
   { path: "/sample-scorecard", component: SampleScorecard },
   { path: "/how-scoring-works", component: HowScoringWorks },
+  { path: "/contact", component: ContactPage, wrapper: PublicRoute },
   { path: "/onboarding", component: Onboarding, wrapper: ProtectedRoute },
   { path: "/getting-started", component: GettingStarted, wrapper: ProtectedRoute, layout: ClientAppLayout },
   { path: "/upload-scorecard", component: UploadScorecard, wrapper: ProtectedRoute, layout: ClientAppLayout },

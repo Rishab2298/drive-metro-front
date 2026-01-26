@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import {
-  Loader2,
   Users,
   Package,
   Trophy,
@@ -23,6 +22,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   ChartContainer,
   ChartTooltip,
@@ -233,17 +233,6 @@ export default function ClientDashboard() {
     return driver.name || [driver.firstName, driver.lastName].filter(Boolean).join(' ') || 'Unknown';
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
-          <p className="text-sm text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -265,10 +254,10 @@ export default function ClientDashboard() {
   }
 
   const { dsp, masterScorecards } = data || {};
-  const hasData = masterScorecards && masterScorecards.length > 0;
+  const hasData = !loading && masterScorecards && masterScorecards.length > 0;
 
-  // Empty state - no scorecards
-  if (!hasData) {
+  // Empty state - no scorecards (only show after loading completes)
+  if (!loading && !hasData) {
     return (
       <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-6 py-12">
@@ -353,9 +342,11 @@ export default function ClientDashboard() {
               Welcome back
             </p>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              {dsp?.companyName || dsp?.dspCode || 'Dashboard'}
+              {loading ? <Skeleton className="w-48 h-8 inline-block" /> : (dsp?.companyName || dsp?.dspCode || 'Dashboard')}
             </h1>
-            {analytics?.latest && (
+            {loading ? (
+              <Skeleton className="w-64 h-4 mt-2" />
+            ) : analytics?.latest && (
               <p className="text-muted-foreground mt-1">
                 Latest: Week {analytics.latest.weekNumber}, {analytics.latest.year}
                 <span className="mx-2">•</span>
@@ -397,7 +388,7 @@ export default function ClientDashboard() {
               <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                 <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
-              {analytics?.weeklyComparison?.drivers?.change !== 0 && (
+              {!loading && analytics?.weeklyComparison?.drivers?.change !== 0 && (
                 <div className={cn(
                   'flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full',
                   analytics.weeklyComparison.drivers.change > 0
@@ -413,7 +404,11 @@ export default function ClientDashboard() {
                 </div>
               )}
             </div>
-            <p className="text-2xl font-bold text-foreground">{analytics?.weeklyComparison?.drivers?.current || 0}</p>
+            {loading ? (
+              <Skeleton className="w-16 h-8 mb-1" />
+            ) : (
+              <p className="text-2xl font-bold text-foreground">{analytics?.weeklyComparison?.drivers?.current || 0}</p>
+            )}
             <p className="text-sm text-muted-foreground">Active Drivers</p>
           </div>
 
@@ -423,7 +418,7 @@ export default function ClientDashboard() {
               <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                 <Package className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
-              {analytics?.weeklyComparison?.packages?.percentChange != 0 && (
+              {!loading && analytics?.weeklyComparison?.packages?.percentChange != 0 && (
                 <div className={cn(
                   'flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full',
                   analytics.weeklyComparison.packages.change > 0
@@ -439,9 +434,13 @@ export default function ClientDashboard() {
                 </div>
               )}
             </div>
-            <p className="text-2xl font-bold text-foreground">
-              {(analytics?.weeklyComparison?.packages?.current || 0).toLocaleString()}
-            </p>
+            {loading ? (
+              <Skeleton className="w-20 h-8 mb-1" />
+            ) : (
+              <p className="text-2xl font-bold text-foreground">
+                {(analytics?.weeklyComparison?.packages?.current || 0).toLocaleString()}
+              </p>
+            )}
             <p className="text-sm text-muted-foreground">Packages Delivered</p>
           </div>
 
@@ -451,7 +450,7 @@ export default function ClientDashboard() {
               <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                 <Trophy className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
-              {analytics?.weeklyComparison?.standing?.previous && (
+              {!loading && analytics?.weeklyComparison?.standing?.previous && (
                 <div className={cn(
                   'flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full',
                   analytics.weeklyComparison.standing.improved
@@ -472,12 +471,16 @@ export default function ClientDashboard() {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <span className={cn(
-                'px-3 py-1 rounded-full text-sm font-semibold',
-                STANDING_COLORS[analytics?.weeklyComparison?.standing?.current] || STANDING_COLORS['N/A']
-              )}>
-                {analytics?.weeklyComparison?.standing?.current || 'N/A'}
-              </span>
+              {loading ? (
+                <Skeleton className="w-20 h-7 rounded-full" />
+              ) : (
+                <span className={cn(
+                  'px-3 py-1 rounded-full text-sm font-semibold',
+                  STANDING_COLORS[analytics?.weeklyComparison?.standing?.current] || STANDING_COLORS['N/A']
+                )}>
+                  {analytics?.weeklyComparison?.standing?.current || 'N/A'}
+                </span>
+              )}
             </div>
             <p className="text-sm text-muted-foreground mt-2">Average Standing</p>
           </div>
@@ -489,7 +492,11 @@ export default function ClientDashboard() {
                 <Calendar className="w-5 h-5 text-green-600 dark:text-green-400" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-foreground">{analytics?.totalWeeks || 0}</p>
+            {loading ? (
+              <Skeleton className="w-12 h-8 mb-1" />
+            ) : (
+              <p className="text-2xl font-bold text-foreground">{analytics?.totalWeeks || 0}</p>
+            )}
             <p className="text-sm text-muted-foreground">Weeks Tracked</p>
           </div>
         </div>
@@ -497,7 +504,22 @@ export default function ClientDashboard() {
         {/* Two Column Layout for Charts and Insights */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Performance Trend Chart */}
-          {analytics?.trendData && analytics.trendData.length > 1 && (
+          {loading ? (
+            <div className="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-semibold text-foreground">Weekly Package Volume</h3>
+                  <p className="text-sm text-muted-foreground">Loading data...</p>
+                </div>
+                <BarChart3 className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div className="h-48 flex items-end justify-between gap-2">
+                {[...Array(8)].map((_, i) => (
+                  <Skeleton key={i} className="flex-1 rounded-t" style={{ height: `${30 + Math.random() * 60}%` }} />
+                ))}
+              </div>
+            </div>
+          ) : analytics?.trendData && analytics.trendData.length > 1 && (
             <div className="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -552,7 +574,27 @@ export default function ClientDashboard() {
           )}
 
           {/* Tier Distribution */}
-          {tierDistribution.length > 0 && (
+          {loading ? (
+            <div className="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-semibold text-foreground">Driver Standings</h3>
+                  <p className="text-sm text-muted-foreground">Loading distribution...</p>
+                </div>
+                <Target className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div className="space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <Skeleton className="w-20 h-6 rounded" />
+                    <Skeleton className="flex-1 h-2 rounded-full" />
+                    <Skeleton className="w-8 h-4" />
+                    <Skeleton className="w-10 h-4" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : tierDistribution.length > 0 && (
             <div className="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -637,7 +679,28 @@ export default function ClientDashboard() {
         {/* Driver Highlights */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Top Performers */}
-          {driverHighlights.topPerformers.length > 0 && (
+          {loading ? (
+            <div className="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+              <div className="flex items-center gap-2 mb-4">
+                <Star className="w-5 h-5 text-amber-500" />
+                <h3 className="font-semibold text-foreground">Top Performers Based on Packages Delivered</h3>
+              </div>
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-neutral-50 dark:bg-neutral-800/50">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-8 h-8 rounded-full" />
+                      <div>
+                        <Skeleton className="w-28 h-4 mb-1" />
+                        <Skeleton className="w-20 h-3" />
+                      </div>
+                    </div>
+                    <Skeleton className="w-16 h-6 rounded" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : driverHighlights.topPerformers.length > 0 && (
             <div className="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
               <div className="flex items-center gap-2 mb-4">
                 <Star className="w-5 h-5 text-amber-500" />
@@ -678,7 +741,28 @@ export default function ClientDashboard() {
           )}
 
           {/* Needs Attention */}
-          {driverHighlights.needsAttention.length > 0 && (
+          {loading ? (
+            <div className="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+              <div className="flex items-center gap-2 mb-4">
+                <AlertTriangle className="w-5 h-5 text-orange-500" />
+                <h3 className="font-semibold text-foreground">Needs Attention</h3>
+              </div>
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-neutral-50 dark:bg-neutral-800/50">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-8 h-8 rounded-full" />
+                      <div>
+                        <Skeleton className="w-28 h-4 mb-1" />
+                        <Skeleton className="w-20 h-3" />
+                      </div>
+                    </div>
+                    <Skeleton className="w-16 h-6 rounded" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : driverHighlights.needsAttention.length > 0 && (
             <div className="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
               <div className="flex items-center gap-2 mb-4">
                 <AlertTriangle className="w-5 h-5 text-orange-500" />
@@ -736,7 +820,30 @@ export default function ClientDashboard() {
             </Link>
           </div>
           <div className="space-y-3">
-            {masterScorecards.slice(0, 3).map((scorecard, index) => (
+            {loading ? (
+              [...Array(3)].map((_, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 rounded-xl border border-neutral-200 dark:border-neutral-800"
+                >
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="w-12 h-12 rounded-xl" />
+                    <div>
+                      <Skeleton className="w-32 h-5 mb-1" />
+                      <Skeleton className="w-24 h-4" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right hidden md:block">
+                      <Skeleton className="w-20 h-4 mb-1" />
+                      <Skeleton className="w-24 h-3" />
+                    </div>
+                    <Skeleton className="w-16 h-6 rounded-full" />
+                    <ChevronRight className="w-5 h-5 text-neutral-400" />
+                  </div>
+                </div>
+              ))
+            ) : masterScorecards?.slice(0, 3).map((scorecard, index) => (
               <Link
                 key={scorecard.id}
                 to={`/master-scorecard/${scorecard.id}`}
@@ -791,7 +898,7 @@ export default function ClientDashboard() {
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions - always visible */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
             to="/upload-scorecard"

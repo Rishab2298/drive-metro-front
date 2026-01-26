@@ -1,135 +1,158 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, ArrowRight } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useTheme } from 'next-themes';
+import { Menu, X, ArrowRight, TrendingUp } from 'lucide-react';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { setTheme } = useTheme();
+  const location = useLocation();
+  const isHomePage = location.pathname === '/' || location.pathname === '/home';
+
+  // Set dark mode as default
+  useEffect(() => {
+    setTheme('dark');
+  }, [setTheme]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navLinks = [
-    { name: 'Features', href: '#features' },
-    { name: 'How It Works', href: '#how-it-works' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Features', href: isHomePage ? '#features' : '/#features' },
+    { name: 'How It Works', href: isHomePage ? '#how-it-works' : '/#how-it-works' },
+    { name: 'Benefits', href: isHomePage ? '#benefits' : '/#benefits' },
+    { name: 'Pricing', href: isHomePage ? '#pricing' : '/#pricing' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'py-3' : 'py-5'}`}>
+      <div className={`mx-4 md:mx-8 transition-all duration-500 rounded-2xl ${
         isScrolled
-          ? 'bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 shadow-lg shadow-purple-500/5'
-          : 'bg-transparent'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-linear-to-br from-purple-600 to-blue-600 rounded-lg blur-sm group-hover:blur-md transition-all" />
-              <div className="relative bg-linear-to-br from-purple-600 to-blue-600 p-2 rounded-lg">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                  />
-                </svg>
+          ? 'bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-indigo-500/5'
+          : ''
+      }`}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-xl blur-lg opacity-50 group-hover:opacity-80 transition-all duration-500" />
+                <div className="relative bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 p-2.5 rounded-xl shadow-lg">
+                  <TrendingUp className="w-5 h-5 text-white" />
+                </div>
               </div>
+              <span className="text-xl font-bold text-slate-900 dark:text-white">
+                DiveMetric
+              </span>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-1">
+              {navLinks.map((link) => (
+                link.href.startsWith('/') ? (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    className="relative px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-300 group"
+                  >
+                    <span className="relative z-10">{link.name}</span>
+                    <div className="absolute inset-0 bg-slate-100 dark:bg-white/5 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300" />
+                  </Link>
+                ) : (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    className="relative px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-300 group"
+                  >
+                    <span className="relative z-10">{link.name}</span>
+                    <div className="absolute inset-0 bg-slate-100 dark:bg-white/5 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300" />
+                  </a>
+                )
+              ))}
+            </nav>
+
+            {/* CTA Buttons */}
+            <div className="hidden md:flex items-center gap-3">
+              <Link to="/sign-in">
+                <button className="px-5 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-xl hover:bg-slate-100 dark:hover:bg-white/5">
+                  Sign In
+                </button>
+              </Link>
+              <Link to="/sign-up">
+                <button className="group relative px-6 py-2.5 rounded-xl font-semibold text-white text-sm overflow-hidden shadow-lg shadow-indigo-500/20">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="relative flex items-center gap-2">
+                    Start Free Trial
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </span>
+                </button>
+              </Link>
             </div>
-            <span className="text-2xl font-bold bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-              DiveMetric
-            </span>
-          </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors relative group"
+            {/* Mobile: Menu Button */}
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
               >
-                {link.name}
-                <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-linear-to-r from-purple-500 to-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
-              </a>
-            ))}
-          </nav>
-
-          {/* CTA Buttons */}
-          <div className="hidden md:flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="text-slate-300 hover:text-white hover:bg-slate-800/50"
-            >
-              Sign In
-            </Button>
-            <Button className="bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white border-0 shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 transition-all group">
-              Get Started
-              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-slate-300 hover:bg-slate-800/50 hover:text-white transition-colors"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      <div
-        className={`md:hidden transition-all duration-300 ease-in-out ${
-          isMobileMenuOpen
-            ? 'max-h-screen opacity-100'
-            : 'max-h-0 opacity-0 overflow-hidden'
-        }`}
+      <motion.div
+        initial={false}
+        animate={isMobileMenuOpen ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
+        className="md:hidden overflow-hidden"
       >
-        <div className="px-4 pt-2 pb-6 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800/50">
+        <div className="mx-4 mt-2 p-4 bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl">
           <nav className="flex flex-col gap-1">
             {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="px-4 py-3 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.name}
-              </a>
+              link.href.startsWith('/') ? (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className="px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </a>
+              )
             ))}
           </nav>
-          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-slate-800/50">
-            <Button
-              variant="ghost"
-              className="w-full justify-center text-slate-300 hover:text-white hover:bg-slate-800/50"
-            >
-              Sign In
-            </Button>
-            <Button className="w-full justify-center bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white border-0 shadow-lg shadow-purple-500/25">
-              Get Started
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
+          <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-slate-200 dark:border-white/10">
+            <Link to="/sign-in" onClick={() => setIsMobileMenuOpen(false)}>
+              <button className="w-full py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all">
+                Sign In
+              </button>
+            </Link>
+            <Link to="/sign-up" onClick={() => setIsMobileMenuOpen(false)}>
+              <button className="w-full py-3 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500">
+                Start Free Trial
+              </button>
+            </Link>
           </div>
         </div>
-      </div>
+      </motion.div>
     </header>
   );
 };
