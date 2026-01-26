@@ -181,7 +181,7 @@ export default function Billing() {
                       trialDaysRemaining > 14 ? 'bg-blue-500' :
                       trialDaysRemaining > 7 ? 'bg-amber-500' : 'bg-red-500'
                     )}
-                    style={{ width: `${Math.max(0, (trialDaysRemaining / 30) * 100)}%` }}
+                    style={{ width: `${Math.min(100, Math.max(0, (trialDaysRemaining / 30) * 100))}%` }}
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">

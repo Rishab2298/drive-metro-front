@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import {
   Building2,
   Loader2,
@@ -116,6 +117,7 @@ export default function Onboarding() {
   const { getToken } = useAuth();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const { refreshSubscription } = useSubscription();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
@@ -210,6 +212,9 @@ export default function Onboarding() {
 
       // Reload user to get updated metadata from Clerk
       await user.reload();
+
+      // Refresh subscription to get the new trial status
+      await refreshSubscription();
 
       navigate("/dashboard");
     } catch (err) {

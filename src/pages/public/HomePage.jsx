@@ -1269,19 +1269,16 @@ const TestimonialsSection = () => {
   const testimonials = [
     {
       quote: "DiveMetric transformed how we communicate performance to our drivers. The AI coaching notes save us hours every week and drivers actually read their scorecards now.",
-      role: "Operations Manager",
       company: "DSP-California",
       metric: "40% more engagement",
     },
     {
       quote: "What used to take our team 4+ hours every week now takes 15 minutes. It's a game-changer for our 50-driver operation. We've maintained Fantastic+ for 6 months straight.",
-      role: "DSP Owner",
       company: "DSP-Texas",
       metric: "4 hours saved weekly",
     },
     {
       quote: "Our driver satisfaction scores went up 35% after implementing DiveMetric. They appreciate the personalized feedback and knowing exactly where they stand.",
-      role: "Fleet Manager",
       company: "DSP-Florida",
       metric: "35% satisfaction increase",
     },
@@ -1329,7 +1326,6 @@ In North America
                   </div>
                   <div>
                     <div className="font-semibold text-slate-900 dark:text-white text-sm">{t.company}</div>
-                    <div className="text-xs text-slate-500">{t.role}</div>
                   </div>
                 </div>
               </GlassCard>

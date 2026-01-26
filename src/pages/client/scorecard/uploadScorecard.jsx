@@ -184,7 +184,10 @@ const CollapsibleSection = ({
 const UploadScorecard = () => {
   const { getToken } = useAuth();
   const navigate = useNavigate();
-  const { hasPremiumAccess } = useSubscription();
+  const { hasPremiumAccess, isLoading: subscriptionLoading } = useSubscription();
+
+  // While subscription is loading, assume premium access (for trial users)
+  const effectivePremiumAccess = subscriptionLoading ? true : hasPremiumAccess;
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [dspInfo, setDspInfo] = useState(null);
   const [dspLoading, setDspLoading] = useState(true);
@@ -379,17 +382,17 @@ const UploadScorecard = () => {
 
         {/* Premium Section */}
         <CollapsibleSection
-          title={hasPremiumAccess ? "Premium Reports" : "Premium Reports (Upgrade Required)"}
-          description={hasPremiumAccess ? "Advanced analytics for subscribers" : "Upgrade to Pro to unlock these reports"}
-          icon={hasPremiumAccess ? Star : Lock}
-          iconClassName={hasPremiumAccess ? "bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400" : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"}
+          title={effectivePremiumAccess ? "Premium Reports" : "Premium Reports (Upgrade Required)"}
+          description={effectivePremiumAccess ? "Advanced analytics for subscribers" : "Upgrade to Pro to unlock these reports"}
+          icon={effectivePremiumAccess ? Star : Lock}
+          iconClassName={effectivePremiumAccess ? "bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400" : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"}
           docs={premiumDocs}
           uploadedFiles={uploadedFiles}
           onUploadComplete={handleUploadComplete}
           indexOffset={requiredDocs.length + optionalDocs.length}
           defaultOpen={false}
           dspInfo={dspInfo}
-          hasPremiumAccess={hasPremiumAccess}
+          hasPremiumAccess={effectivePremiumAccess}
         />
 
         {/* Processing Error */}
