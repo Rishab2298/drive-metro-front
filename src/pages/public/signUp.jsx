@@ -4,7 +4,7 @@ import { TrendingUp, Shield, CheckCircle2, Sparkles, Clock, CreditCard, ArrowLef
 
 const SignUpPage = () => {
   const features = [
-    { text: "45-day free trial included", icon: Clock },
+    { text: "30-day free trial included", icon: Clock },
     { text: "No credit card required", icon: CreditCard },
     { text: "AI-powered coaching insights", icon: Sparkles },
     { text: "Cancel anytime, no questions", icon: CheckCircle2 },
@@ -58,7 +58,7 @@ const SignUpPage = () => {
           <div className="max-w-md">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6">
               <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span className="text-sm font-semibold text-emerald-300">45-Day Free Trial</span>
+              <span className="text-sm font-semibold text-emerald-300">30-Day Free Trial</span>
             </div>
             <h2 className="text-4xl font-black mb-6 text-white">
               Start driving excellence today
@@ -112,7 +112,7 @@ const SignUpPage = () => {
             </Link>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
               <Sparkles className="w-3 h-3 text-emerald-400" />
-              <span className="text-xs font-semibold text-emerald-300">45-Day Free Trial</span>
+              <span className="text-xs font-semibold text-emerald-300">30-Day Free Trial</span>
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Create your account</h2>
             <p className="text-slate-400 text-sm">Start your free trial today</p>

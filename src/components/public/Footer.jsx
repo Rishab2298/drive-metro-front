@@ -4,9 +4,13 @@ import { TrendingUp } from 'lucide-react';
 const Footer = () => {
   const footerLinks = {
     Product: [
-      { name: 'Features', href: '/#features' },
-      { name: 'Pricing', href: '/#pricing' },
-      { name: 'How It Works', href: '/#how-it-works' },
+      { name: 'Features', href: '/home#features' },
+      { name: 'Pricing', href: '/home#pricing' },
+      { name: 'Sample Scorecard', href: '/sample-scorecard' },
+    ],
+    Account: [
+      { name: 'Sign In', href: '/sign-in' },
+      { name: 'Sign Up', href: '/sign-up' },
     ],
     Support: [
       { name: 'Contact Us', href: '/contact' },

@@ -275,7 +275,7 @@ const HeroSection = () => {
                 <div className="absolute inset-0 bg-linear-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <span className="relative flex items-center gap-3">
                   <Sparkles className="w-5 h-5" />
-                  Start 45-Day Free Trial
+                  Start 30-Day Free Trial
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </button>
@@ -924,13 +924,13 @@ const HowItWorksSection = () => {
     {
       step: '02',
       title: 'Auto-Generate Scorecards',
-      description: 'Our AI parses and merges data from all sources, creating unified driver scorecards with rankings and tier standings.',
+      description: 'Our tool parses and merges data from all sources, creating unified driver scorecards with rankings and tier standings.',
       icon: Zap,
       color: '#FCD34D',
     },
     {
       step: '03',
-      title: 'Add Coaching Notes',
+      title: 'Enable AI Coaching',
       description: 'Use AI-powered suggestions or write your own personalized feedback for each driver based on their metrics.',
       icon: Brain,
       color: '#C4B5FD',
@@ -1269,23 +1269,20 @@ const TestimonialsSection = () => {
   const testimonials = [
     {
       quote: "DiveMetric transformed how we communicate performance to our drivers. The AI coaching notes save us hours every week and drivers actually read their scorecards now.",
-      author: "Sarah Chen",
       role: "Operations Manager",
-      company: "FastTrack DSP",
+      company: "DSP-California",
       metric: "40% more engagement",
     },
     {
       quote: "What used to take our team 4+ hours every week now takes 15 minutes. It's a game-changer for our 50-driver operation. We've maintained Fantastic+ for 6 months straight.",
-      author: "Marcus Johnson",
       role: "DSP Owner",
-      company: "Elite Delivery",
+      company: "DSP-Texas",
       metric: "4 hours saved weekly",
     },
     {
       quote: "Our driver satisfaction scores went up 35% after implementing DiveMetric. They appreciate the personalized feedback and knowing exactly where they stand.",
-      author: "Jennifer Martinez",
-      role: "Team Manager",
-      company: "Metro Logistics",
+      role: "Fleet Manager",
+      company: "DSP-Florida",
       metric: "35% satisfaction increase",
     },
   ];
@@ -1304,7 +1301,7 @@ const TestimonialsSection = () => {
             Trusted by DSPs
             <br />
             <span className="bg-linear-to-r from-indigo-600 via-violet-600 to-pink-600 dark:from-indigo-400 dark:via-violet-400 dark:to-pink-400 bg-clip-text text-transparent">
-              Across the Nation
+In North America
             </span>
           </h2>
         </AnimatedSection>
@@ -1328,11 +1325,11 @@ const TestimonialsSection = () => {
 
                 <div className="flex items-center gap-3 pt-4 border-t border-slate-200 dark:border-white/5">
                   <div className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm">
-                    {t.author.split(' ').map(n => n[0]).join('')}
+                    {t.company.split('-')[1]?.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
-                    <div className="font-semibold text-slate-900 dark:text-white text-sm">{t.author}</div>
-                    <div className="text-xs text-slate-500">{t.role}, {t.company}</div>
+                    <div className="font-semibold text-slate-900 dark:text-white text-sm">{t.company}</div>
+                    <div className="text-xs text-slate-500">{t.role}</div>
                   </div>
                 </div>
               </GlassCard>
@@ -1358,14 +1355,6 @@ const PricingSection = () => {
     'Engagement Tracking & Analytics',
   ];
 
-  const freeFeatures = [
-    'DSP Scorecard Upload',
-    'Weekly Overview Report',
-    'Customer Feedback Report',
-    'POD Quality Report',
-    'Basic Analytics Dashboard',
-  ];
-
   return (
     <section id="pricing" className="relative py-24 overflow-hidden">
       {/* Background handled by GlobalBackground */}
@@ -1384,7 +1373,7 @@ const PricingSection = () => {
             </span>
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-400">
-            Start with a 45-day free trial. No credit card required.
+            Start with a 30-day free trial. No credit card required.
           </p>
         </AnimatedSection>
 
@@ -1397,10 +1386,10 @@ const PricingSection = () => {
                 <div className="relative z-10">
                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-4">
                     <Sparkles className="w-4 h-4 text-white" />
-                    <span className="text-sm font-bold text-white">45-Day Free Trial</span>
+                    <span className="text-sm font-bold text-white">30-Day Free Trial</span>
                   </div>
                   <div className="flex items-baseline justify-center gap-2 mb-1">
-                    <span className="text-6xl font-black text-white">$20</span>
+                    <span className="text-6xl font-black text-white">$24.99</span>
                     <span className="text-xl text-white/70 font-medium">/week</span>
                   </div>
                   <p className="text-white/60 text-sm">Billed weekly after trial</p>
@@ -1423,25 +1412,6 @@ const PricingSection = () => {
                           <CheckCircle2 className="w-3 h-3 text-white" />
                         </div>
                         <span className="text-slate-600 dark:text-slate-300 text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="border-t border-slate-200 dark:border-white/5 my-6" />
-
-                <div className="mb-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-6 h-6 rounded-md bg-linear-to-br from-emerald-400 to-emerald-500 flex items-center justify-center">
-                      <Infinity className="w-3 h-3 text-white" />
-                    </div>
-                    <span className="font-bold text-slate-900 dark:text-white">Always Free</span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {freeFeatures.map((feature, i) => (
-                      <div key={i} className="flex items-center gap-2 p-1">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span className="text-xs text-slate-600 dark:text-slate-400">{feature}</span>
                       </div>
                     ))}
                   </div>
@@ -1491,7 +1461,7 @@ const FAQSection = () => {
     },
     {
       question: 'How does billing work after the trial?',
-      answer: "Start with a full-access 45-day free trial - no credit card needed. After the trial, you'll be billed $20 weekly. You can cancel anytime with no questions asked.",
+      answer: "Start with a full-access 30-day free trial - no credit card needed. After the trial, you'll be billed $24.99 weekly. You can cancel anytime with no questions asked.",
     },
     {
       question: 'Is my data secure?',
@@ -1597,7 +1567,7 @@ const CTASection = () => {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
                   </div>
-                  <span className="text-sm font-semibold text-white">Limited Time: 45-Day Free Trial</span>
+                  <span className="text-sm font-semibold text-white">Limited Time: 30-Day Free Trial</span>
                 </div>
 
                 {/* Headline */}

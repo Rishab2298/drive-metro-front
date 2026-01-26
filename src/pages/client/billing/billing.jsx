@@ -163,7 +163,7 @@ export default function Billing() {
                       <Sparkles className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground">45-Day Free Trial</h3>
+                      <h3 className="font-semibold text-foreground">30-Day Free Trial</h3>
                       <p className="text-sm text-muted-foreground">Full access to all premium features</p>
                     </div>
                   </div>
@@ -181,7 +181,7 @@ export default function Billing() {
                       trialDaysRemaining > 14 ? 'bg-blue-500' :
                       trialDaysRemaining > 7 ? 'bg-amber-500' : 'bg-red-500'
                     )}
-                    style={{ width: `${Math.max(0, (trialDaysRemaining / 45) * 100)}%` }}
+                    style={{ width: `${Math.max(0, (trialDaysRemaining / 30) * 100)}%` }}
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
@@ -202,7 +202,7 @@ export default function Billing() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-foreground">$20</p>
+                  <p className="text-2xl font-bold text-foreground">$24.99</p>
                   <p className="text-sm text-muted-foreground">per week</p>
                 </div>
               </div>
@@ -247,7 +247,7 @@ export default function Billing() {
                   ) : (
                     <>
                       <CreditCard className="w-4 h-4" />
-                      Upgrade to Premium - $20/week
+                      Upgrade to Premium - $24.99/week
                     </>
                   )}
                 </button>
@@ -330,7 +330,7 @@ export default function Billing() {
           <div className="space-y-4 text-sm">
             <div>
               <p className="font-medium text-foreground">When will I be charged?</p>
-              <p className="text-muted-foreground">You'll be charged $20 weekly after subscribing. The first charge occurs immediately.</p>
+              <p className="text-muted-foreground">You'll be charged $24.99 weekly after subscribing. The first charge occurs immediately.</p>
             </div>
             <div>
               <p className="font-medium text-foreground">Can I cancel anytime?</p>

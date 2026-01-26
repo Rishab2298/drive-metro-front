@@ -379,7 +379,7 @@ const HeroSection = () => {
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
             </div>
             <span className="text-sm font-semibold bg-linear-to-r from-indigo-200 to-violet-200 bg-clip-text text-transparent">
-              45-Day Free Trial — No Credit Card Required
+              30-Day Free Trial — No Credit Card Required
             </span>
             <Sparkles className="w-4 h-4 text-amber-400" />
           </div>
@@ -921,7 +921,7 @@ const PricingSection = () => {
             </span>
           </h2>
           <p className="text-lg text-indigo-200/70">
-            Start with a 45-day free trial. No credit card required.
+            Start with a 30-day free trial. No credit card required.
           </p>
         </div>
 
@@ -936,10 +936,10 @@ const PricingSection = () => {
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-5 shadow-lg">
                   <Sparkles className="w-4 h-4 text-white" />
-                  <span className="text-sm font-bold text-white">45-Day Free Trial</span>
+                  <span className="text-sm font-bold text-white">30-Day Free Trial</span>
                 </div>
                 <div className="flex items-baseline justify-center gap-2 mb-2">
-                  <span className="text-7xl font-black text-white drop-shadow-lg">$20</span>
+                  <span className="text-7xl font-black text-white drop-shadow-lg">$24.99</span>
                   <span className="text-2xl text-white/80 font-medium">/week</span>
                 </div>
                 <p className="text-white/70 font-medium">Billed weekly after trial</p>
@@ -1034,7 +1034,7 @@ const FAQSection = () => {
     },
     {
       question: 'How does billing work?',
-      answer: "Start with a 45-day free trial with full access. After the trial, you're billed $20 weekly. Cancel anytime.",
+      answer: "Start with a 30-day free trial with full access. After the trial, you're billed $24.99 weekly. Cancel anytime.",
     },
     {
       question: 'Is my data secure?',
@@ -1101,7 +1101,7 @@ const CTASection = () => {
           </span>
         </h2>
         <p className="text-xl text-indigo-200/70 mb-14 max-w-2xl mx-auto leading-relaxed">
-          Join hundreds of DSPs who trust DiveMetric. Start your 45-day free trial today.
+          Join hundreds of DSPs who trust DiveMetric. Start your 30-day free trial today.
         </p>
 
         <Link to="/sign-up">
@@ -1118,7 +1118,7 @@ const CTASection = () => {
         </Link>
 
         <p className="mt-10 text-indigo-200/50 font-medium">
-          45-day free trial. No credit card required. $20/week after.
+          30-day free trial. No credit card required. $24.99/week after.
         </p>
       </div>
     </section>
