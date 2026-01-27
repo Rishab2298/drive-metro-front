@@ -1,15 +1,19 @@
+import { useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const PublicRoute = ({ children }) => {
   const { isSignedIn, isLoaded } = useAuth();
+  const navigate = useNavigate();
 
-  // Redirect to dashboard if signed in (after Clerk loads)
-  if (isLoaded && isSignedIn) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // Redirect to dashboard only after page is rendered and Clerk is loaded
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isLoaded, isSignedIn, navigate]);
 
-  // Show content immediately without waiting for Clerk
+  // Always render children immediately - no blocking checks
   return children;
 };
 
