@@ -715,7 +715,7 @@ const FeaturesSection = () => {
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-slate-900 dark:text-white">AI Coaching</h3>
-                    <p className="text-[10px] text-slate-500">Powered by Grok</p>
+                    
                   </div>
                 </div>
 

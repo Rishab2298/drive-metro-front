@@ -15,8 +15,8 @@ const SignUpPage = () => {
       {/* Global Background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-linear-to-br from-slate-950 via-[#0c0a1d] to-slate-950" />
-        <div className="absolute top-0 right-1/4 w-[800px] h-[800px] rounded-full bg-linear-to-br from-violet-600/20 to-transparent blur-[120px]" />
-        <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] rounded-full bg-linear-to-br from-indigo-600/15 to-transparent blur-[100px]" />
+        <div className="absolute top-0 right-1/4 w-200 h-200 rounded-full bg-linear-to-br from-violet-600/20 to-transparent blur-[120px]" />
+        <div className="absolute bottom-0 left-1/4 w-150 h-150 rounded-full bg-linear-to-br from-indigo-600/15 to-transparent blur-[100px]" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -71,7 +71,7 @@ const SignUpPage = () => {
             {/* Features */}
             <div className="space-y-4">
               {features.map((feature, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.05] hover:border-emerald-500/20 transition-all">
+                <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-white/3 border border-white/6 hover:bg-white/5 hover:border-emerald-500/20 transition-all">
                   <div className="w-8 h-8 rounded-lg bg-linear-to-br from-emerald-500/20 to-indigo-500/20 flex items-center justify-center">
                     <feature.icon className="w-4 h-4 text-emerald-400" />
                   </div>
