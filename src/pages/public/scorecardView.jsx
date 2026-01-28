@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   Square,
   CheckSquare,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -493,7 +494,7 @@ const ScorecardView = () => {
   const [feedbackModal, setFeedbackModal] = useState(null);
   const [view, setView] = useState('current');
   const [expandedSections, setExpandedSections] = useState({
-    safety: true, delivery: true, customer: true, dvic: true, standing: true
+    overall: true, safety: true, delivery: true, customer: true, dvic: true, standing: true
   });
   const [isAcknowledging, setIsAcknowledging] = useState(false);
   const [acknowledgeError, setAcknowledgeError] = useState(null);
@@ -789,6 +790,20 @@ const ScorecardView = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Overall Performance Section - Trailing View Only (shown first) */}
+        {categories.isTrailing && categories.overall?.length > 0 && (
+          <Section
+            id="overall"
+            title="Overall Performance"
+            icon={Star}
+            metrics={categories.overall}
+            defaultSev="great"
+            expandedSections={expandedSections}
+            toggleSection={toggleSection}
+            onOpenMetricModal={setMetricModal}
+          />
         )}
 
         {/* Safety Section */}

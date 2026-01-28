@@ -90,8 +90,7 @@ const SignUpPage = () => {
           </div>
           <div className="w-1 h-1 rounded-full bg-slate-700" />
           <span>99.9% Uptime</span>
-          <div className="w-1 h-1 rounded-full bg-slate-700" />
-          <span>SOC 2 Compliant</span>
+          
         </div>
       </div>
 

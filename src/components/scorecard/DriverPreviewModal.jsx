@@ -13,6 +13,7 @@ import {
   Sparkles,
   Lightbulb,
   AlertTriangle,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -243,13 +244,26 @@ const FeedbackCategoryRow = ({ category, onClick }) => (
 );
 
 // Metric Row Component
-const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, onOpenMetricModal }) => {
+const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, isPodBreakdown, onOpenMetricModal }) => {
   const isDvicTime = metricKey?.toLowerCase().startsWith('dvictime');
   const isPpsBreakdown = metricKey?.toLowerCase().startsWith('pps') && metricKey?.toLowerCase() !== 'ppscompliancerate';
   const isSafetyEvent = ['distractionsrate', 'speedingeventrate', 'seatbeltoffrate', 'followingdistancerate', 'signalviolationsrate'].includes(metricKey?.toLowerCase());
 
+  // Check if this is the parent POD rejects metric
+  const isPodRejectsParent = metricKey?.toLowerCase() === 'podrejects' ||
+                             metricKey?.toLowerCase() === 'photoondeliveryrejects' ||
+                             metricKey?.toLowerCase().includes('podreject');
+
+  // POD breakdown item keys (nested items under Photo on Delivery Rejects)
+  const podBreakdownKeys = ['blurry', 'humaninphoto', 'nopackagedetected', 'packagetooclose', 'phototoodark', 'other'];
+  const isPodBreakdownItem = isPodBreakdown || podBreakdownKeys.includes(metricKey?.toLowerCase());
+
   // Check if PPS breakdown has any non-compliance (value contains "/" and first number > 0)
   const hasPpsNonCompliance = isPpsBreakdown && typeof value === 'string' && value.includes('/') && parseInt(value.split('/')[0]) > 0;
+
+  // Check if POD-related items have issues (value > 0)
+  const numericValue = typeof value === 'number' ? value : (typeof value === 'string' && !isNaN(parseInt(value)) ? parseInt(value) : 0);
+  const hasPodIssue = (isPodRejectsParent || isPodBreakdownItem) && numericValue > 0;
 
   // Get base severity
   let severity = isDvicTime
@@ -261,14 +275,19 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, on
     severity = 'poor';
   }
 
+  // Force severity to 'poor' for POD rejects and POD breakdown items with value > 0
+  if (hasPodIssue) {
+    severity = 'poor';
+  }
+
   const sevColor = severity ? SEVERITY_COLORS[severity] : null;
   const displayLabel = label || formatLabel(metricKey);
   const shouldHighlight = severity === 'poor' || severity === 'fair';
   const isSevere = severity === 'poor';
   const isConcerning = severity === 'fair';
 
-  // Force highlight for PPS breakdown with issues, safety events with poor/fair severity, or explicit forceHighlight prop
-  const shouldForceHighlight = forceHighlight || hasPpsNonCompliance || (isSafetyEvent && shouldHighlight);
+  // Force highlight for PPS breakdown with issues, safety events with poor/fair severity, POD issues, or explicit forceHighlight prop
+  const shouldForceHighlight = forceHighlight || hasPpsNonCompliance || hasPodIssue || (isSafetyEvent && shouldHighlight);
 
   const showSevereHighlight = shouldHighlight && (!indent || isDvicTime || shouldForceHighlight);
   const showSevereIcon = isSevere && (!indent || isDvicTime || shouldForceHighlight);
@@ -454,7 +473,7 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
   const [metricModal, setMetricModal] = useState(null);
   const [feedbackModal, setFeedbackModal] = useState(null);
   const [expandedSections, setExpandedSections] = useState({
-    safety: true, delivery: true, customer: true, dvic: true, standing: true
+    overall: true, safety: true, delivery: true, customer: true, dvic: true, standing: true
   });
 
   const historicalData = parseHistoricalData(driver);
@@ -646,6 +665,20 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Overall Performance Section - Trailing View Only (shown first) */}
+          {categories.isTrailing && categories.overall?.length > 0 && (
+            <Section
+              id="overall"
+              title="Overall Performance"
+              icon={Star}
+              metrics={categories.overall}
+              defaultSev="great"
+              expandedSections={expandedSections}
+              toggleSection={toggleSection}
+              onOpenMetricModal={setMetricModal}
+            />
           )}
 
           {/* Safety Section */}

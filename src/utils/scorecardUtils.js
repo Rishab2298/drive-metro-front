@@ -82,7 +82,21 @@ export const KEY_METRICS = {
     { key: 'ppsDidNotApplyParkingBrake', label: 'Did Not Apply Parking Brake', format: 'ppsBreakdown', stopsKey: 'missingParkingBrakeStops', totalKey: 'ppsTotalEvaluatedStops' },
     { key: 'ppsDidNotShiftGearToPark', label: 'Did Not Shift Gear to Park', format: 'ppsBreakdown', stopsKey: 'missingGearInParkStops', totalKey: 'ppsTotalEvaluatedStops' },
   ],
-  safetyTrailing: ['onRoadSafetyScore', 'pawPrintContactCompliance'],
+  // Trailing view - Overall section (most important metrics first)
+  overallTrailing: [
+    { key: 'overallScore', label: 'Overall Performance Score' },
+    { key: 'overallStanding', label: 'Overall Standing', type: 'tier' },
+    { key: 'packagesDelivered', label: 'Total Packages Delivered' },
+  ],
+  // Trailing view - Safety section
+  safetyTrailing: [
+    { key: 'ficoScore', label: 'FICO Score', format: 'outOf850' },
+    { key: 'speedingEventRate', label: 'Speeding Events' },
+    { key: 'seatbeltOffRate', label: 'Seatbelt Off Events' },
+    { key: 'distractionsRate', label: 'Distraction Events' },
+    { key: 'signalViolationsRate', label: 'Sign/Signal Violations' },
+    { key: 'followingDistanceRate', label: 'Following Distance Events' },
+  ],
   delivery: [
     { key: 'qualityTier', label: 'Overall Quality Score', type: 'tier', fallback: 'tier' },
     { key: 'deliveryCompletionRate', label: 'Completion Rate', format: 'percent' },
@@ -99,7 +113,20 @@ export const KEY_METRICS = {
     { key: 'podRejectsBreakdown_packageTooClose', label: 'Package Too Close' },
     { key: 'podRejectsBreakdown_photoTooDark', label: 'Photo Too Dark' },
   ],
-  deliveryTrailing: ['overallQualityScore', 'completionRate', 'photoOnDeliveryAcceptance'],
+  deliveryTrailing: [
+    { key: 'dcr', label: 'Delivery Completion Rate', format: 'percent' },
+    { key: 'dcrTier', label: 'DCR Tier', type: 'tier' },
+    { key: 'pod', label: 'Photo-On-Delivery', format: 'percent' },
+    { key: 'podTier', label: 'POD Tier', type: 'tier' },
+    { key: 'podScore', label: 'POD Score' },
+    { key: 'dsb', label: 'Delivery Success Behaviors' },
+    { key: 'dsbDpmoTier', label: 'DSB Tier', type: 'tier' },
+    { key: 'dsbDpmoScore', label: 'DSB Score' },
+    { key: 'psb', label: 'Pickup Success Behaviors' },
+    { key: 'psbTier', label: 'PSB Tier', type: 'tier' },
+    { key: 'psbScore', label: 'PSB Score' },
+    { key: 'packagesDelivered', label: 'Packages Delivered' },
+  ],
   customer: [
     { key: 'feedbackTier', label: 'Overall Feedback Score', type: 'tier', fallback: 'tier' },
     { key: 'cdfDpmo', label: 'Negative Feedback Rate (CDF DPMO)' },
@@ -115,7 +142,12 @@ export const KEY_METRICS = {
     { key: 'neverReceived', label: 'Never Received Delivery' },
     { key: 'receivedWrongItem', label: 'Received Wrong Item' },
   ],
-  customerTrailing: ['overallFeedbackScore', 'negativeFeedbackRate'],
+  customerTrailing: [
+    { key: 'cdfDpmo', label: 'Negative Feedback Rate (CDF DPMO)' },
+    { key: 'cdfDpmoTier', label: 'CDF Tier', type: 'tier' },
+    { key: 'cdfDpmoScore', label: 'CDF Score' },
+    { key: 'cedScore', label: 'Customer Escalation Score' },
+  ],
   dvic: [
     { key: 'rushedInspections', label: 'Rushed Inspections' },
     { key: 'dvicRushed', label: 'Rushed Inspections' },
@@ -129,7 +161,10 @@ export const KEY_METRICS = {
     { key: 'dvicTime6', labelKey: 'dvicDate6' },
     { key: 'dvicTime7', labelKey: 'dvicDate7' },
   ],
-  standingTrailing: ['overallStanding', 'tier'],
+  standingTrailing: [
+    { key: 'overallStanding', label: 'Overall Standing', type: 'tier' },
+    { key: 'tier', label: 'Performance Tier', type: 'tier' },
+  ],
   standing: ['overallStanding', 'tier']
 };
 
@@ -302,12 +337,29 @@ export const METRIC_EXPLANATIONS = {
 
 // Metric display names
 export const METRIC_DISPLAY_NAMES = {
+  // Overall metrics
+  overallScore: 'Overall Performance Score',
+  overallStanding: 'Overall Standing',
+
+  // FICO / Safety
   ficoScore: 'FICO Safety Score',
+  ficoMetric: 'FICO Metric',
+  ficoTier: 'FICO Tier',
   seatbeltOffRate: 'Seatbelt Off Events',
+  seatbeltOffRateTier: 'Seatbelt Off Tier',
+  seatbeltOffRateScore: 'Seatbelt Off Score',
   speedingEventRate: 'Speeding Events',
+  speedingEventRateTier: 'Speeding Tier',
+  speedingEventRateScore: 'Speeding Score',
   distractionsRate: 'Distraction Events',
+  distractionsRateTier: 'Distractions Tier',
+  distractionsRateScore: 'Distractions Score',
   followingDistanceRate: 'Follow Distance Events',
+  followingDistanceRateTier: 'Following Distance Tier',
+  followingDistanceRateScore: 'Following Distance Score',
   signalViolationsRate: 'Sign/Signal Violations',
+  signalViolationsRateTier: 'Sign/Signal Violations Tier',
+  signalViolationsRateScore: 'Sign/Signal Violations Score',
   onRoadSafetyScore: 'On-Road Safety Score',
   pawPrintContactCompliance: 'Paw Print Contact Compliance',
   pawPrintCompliance: 'Paw Print Contact Compliance',
@@ -327,10 +379,20 @@ export const METRIC_DISPLAY_NAMES = {
   completionRate: 'Completion Rate',
   photoOnDeliveryAcceptance: 'Photo-On-Delivery Acceptance',
   dcr: 'Delivery Completion Rate',
+  dcrTier: 'DCR Tier',
   pod: 'Photo-On-Delivery Acceptance',
+  podTier: 'POD Tier',
+  podScore: 'POD Score',
   dsb: 'Delivery Success Behaviors',
+  dsbDpmo: 'DSB DPMO',
+  dsbDpmoTier: 'DSB Tier',
+  dsbDpmoScore: 'DSB Score',
   psb: 'Pickup Success Behaviors',
+  psbTier: 'PSB Tier',
+  psbScore: 'PSB Score',
   cdfDpmo: 'Negative Feedback Rate (CDF DPMO)',
+  cdfDpmoTier: 'CDF Tier',
+  cdfDpmoScore: 'CDF Score',
   cdf: 'Customer Delivery Feedback',
   customerEscalationDefect: 'Escalation Defects',
   cedScore: 'Customer Escalation Score',
@@ -345,8 +407,6 @@ export const METRIC_DISPLAY_NAMES = {
   ppsDidNotApplyParkingBrake: 'Did Not Apply Parking Brake',
   ppsDidNotShiftGearToPark: 'Did Not Shift Gear to Park',
   pawPrintComplianceRate: 'Paw Print Notification Rate',
-  overallStanding: 'Overall Standing',
-  overallScore: 'Overall Performance Score',
   tier: 'Performance Tier',
 };
 
@@ -559,6 +619,14 @@ export const getSeverityLevel = (key, value) => {
 
   const keyLower = key.toLowerCase();
 
+  // Overall Score - main performance metric (0-100 scale)
+  if (keyLower === 'overallscore') {
+    if (numValue >= 90) return 'fantastic';
+    if (numValue >= 80) return 'great';
+    if (numValue >= 70) return 'fair';
+    return 'poor';
+  }
+
   // Customer feedback category counts - ANY negative feedback is severe
   if (FEEDBACK_CATEGORY_KEYS.includes(keyLower)) {
     if (numValue === 0) return 'fantastic';
@@ -570,6 +638,14 @@ export const getSeverityLevel = (key, value) => {
     if (numValue === 0) return 'fantastic';
     if (numValue <= 1) return 'great';
     if (numValue <= 3) return 'fair';
+    return 'poor';
+  }
+
+  // Score fields (typically 0-100)
+  if (keyLower.includes('score') && !keyLower.includes('fico')) {
+    if (numValue >= 90) return 'fantastic';
+    if (numValue >= 75) return 'great';
+    if (numValue >= 50) return 'fair';
     return 'poor';
   }
 
@@ -656,6 +732,7 @@ export const formatLabel = (key) => {
 
 // Categorize driver metrics into sections
 export const categorizeMetrics = (driver, useHistorical = false, historicalData = null) => {
+  const overall = [];  // Overall performance metrics (for trailing view)
   const safety = [];
   const safetyEvents = [];
   const ppsBreakdown = [];
@@ -746,10 +823,11 @@ export const categorizeMetrics = (driver, useHistorical = false, historicalData 
   };
 
   if (useHistorical) {
-    KEY_METRICS.safetyTrailing.forEach(key => addMetricFromDef(safety, key));
-    KEY_METRICS.deliveryTrailing.forEach(key => addMetricFromDef(delivery, key));
-    KEY_METRICS.customerTrailing.forEach(key => addMetricFromDef(customer, key));
-    KEY_METRICS.standingTrailing.forEach(key => addMetricFromDef(standing, key));
+    KEY_METRICS.overallTrailing.forEach(def => addMetricFromDef(overall, def));
+    KEY_METRICS.safetyTrailing.forEach(def => addMetricFromDef(safety, def));
+    KEY_METRICS.deliveryTrailing.forEach(def => addMetricFromDef(delivery, def));
+    KEY_METRICS.customerTrailing.forEach(def => addMetricFromDef(customer, def));
+    KEY_METRICS.standingTrailing.forEach(def => addMetricFromDef(standing, def));
   } else {
     KEY_METRICS.safety.forEach(def => addMetricFromDef(safety, def));
     KEY_METRICS.safetyEvents.forEach(def => addMetricFromDef(safetyEvents, def));
@@ -820,6 +898,7 @@ export const categorizeMetrics = (driver, useHistorical = false, historicalData 
   }
 
   return {
+    overall,
     safety,
     safetyEvents,
     ppsBreakdown,

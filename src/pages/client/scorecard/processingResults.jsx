@@ -18,6 +18,7 @@ import {
   MessageCircle,
   Wrench,
   Trophy,
+  Star,
 } from 'lucide-react';
 
 
@@ -44,8 +45,18 @@ const KEY_METRICS = {
   ],
   // Safety - Trailing metrics (6-Week)
   safetyTrailing: [
-    'onRoadSafetyScore',
-    'pawPrintContactCompliance',
+    { key: 'ficoScore', label: 'FICO Score', format: 'outOf850' },
+    { key: 'speedingEventRate', label: 'Speeding Events' },
+    { key: 'seatbeltOffRate', label: 'Seatbelt Off Events' },
+    { key: 'distractionsRate', label: 'Distraction Events' },
+    { key: 'signalViolationsRate', label: 'Sign/Signal Violations' },
+    { key: 'followingDistanceRate', label: 'Following Distance Events' },
+  ],
+  // Overall - Trailing metrics (6-Week)
+  overallTrailing: [
+    { key: 'overallScore', label: 'Overall Performance Score' },
+    { key: 'overallStanding', label: 'Overall Standing', type: 'tier' },
+    { key: 'packagesDelivered', label: 'Total Packages Delivered' },
   ],
   // Delivery - Current Week
   delivery: [
@@ -66,9 +77,18 @@ const KEY_METRICS = {
   ],
   // Delivery - Trailing metrics (6-Week)
   deliveryTrailing: [
-    'overallQualityScore',
-    'completionRate',
-    'photoOnDeliveryAcceptance',
+    { key: 'dcr', label: 'Delivery Completion Rate', format: 'percent' },
+    { key: 'dcrTier', label: 'DCR Tier', type: 'tier' },
+    { key: 'pod', label: 'Photo-On-Delivery', format: 'percent' },
+    { key: 'podTier', label: 'POD Tier', type: 'tier' },
+    { key: 'podScore', label: 'POD Score' },
+    { key: 'dsb', label: 'Delivery Success Behaviors' },
+    { key: 'dsbDpmoTier', label: 'DSB Tier', type: 'tier' },
+    { key: 'dsbDpmoScore', label: 'DSB Score' },
+    { key: 'psb', label: 'Pickup Success Behaviors' },
+    { key: 'psbTier', label: 'PSB Tier', type: 'tier' },
+    { key: 'psbScore', label: 'PSB Score' },
+    { key: 'packagesDelivered', label: 'Packages Delivered' },
   ],
   // Customer Feedback - Current Week
   customer: [
@@ -79,8 +99,10 @@ const KEY_METRICS = {
   ],
   // Customer - Trailing metrics (6-Week)
   customerTrailing: [
-    'overallFeedbackScore',
-    'negativeFeedbackRate',
+    { key: 'cdfDpmo', label: 'Negative Feedback Rate (CDF DPMO)' },
+    { key: 'cdfDpmoTier', label: 'CDF Tier', type: 'tier' },
+    { key: 'cdfDpmoScore', label: 'CDF Score' },
+    { key: 'cedScore', label: 'Customer Escalation Score' },
   ],
   // DVIC - Current Week
   dvic: [
@@ -99,8 +121,8 @@ const KEY_METRICS = {
   ],
   // Standing - Trailing (uses keys from historical data)
   standingTrailing: [
-    'overallStanding',
-    'tier',
+    { key: 'overallStanding', label: 'Overall Standing', type: 'tier' },
+    { key: 'tier', label: 'Performance Tier', type: 'tier' },
   ],
   // Standing
   standing: [
@@ -821,6 +843,7 @@ const categorizeMetrics = (driver, useHistorical = false, historicalData = null)
   const delivery = [];
   const podBreakdown = [];
   const customer = [];
+  const overall = [];
   const dvic = [];
   const dvicTimes = [];
   const standing = [];
@@ -901,11 +924,12 @@ const categorizeMetrics = (driver, useHistorical = false, historicalData = null)
   };
 
   if (useHistorical) {
-    // Use trailing-specific metrics (simple string keys)
-    KEY_METRICS.safetyTrailing.forEach(key => addMetricFromDef(safety, key));
-    KEY_METRICS.deliveryTrailing.forEach(key => addMetricFromDef(delivery, key));
-    KEY_METRICS.customerTrailing.forEach(key => addMetricFromDef(customer, key));
-    KEY_METRICS.standingTrailing.forEach(key => addMetricFromDef(standing, key));
+    // Use trailing-specific metrics (object definitions)
+    KEY_METRICS.overallTrailing.forEach(def => addMetricFromDef(overall, def));
+    KEY_METRICS.safetyTrailing.forEach(def => addMetricFromDef(safety, def));
+    KEY_METRICS.deliveryTrailing.forEach(def => addMetricFromDef(delivery, def));
+    KEY_METRICS.customerTrailing.forEach(def => addMetricFromDef(customer, def));
+    KEY_METRICS.standingTrailing.forEach(def => addMetricFromDef(standing, def));
   } else {
     // Use current week metrics (object definitions)
     KEY_METRICS.safety.forEach(def => addMetricFromDef(safety, def));
@@ -930,6 +954,7 @@ const categorizeMetrics = (driver, useHistorical = false, historicalData = null)
   }
 
   return {
+    overall,
     safety,
     safetyEvents,
     delivery,
@@ -949,7 +974,7 @@ const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount }) => {
   const [view, setView] = useState('current');
   const [metricModal, setMetricModal] = useState(null);
   const [expandedSections, setExpandedSections] = useState({
-    safety: true, delivery: true, customer: true, dvic: true, standing: true
+    overall: true, safety: true, delivery: true, customer: true, dvic: true, standing: true
   });
 
   const t = MODAL_THEMES[theme];
@@ -1445,6 +1470,17 @@ const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount }) => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Overall Performance Section - Trailing View Only (shown first) */}
+          {categories.isTrailing && categories.overall?.length > 0 && (
+            <Section
+              id="overall"
+              title="Overall Performance"
+              icon={Star}
+              metrics={categories.overall}
+              defaultSev="great"
+            />
           )}
 
           {/* Safety Section with Events subsection */}

@@ -6,7 +6,7 @@
 
 import { useState } from 'react'
 
-// Sample driver data
+// Sample driver data - Current Week
 const sampleDriver = {
   name: "Joe Driver",
   firstName: "Joe",
@@ -14,9 +14,11 @@ const sampleDriver = {
   transporterId: "A3AHESB408LBV7",
   dspCode: "DSPX",
   stationCode: "DXX1",
-  week: 42,
-  year: 2024,
+  week: 48,
+  year: 2025,
   tier: "Platinum",
+  overallStanding: "Platinum",
+  overallScore: 87.58,
   rank: 12,
   totalDrivers: 55,
   packagesDelivered: 1254,
@@ -30,26 +32,40 @@ const sampleDriver = {
   ppsDidNotShiftToPark: 11,
   pawPrintSent: 105,
   pawPrintTotal: 120,
-  distractionsRate: 0.1,
-  speedingEventRate: 0.8,
-  seatbeltOffRate: 0.2,
-  followingDistanceRate: 0.3,
-  signalViolationsRate: 0.1,
+  distractionsRate: 0.0,
+  speedingEventRate: 0.0,
+  seatbeltOffRate: 0.0,
+  followingDistanceRate: 0.0,
+  signalViolationsRate: 0.0,
   // Delivery
   deliveryQualityScore: "Gold",
   completionRate: 99.5,
+  dcr: 99.5,
+  dcrTier: "Platinum",
   deliveredNotReceived: 2,
-  podAcceptanceRate: 99.3,
+  podAcceptanceRate: 99.2,
+  pod: 99.2,
+  podTier: "Platinum",
+  podScore: 90.6,
   podOpportunities: 561,
   podRejects: 4,
   podRejectsBreakdown_blurryPhoto: 2,
-  podRejectsBreakdown_humanInPicture: 1,
+  podRejectsBreakdown_humanInPicture: 0,
   podRejectsBreakdown_noPackageDetected: 1,
-  dsb: 320,
-  psb: 500,
+  podRejectsBreakdown_packageTooClose: 0,
+  podRejectsBreakdown_photoTooDark: 1,
+  dsb: 162,
+  dsbDpmoTier: "Platinum",
+  dsbDpmoScore: 84.35,
+  psb: 0,
+  psbTier: "",
+  psbScore: 0,
   // Customer
-  customerFeedbackScore: "Silver",
-  cdfDpmo: 2107,
+  customerFeedbackScore: "Bronze",
+  cdfDpmo: 2762,
+  cdfDpmoTier: "Bronze",
+  cdfDpmoScore: 0,
+  cedScore: 0,
   negativeFeedbackCount: 3,
   escalationDefects: 1,
   negativeFeedback: {
@@ -67,7 +83,16 @@ const sampleDriver = {
     { day: "Sat 10/04", time: "00:09", severity: "poor" }
   ],
   focusArea: "Customer Delivery Feedback",
-  focusGuidance: "Always read the customer notes before executing a delivery! These notes will aid you in the delivery and help to ensure your success. When in doubt, call customer support or call/text the customer for guidance on how they want their package delivered."
+  focusGuidance: "Always read the customer notes before executing a delivery! These notes will aid you in the delivery and help to ensure your success. When in doubt, call customer support or call/text the customer for guidance on how they want their package delivered.",
+  // 6-Week Trailing Historical Data
+  historicalData: JSON.stringify([
+    { week: 43, year: 2025, metrics: { overallScore: 85.2, overallStanding: "Platinum", dcr: 99.1, pod: 98.9, cdfDpmo: 2500, speedingEventRate: 0.0, seatbeltOffRate: 0.0 }},
+    { week: 44, year: 2025, metrics: { overallScore: 86.5, overallStanding: "Platinum", dcr: 99.3, pod: 99.0, cdfDpmo: 2650, speedingEventRate: 0.0, seatbeltOffRate: 0.0 }},
+    { week: 45, year: 2025, metrics: { overallScore: 88.1, overallStanding: "Platinum", dcr: 99.5, pod: 99.1, cdfDpmo: 2800, speedingEventRate: 0.0, seatbeltOffRate: 0.0 }},
+    { week: 46, year: 2025, metrics: { overallScore: 87.0, overallStanding: "Platinum", dcr: 99.4, pod: 99.2, cdfDpmo: 2700, speedingEventRate: 0.0, seatbeltOffRate: 0.0 }},
+    { week: 47, year: 2025, metrics: { overallScore: 86.8, overallStanding: "Platinum", dcr: 99.2, pod: 99.0, cdfDpmo: 2750, speedingEventRate: 0.0, seatbeltOffRate: 0.0 }},
+    { week: 48, year: 2025, metrics: { overallScore: 87.58, overallStanding: "Platinum", dcr: 99.5, pod: 99.2, cdfDpmo: 2762, speedingEventRate: 0.0, seatbeltOffRate: 0.0 }},
+  ])
 }
 
 export default function ScorecardSampleDemo({ driver = sampleDriver }) {
@@ -474,8 +499,32 @@ export default function ScorecardSampleDemo({ driver = sampleDriver }) {
 
       {/* Content */}
       <div style={{ padding: '0 16px 32px' }}>
-        {/* DSP Note */}
-        {driver.dspNote && (
+        {/* Trailing View Indicator */}
+        {activeView === 'trailing' && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1))',
+            borderRadius: '12px',
+            padding: '12px 16px',
+            marginBottom: '12px',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}>
+            <span style={{ fontSize: '16px' }}>📊</span>
+            <div>
+              <div style={{ fontSize: '12px', fontWeight: '600', color: '#A78BFA' }}>
+                6-Week Trailing Averages
+              </div>
+              <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>
+                Showing averaged metrics from weeks 43-48
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DSP Note - Current view only */}
+        {activeView === 'current' && driver.dspNote && (
           <div style={{
             background: theme.bg.secondary,
             borderRadius: '12px',
@@ -505,63 +554,146 @@ export default function ScorecardSampleDemo({ driver = sampleDriver }) {
           </div>
         )}
 
+        {/* Overall Performance - Trailing View Only */}
+        {activeView === 'trailing' && (
+          <Section id="overall" title="Overall Performance" icon="⭐" severity={driver.overallScore >= 90 ? 'fantastic' : driver.overallScore >= 80 ? 'great' : 'fair'}>
+            <MetricRow
+              label="Overall Score"
+              value={driver.overallScore}
+              severity={driver.overallScore >= 90 ? 'fantastic' : driver.overallScore >= 80 ? 'great' : driver.overallScore >= 70 ? 'fair' : 'poor'}
+            />
+            <MetricRow label="Overall Standing" value={driver.overallStanding} severity="fantastic" />
+            <MetricRow label="Packages Delivered" value={driver.packagesDelivered.toLocaleString()} />
+          </Section>
+        )}
+
         {/* Driving Safety */}
         <Section id="safety" title="Driving Safety" icon="🛡️" severity="fantastic">
-          <MetricRow label="On-Road Safety" value={driver.onRoadSafetyScore} severity="fantastic" />
-          <MetricRow
-            label="FICO Score"
-            value={driver.ficoScore}
-            denominator={850}
-            severity={driver.ficoScore >= 800 ? 'fantastic' : driver.ficoScore >= 700 ? 'great' : 'fair'}
-          />
-          <MetricRow label="PPS Compliance" value={driver.ppsComplianceRate} suffix="%" />
-          <MetricRow label="Parking Brake Missed" value={driver.ppsDidNotApplyParkingBrake} denominator={driver.ppsTotalStops} indent />
-          <MetricRow label="Shift to Park Missed" value={driver.ppsDidNotShiftToPark} denominator={driver.ppsTotalStops} indent />
-          <MetricRow label="Paw Print Compliance" value={driver.pawPrintSent} denominator={driver.pawPrintTotal} severity="great" />
+          {activeView === 'current' ? (
+            <>
+              <MetricRow label="On-Road Safety" value={driver.onRoadSafetyScore} severity="fantastic" />
+              <MetricRow
+                label="FICO Score"
+                value={driver.ficoScore}
+                denominator={850}
+                severity={driver.ficoScore >= 800 ? 'fantastic' : driver.ficoScore >= 700 ? 'great' : 'fair'}
+              />
+              <MetricRow
+                label="PPS Compliance"
+                value={driver.ppsComplianceRate}
+                suffix="%"
+                severity={driver.ppsComplianceRate >= 95 ? 'fantastic' : driver.ppsComplianceRate >= 85 ? 'great' : driver.ppsComplianceRate >= 75 ? 'fair' : 'poor'}
+              />
+              <MetricRow
+                label="Parking Brake Missed"
+                value={driver.ppsDidNotApplyParkingBrake}
+                denominator={driver.ppsTotalStops}
+                indent
+                severity={driver.ppsDidNotApplyParkingBrake > 0 ? 'poor' : 'fantastic'}
+              />
+              <MetricRow
+                label="Shift to Park Missed"
+                value={driver.ppsDidNotShiftToPark}
+                denominator={driver.ppsTotalStops}
+                indent
+                severity={driver.ppsDidNotShiftToPark > 0 ? 'poor' : 'fantastic'}
+              />
+              <MetricRow
+                label="Paw Print Compliance"
+                value={driver.pawPrintSent}
+                denominator={driver.pawPrintTotal}
+                severity={driver.pawPrintSent / driver.pawPrintTotal >= 0.95 ? 'fantastic' : driver.pawPrintSent / driver.pawPrintTotal >= 0.85 ? 'great' : 'fair'}
+              />
 
-          <SubLabel>Events per 100 Deliveries</SubLabel>
-          <MetricRow label="Distractions" value={driver.distractionsRate} />
-          <MetricRow label="Speeding" value={driver.speedingEventRate} severity="poor" />
-          <MetricRow label="Seatbelt Off" value={driver.seatbeltOffRate} severity="great" />
-          <MetricRow label="Following Distance" value={driver.followingDistanceRate} severity="fair" />
-          <MetricRow label="Signal Violations" value={driver.signalViolationsRate} />
+              <SubLabel>Events per 100 Deliveries</SubLabel>
+              <MetricRow label="Distractions" value={driver.distractionsRate} severity={driver.distractionsRate === 0 ? 'fantastic' : 'poor'} />
+              <MetricRow label="Speeding" value={driver.speedingEventRate} severity={driver.speedingEventRate === 0 ? 'fantastic' : 'poor'} />
+              <MetricRow label="Seatbelt Off" value={driver.seatbeltOffRate} severity={driver.seatbeltOffRate === 0 ? 'fantastic' : 'poor'} />
+              <MetricRow label="Following Distance" value={driver.followingDistanceRate} severity={driver.followingDistanceRate === 0 ? 'fantastic' : 'fair'} />
+              <MetricRow label="Signal Violations" value={driver.signalViolationsRate} severity={driver.signalViolationsRate === 0 ? 'fantastic' : 'poor'} />
+            </>
+          ) : (
+            <>
+              <MetricRow
+                label="FICO Score"
+                value={driver.ficoScore}
+                denominator={850}
+                severity={driver.ficoScore >= 800 ? 'fantastic' : driver.ficoScore >= 700 ? 'great' : 'fair'}
+              />
+              <MetricRow label="Speeding Events" value="0.0" severity="fantastic" />
+              <MetricRow label="Seatbelt Off Events" value="0.0" severity="fantastic" />
+              <MetricRow label="Distraction Events" value="0.0" severity="fantastic" />
+              <MetricRow label="Sign/Signal Violations" value="0.0" severity="fantastic" />
+              <MetricRow label="Following Distance Events" value="0.0" severity="fantastic" />
+            </>
+          )}
         </Section>
 
         {/* Delivery Quality */}
         <Section id="delivery" title="Delivery Quality" icon="📦" severity="great">
-          <MetricRow label="Quality Score" value={driver.deliveryQualityScore} severity="great" />
-          <MetricRow label="Completion Rate" value={driver.completionRate} suffix="%" />
-          <MetricRow label="Delivered Not Received" value={driver.deliveredNotReceived} denominator={driver.packagesDelivered} severity="fair" />
-          <MetricRow label="POD Acceptance" value={driver.podAcceptanceRate} suffix="%" />
-          <MetricRow label="POD Rejects" value={driver.podRejects} denominator={driver.podOpportunities} />
-          <MetricRow label="Blurry Photo" value={driver.podRejectsBreakdown_blurryPhoto} indent />
-          <MetricRow label="Human in Photo" value={driver.podRejectsBreakdown_humanInPicture} indent />
-          <MetricRow label="No Package Detected" value={driver.podRejectsBreakdown_noPackageDetected} indent />
-          <MetricRow label="Delivery Success Behaviors" value={driver.dsb} severity="great" />
-          <MetricRow label="Pickup Success Behaviors" value={driver.psb} severity="fair" />
+          {activeView === 'current' ? (
+            <>
+              <MetricRow label="Quality Score" value={driver.deliveryQualityScore} severity="great" />
+              <MetricRow label="Completion Rate" value={driver.completionRate} suffix="%" />
+              <MetricRow label="Delivered Not Received" value={driver.deliveredNotReceived} denominator={driver.packagesDelivered} severity="fair" />
+              <MetricRow label="POD Acceptance" value={driver.podAcceptanceRate} suffix="%" />
+              <MetricRow label="POD Rejects" value={driver.podRejects} denominator={driver.podOpportunities} severity={driver.podRejects > 0 ? 'poor' : 'fantastic'} />
+              <MetricRow label="Blurry Photo" value={driver.podRejectsBreakdown_blurryPhoto} indent severity={driver.podRejectsBreakdown_blurryPhoto > 0 ? 'poor' : undefined} />
+              <MetricRow label="Human in Photo" value={driver.podRejectsBreakdown_humanInPicture} indent severity={driver.podRejectsBreakdown_humanInPicture > 0 ? 'poor' : undefined} />
+              <MetricRow label="No Package Detected" value={driver.podRejectsBreakdown_noPackageDetected} indent severity={driver.podRejectsBreakdown_noPackageDetected > 0 ? 'poor' : undefined} />
+              <MetricRow label="Package Too Close" value={driver.podRejectsBreakdown_packageTooClose} indent severity={driver.podRejectsBreakdown_packageTooClose > 0 ? 'poor' : undefined} />
+              <MetricRow label="Photo Too Dark" value={driver.podRejectsBreakdown_photoTooDark} indent severity={driver.podRejectsBreakdown_photoTooDark > 0 ? 'poor' : undefined} />
+              <MetricRow label="Delivery Success Behaviors" value={driver.dsb} severity="great" />
+              <MetricRow label="Pickup Success Behaviors" value={driver.psb || 'N/A'} />
+            </>
+          ) : (
+            <>
+              <MetricRow label="Delivery Completion Rate" value="99.3%" severity="fantastic" />
+              <MetricRow label="DCR Tier" value="Platinum" severity="fantastic" />
+              <MetricRow label="Photo-On-Delivery" value="99.1%" severity="fantastic" />
+              <MetricRow label="POD Tier" value="Platinum" severity="fantastic" />
+              <MetricRow label="POD Score" value="90.6" severity="great" />
+              <MetricRow label="Delivery Success Behaviors" value="162" />
+              <MetricRow label="DSB Tier" value="Platinum" severity="fantastic" />
+              <MetricRow label="DSB Score" value="84.35" severity="great" />
+            </>
+          )}
         </Section>
 
         {/* Customer Feedback */}
-        <Section id="customer" title="Customer Feedback" icon="💬" severity="fair">
-          <MetricRow label="Feedback Score" value={driver.customerFeedbackScore} severity="fair" />
-          <MetricRow label="CDF DPMO" value={driver.cdfDpmo.toLocaleString()} severity="fair" />
-          <MetricRow label="Negative Feedback" value={driver.negativeFeedbackCount} denominator={driver.packagesDelivered} severity="fair" indent />
-          <MetricRow label="Escalation Defects" value={driver.escalationDefects} severity="great" />
+        <Section id="customer" title="Customer Feedback" icon="💬" severity={activeView === 'trailing' ? 'fair' : 'fair'}>
+          {activeView === 'current' ? (
+            <>
+              <MetricRow label="Feedback Score" value={driver.customerFeedbackScore} severity="fair" />
+              <MetricRow label="CDF DPMO" value={driver.cdfDpmo.toLocaleString()} severity="fair" />
+              <MetricRow label="Negative Feedback" value={driver.negativeFeedbackCount} denominator={driver.packagesDelivered} severity="fair" indent />
+              <MetricRow label="Escalation Defects" value={driver.escalationDefects} severity="great" />
 
-          <SubLabel>Feedback Breakdown</SubLabel>
-          <MetricRow label="Not Great" value={driver.negativeFeedback.notGreat} indent />
-          <MetricRow label="Instructions Not Followed" value={driver.negativeFeedback.didNotFollowInstructions} indent />
-          <MetricRow label="Wrong Address" value={driver.negativeFeedback.wrongAddress} indent />
-          <MetricRow label="Never Received" value={driver.negativeFeedback.neverReceived} indent />
+              <SubLabel>Feedback Breakdown</SubLabel>
+              <MetricRow label="Not Great" value={driver.negativeFeedback.notGreat} indent />
+              <MetricRow label="Instructions Not Followed" value={driver.negativeFeedback.didNotFollowInstructions} indent />
+              <MetricRow label="Wrong Address" value={driver.negativeFeedback.wrongAddress} indent />
+              <MetricRow label="Never Received" value={driver.negativeFeedback.neverReceived} indent />
+            </>
+          ) : (
+            <>
+              <MetricRow label="CDF DPMO" value="2,693" severity="fair" />
+              <MetricRow label="CDF Tier" value="Bronze" severity="poor" />
+              <MetricRow label="CDF Score" value="0" severity="poor" />
+              <MetricRow label="Customer Escalation Score" value="0" />
+            </>
+          )}
         </Section>
 
-        {/* DVIC */}
-        <Section id="dvic" title="Vehicle Inspections" icon="🔧" severity="fantastic">
-          <MetricRow label="Rushed Inspections" value={driver.dvicRushedCount} denominator={driver.dvicTotalInspections} />
-          {driver.dvicInspections.map((insp, i) => (
-            <MetricRow key={i} label={insp.day} value={insp.time} severity={insp.severity} indent />
-          ))}
-        </Section>
+        {/* DVIC - Current view only */}
+        {activeView === 'current' && (
+          <Section id="dvic" title="Vehicle Inspections" icon="🔧" severity="fantastic">
+            <MetricRow label="Rushed Inspections" value={driver.dvicRushedCount} denominator={driver.dvicTotalInspections} />
+            {driver.dvicInspections.map((insp, i) => (
+              <MetricRow key={i} label={insp.day} value={insp.time} severity={insp.severity} indent />
+            ))}
+          </Section>
+        )}
 
         {/* Focus Area */}
         <Section id="focus" title="Focus Area" icon="🎯" severity="fantastic">
