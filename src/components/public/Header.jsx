@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { Menu, X, ArrowRight, TrendingUp } from 'lucide-react';
+import logo from '../../assets/logo.png';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -42,10 +43,7 @@ const Header = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-xl blur-lg opacity-50 group-hover:opacity-80 transition-all duration-500" />
-                <div className="relative bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 p-2.5 rounded-xl shadow-lg">
-                  <TrendingUp className="w-5 h-5 text-white" />
-                </div>
+                <img src={logo} alt="DiveMetric Logo" className="h-8 w-8 mr-2" />
               </div>
               <span className="text-xl font-bold text-slate-900 dark:text-white">
                 DiveMetric

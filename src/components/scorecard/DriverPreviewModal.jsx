@@ -262,8 +262,11 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, is
   const hasPpsNonCompliance = isPpsBreakdown && typeof value === 'string' && value.includes('/') && parseInt(value.split('/')[0]) > 0;
 
   // Check if POD-related items have issues (value > 0)
-  const numericValue = typeof value === 'number' ? value : (typeof value === 'string' && !isNaN(parseInt(value)) ? parseInt(value) : 0);
+  const numericValue = typeof value === 'number' ? value : (typeof value === 'string' && !isNaN(parseFloat(value)) ? parseFloat(value) : 0);
   const hasPodIssue = (isPodRejectsParent || isPodBreakdownItem) && numericValue > 0;
+
+  // Check if safety event has value > 0 (severe for any non-zero safety event)
+  const hasSafetyIssue = isSafetyEvent && numericValue > 0;
 
   // Get base severity
   let severity = isDvicTime
@@ -280,14 +283,19 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, is
     severity = 'poor';
   }
 
+  // Force severity to 'poor' for safety events with value > 0
+  if (hasSafetyIssue) {
+    severity = 'poor';
+  }
+
   const sevColor = severity ? SEVERITY_COLORS[severity] : null;
   const displayLabel = label || formatLabel(metricKey);
   const shouldHighlight = severity === 'poor' || severity === 'fair';
   const isSevere = severity === 'poor';
   const isConcerning = severity === 'fair';
 
-  // Force highlight for PPS breakdown with issues, safety events with poor/fair severity, POD issues, or explicit forceHighlight prop
-  const shouldForceHighlight = forceHighlight || hasPpsNonCompliance || hasPodIssue || (isSafetyEvent && shouldHighlight);
+  // Force highlight for PPS breakdown with issues, safety events with issues, POD issues, or explicit forceHighlight prop
+  const shouldForceHighlight = forceHighlight || hasPpsNonCompliance || hasPodIssue || hasSafetyIssue || (isSafetyEvent && shouldHighlight);
 
   const showSevereHighlight = shouldHighlight && (!indent || isDvicTime || shouldForceHighlight);
   const showSevereIcon = isSevere && (!indent || isDvicTime || shouldForceHighlight);

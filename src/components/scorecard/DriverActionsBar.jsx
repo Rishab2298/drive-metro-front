@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { downloadBulkScorecardPDFs, downloadCombinedPDF } from '@/lib/generateScorecardPDF.jsx';
-import { sendBulkEmails, generateAIFeedback } from '@/services/scorecardService';
+import { sendBulkEmails, sendBulkSms, generateAIFeedback } from '@/services/scorecardService';
 import { API_URL } from '@/utils/scorecardUtils';
 
 export const DriverActionsBar = ({
@@ -32,6 +32,7 @@ export const DriverActionsBar = ({
 }) => {
   const [showPdfDropdown, setShowPdfDropdown] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [sendingSms, setSendingSms] = useState(false);
   const [generatingAIFeedback, setGeneratingAIFeedback] = useState(false);
   const [aiFeedbackError, setAiFeedbackError] = useState(null);
   const [aiFeedbackProcessing, setAiFeedbackProcessing] = useState(false);
@@ -122,14 +123,45 @@ export const DriverActionsBar = ({
     }
   };
 
-  const handleBulkSMS = () => {
+  const handleBulkSMS = async () => {
     if (!hasPremiumAccess) {
       promptUpgrade('Send SMS');
       return;
     }
     if (selectedDriverObjects.length === 0) return;
-    const message = `Hi, your weekly scorecard for Week ${data?.weekNumber} is ready! Check your email or contact your DSP for details.`;
-    window.open(`sms:?body=${encodeURIComponent(message)}`);
+
+    const driversWithPhone = selectedDriverObjects.filter(d => d.phone);
+    const driversWithoutPhone = selectedDriverObjects.filter(d => !d.phone);
+
+    if (driversWithPhone.length === 0) {
+      toast.error('None of the selected drivers have phone numbers');
+      return;
+    }
+
+    if (driversWithoutPhone.length > 0) {
+      toast.warning(`${driversWithoutPhone.length} driver(s) don't have phone numbers and will be skipped`);
+    }
+
+    setSendingSms(true);
+
+    try {
+      const scorecardIds = driversWithPhone.map(d => d.id);
+      const result = await sendBulkSms(scorecardIds, getToken);
+
+      if (result.successCount > 0) {
+        toast.success(`Scorecard SMS sent to ${result.successCount} driver(s)`);
+      }
+      if (result.failCount > 0) {
+        toast.error(`Failed to send ${result.failCount} SMS`);
+      }
+
+      clearSelection();
+    } catch (err) {
+      console.error('Bulk SMS error:', err);
+      toast.error(err.message || 'Failed to send SMS');
+    } finally {
+      setSendingSms(false);
+    }
   };
 
   const handleBulkNotes = () => {
@@ -292,10 +324,11 @@ export const DriverActionsBar = ({
           </button>
           <button
             onClick={handleBulkSMS}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 dark:bg-neutral-900/10 hover:bg-white/20 dark:hover:bg-neutral-900/20 text-white dark:text-neutral-900 text-sm font-medium transition-colors"
+            disabled={sendingSms}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 dark:bg-neutral-900/10 hover:bg-white/20 dark:hover:bg-neutral-900/20 text-white dark:text-neutral-900 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <MessageSquare className="w-4 h-4" />
-            Send SMS
+            {sendingSms ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
+            {sendingSms ? 'Sending...' : 'Send SMS'}
           </button>
           <button
             onClick={handleBulkNotes}

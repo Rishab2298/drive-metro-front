@@ -22,6 +22,8 @@ import ManageDrivers from "../pages/client/drivers/manageDrivers";
 import GeneralSettings from "../pages/client/settings/generalSettings";
 import Billing from "../pages/client/billing/billing";
 import DriverScorecard from "../sampleScorecard";
+import PrivacyPolicy from "../pages/references/privacyPolicy";
+import TermsConditions from "../pages/references/termsConditions";
 
 const wrapRoute = (Component, Wrapper, Layout) => {
   const content = <Component />;
@@ -50,6 +52,8 @@ const routeConfig = [
   { path: "/settings", component: GeneralSettings, wrapper: ProtectedRoute, layout: ClientAppLayout },
   { path: "/billing", component: Billing, wrapper: ProtectedRoute, layout: ClientAppLayout },
   { path: "/driver-scorecard", component: DriverScorecard, wrapper: ProtectedRoute, layout: ClientAppLayout },
+  { path: "/privacy-policy", component: PrivacyPolicy, wrapper: PublicRoute },
+  { path: "/terms-of-service", component: TermsConditions, wrapper: PublicRoute },
 ];
 
 export const router = createBrowserRouter(

@@ -98,6 +98,47 @@ export const sendBulkEmails = async (scorecardIds, getToken) => {
   return result;
 };
 
+// Send SMS to single driver
+export const sendDriverSms = async (driverId, getToken) => {
+  const token = await getToken();
+  const response = await fetch(`${API_URL}/api/scorecard/${driverId}/send-sms`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || 'Failed to send SMS');
+  }
+
+  return result;
+};
+
+// Send bulk SMS
+export const sendBulkSms = async (scorecardIds, getToken) => {
+  const token = await getToken();
+  const response = await fetch(`${API_URL}/api/scorecards/send-bulk-sms`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ scorecardIds }),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || 'Failed to send SMS');
+  }
+
+  return result;
+};
+
 // Generate AI feedback for drivers
 export const generateAIFeedback = async (scorecardIds, masterScorecardId, getToken) => {
   const token = await getToken();

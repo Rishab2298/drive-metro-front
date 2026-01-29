@@ -1173,17 +1173,39 @@ const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount }) => {
   const MetricRow = ({ metricKey, value, label, indent, isTier }) => {
     // Check if DVIC time metric
     const isDvicTime = metricKey?.toLowerCase().startsWith('dvictime');
+    const isPpsBreakdown = metricKey?.toLowerCase().startsWith('pps') && metricKey?.toLowerCase() !== 'ppscompliancerate';
+    const isSafetyEvent = ['distractionsrate', 'speedingeventrate', 'seatbeltoffrate', 'followingdistancerate', 'signalviolationsrate'].includes(metricKey?.toLowerCase());
+
+    // Check if POD-related
+    const isPodRejectsParent = metricKey?.toLowerCase() === 'podrejects' || metricKey?.toLowerCase().includes('podreject');
+    const podBreakdownKeys = ['blurry', 'humaninphoto', 'nopackagedetected', 'packagetooclose', 'phototoodark', 'other'];
+    const isPodBreakdownItem = podBreakdownKeys.includes(metricKey?.toLowerCase());
+
+    // Check for non-compliance/issues
+    const hasPpsNonCompliance = isPpsBreakdown && typeof value === 'string' && value.includes('/') && parseInt(value.split('/')[0]) > 0;
+    const numericValue = typeof value === 'number' ? value : (typeof value === 'string' && !isNaN(parseFloat(value)) ? parseFloat(value) : 0);
+    const hasPodIssue = (isPodRejectsParent || isPodBreakdownItem) && numericValue > 0;
+    const hasSafetyIssue = isSafetyEvent && numericValue > 0;
 
     // Get severity (use DVIC logic for times, standard for others)
-    const severity = isDvicTime
+    let severity = isDvicTime
       ? getDvicTimeSeverity(value)
       : (isTier ? getSeverityLevel('tier', value) : getSeverityLevel(metricKey, value));
+
+    // Force severity to 'poor' for items with issues (value > 0)
+    if (hasPpsNonCompliance || hasPodIssue || hasSafetyIssue) {
+      severity = 'poor';
+    }
 
     const sevColor = severity ? SEVERITY_COLORS[severity] : null;
     const displayLabel = label || formatLabel(metricKey);
 
     // Only highlight poor (Severe) and fair (Concerning) states
     const shouldHighlight = severity === 'poor' || severity === 'fair';
+    const shouldForceHighlight = hasPpsNonCompliance || hasPodIssue || hasSafetyIssue;
+
+    // Show highlight for non-indent items, or indent items with forced highlight (issues > 0)
+    const showHighlight = shouldHighlight && (!indent || shouldForceHighlight);
 
     return (
       <div
@@ -1191,8 +1213,9 @@ const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount }) => {
         style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           padding: indent ? '11px 16px 11px 28px' : '13px 16px',
-          background: shouldHighlight && !indent ? sevColor.bg : (indent ? t.subtle : t.card),
+          background: showHighlight ? sevColor.bg : (indent ? t.subtle : t.card),
           borderBottom: `1px solid ${t.border}`,
+          borderLeft: showHighlight ? `4px solid ${sevColor.dot}` : '4px solid transparent',
           cursor: 'pointer', transition: 'background 0.15s'
         }}
       >
@@ -1200,17 +1223,17 @@ const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount }) => {
           <span style={{
             fontSize: indent ? '12px' : '13px',
             fontWeight: indent ? '400' : '500',
-            color: shouldHighlight ? sevColor.text : (indent ? t.muted : t.text)
+            color: showHighlight ? sevColor.text : (indent ? t.muted : t.text)
           }}>{displayLabel}</span>
           <Info size={12} style={{ opacity: 0.4, color: t.muted }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {/* Severity dot - only for highlighted states */}
-          {shouldHighlight && !indent && (
+          {showHighlight && (
             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: sevColor.dot }} />
           )}
           {/* Severity label badge - only for highlighted states */}
-          {shouldHighlight && !indent && (
+          {showHighlight && (
             <span style={{
               fontSize: '10px', fontWeight: '600', color: sevColor.text,
               padding: '2px 6px', background: sevColor.bg, borderRadius: '4px',

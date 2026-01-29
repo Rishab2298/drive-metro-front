@@ -6,9 +6,9 @@ const Footer = () => {
           {/* Logo and Description */}
           <div className="max-w-md">
             <img
-              src="/landing-images/secondary-logo-retina.png"
-              alt="Logo"
-              className="h-7 mb-4"
+              src="/logo.png"
+              alt="DiveMetric Logo"
+              className="h-8 w-8 mb-4"
             />
             <p className="text-[var(--landing-text-secondary)] leading-[1.625]">
               Elementra is a web application company focused on building scalable digital products through innovative engineering and user-centric solutions.

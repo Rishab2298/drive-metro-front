@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { TrendingUp } from 'lucide-react';
+import logo from '../../assets/logo.png';
 
 const Footer = () => {
   const footerLinks = {
@@ -14,6 +14,10 @@ const Footer = () => {
     ],
     Support: [
       { name: 'Contact Us', href: '/contact' },
+    ],
+    Legal: [
+      { name: 'Privacy Policy', href: '/privacy-policy' },
+      { name: 'Terms of Service', href: '/terms-of-service' },
     ],
   };
 
@@ -35,12 +39,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="max-w-xs">
             <Link to="/" className="flex items-center gap-3 mb-4 group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-xl blur-lg opacity-50 group-hover:opacity-80 transition-opacity" />
-                <div className="relative bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 p-2 rounded-xl">
-                  <TrendingUp className="w-4 h-4 text-white" />
-                </div>
-              </div>
+              <img src={logo} alt="DiveMetric Logo" className="h-8 w-8" />
               <span className="text-lg font-bold text-slate-900 dark:text-white">
                 DiveMetric
               </span>

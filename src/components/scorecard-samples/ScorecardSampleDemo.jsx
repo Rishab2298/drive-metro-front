@@ -622,7 +622,7 @@ export default function ScorecardSampleDemo({ driver = sampleDriver }) {
               />
               <MetricRow label="Speeding Events" value="0.0" severity="fantastic" />
               <MetricRow label="Seatbelt Off Events" value="0.0" severity="fantastic" />
-              <MetricRow label="Distraction Events" value="0.0" severity="fantastic" />
+              <MetricRow label="Distraction Events" value="1.2" severity="poor" />
               <MetricRow label="Sign/Signal Violations" value="0.0" severity="fantastic" />
               <MetricRow label="Following Distance Events" value="0.0" severity="fantastic" />
             </>

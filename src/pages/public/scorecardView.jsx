@@ -280,13 +280,29 @@ const FeedbackCategoryRow = ({ category, onClick }) => (
 );
 
 // Metric Row Component - Matches DriverPreviewModal styling with severity highlights
-const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, onOpenMetricModal }) => {
+const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, isPodBreakdown, onOpenMetricModal }) => {
   const isDvicTime = metricKey?.toLowerCase().startsWith('dvictime');
   const isPpsBreakdown = metricKey?.toLowerCase().startsWith('pps') && metricKey?.toLowerCase() !== 'ppscompliancerate';
   const isSafetyEvent = ['distractionsrate', 'speedingeventrate', 'seatbeltoffrate', 'followingdistancerate', 'signalviolationsrate'].includes(metricKey?.toLowerCase());
 
+  // Check if this is the parent POD rejects metric
+  const isPodRejectsParent = metricKey?.toLowerCase() === 'podrejects' ||
+                             metricKey?.toLowerCase() === 'photoondeliveryrejects' ||
+                             metricKey?.toLowerCase().includes('podreject');
+
+  // POD breakdown item keys (nested items under Photo on Delivery Rejects)
+  const podBreakdownKeys = ['blurry', 'humaninphoto', 'nopackagedetected', 'packagetooclose', 'phototoodark', 'other'];
+  const isPodBreakdownItem = isPodBreakdown || podBreakdownKeys.includes(metricKey?.toLowerCase());
+
   // Check if PPS breakdown has any non-compliance (value contains "/" and first number > 0)
   const hasPpsNonCompliance = isPpsBreakdown && typeof value === 'string' && value.includes('/') && parseInt(value.split('/')[0]) > 0;
+
+  // Check if POD-related items have issues (value > 0)
+  const numericValue = typeof value === 'number' ? value : (typeof value === 'string' && !isNaN(parseFloat(value)) ? parseFloat(value) : 0);
+  const hasPodIssue = (isPodRejectsParent || isPodBreakdownItem) && numericValue > 0;
+
+  // Check if safety event has value > 0 (severe for any non-zero safety event)
+  const hasSafetyIssue = isSafetyEvent && numericValue > 0;
 
   // Get base severity
   let severity = isDvicTime
@@ -298,14 +314,24 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, on
     severity = 'poor';
   }
 
+  // Force severity to 'poor' for POD rejects and POD breakdown items with value > 0
+  if (hasPodIssue) {
+    severity = 'poor';
+  }
+
+  // Force severity to 'poor' for safety events with value > 0
+  if (hasSafetyIssue) {
+    severity = 'poor';
+  }
+
   const sevColor = severity ? SEVERITY_COLORS[severity] : null;
   const displayLabel = label || formatLabel(metricKey);
   const shouldHighlight = severity === 'poor' || severity === 'fair';
   const isSevere = severity === 'poor';
   const isConcerning = severity === 'fair';
 
-  // Force highlight for PPS breakdown with issues, safety events with poor/fair severity, or explicit forceHighlight prop
-  const shouldForceHighlight = forceHighlight || hasPpsNonCompliance || (isSafetyEvent && shouldHighlight);
+  // Force highlight for PPS breakdown with issues, safety events with issues, POD issues, or explicit forceHighlight prop
+  const shouldForceHighlight = forceHighlight || hasPpsNonCompliance || hasPodIssue || hasSafetyIssue || (isSafetyEvent && shouldHighlight);
 
   const showSevereHighlight = shouldHighlight && (!indent || isDvicTime || shouldForceHighlight);
   const showSevereIcon = isSevere && (!indent || isDvicTime || shouldForceHighlight);

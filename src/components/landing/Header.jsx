@@ -18,6 +18,7 @@ const Header = () => {
           {/* Logo */}
           <div className="shrink-0">
             <a href="#home" className="flex items-center">
+              <img src='logo.png' alt="DiveMetric Logo" className="h-8 w-8 mr-2" />
               <span className="text-2xl font-semibold text-purple-300">
                 DiveMetric
               </span>

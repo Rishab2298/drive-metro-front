@@ -7,8 +7,7 @@ import {
   MoreHorizontal,
   Share2,
   StickyNote,
-  UserMinus,
-  Settings2,
+  Phone,
   Link2,
   MessageSquare,
   Mail,
@@ -20,8 +19,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Dropdown, DropdownItem } from './Dropdown';
 import { downloadScorecardPDF } from '@/lib/generateScorecardPDF.jsx';
-import { sendDriverEmail } from '@/services/scorecardService';
-import { STANDING_COLORS, getDriverName } from '@/utils/scorecardUtils';
+import { sendDriverEmail, generateAIFeedback } from '@/services/scorecardService';
+import { STANDING_COLORS, getDriverName, API_URL } from '@/utils/scorecardUtils';
 
 export const DriverRow = ({
   driver,
@@ -33,12 +32,16 @@ export const DriverRow = ({
   onSelect,
   onPreview,
   onEditNote,
+  onEditContact,
+  masterScorecardId,
+  setData,
   hasPremiumAccess,
   promptUpgrade,
   getToken,
 }) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [generatingAI, setGeneratingAI] = useState(false);
 
   const rank = rankInfo?.rank;
   const score = rankInfo?.score;
