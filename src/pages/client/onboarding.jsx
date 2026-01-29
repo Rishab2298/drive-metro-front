@@ -1,5 +1,5 @@
 import { useAuth, useUser } from "@clerk/clerk-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,6 +16,7 @@ import {
   Shield,
   Sun,
   Moon,
+  FileText,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
@@ -38,6 +39,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { PhoneInput, countries } from "@/components/ui/phone-input";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5004";
@@ -126,6 +133,8 @@ export default function Onboarding() {
   const [error, setError] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState([]);
+  const [showTermsDialog, setShowTermsDialog] = useState(false);
+  const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(onboardingSchema),
@@ -668,21 +677,21 @@ export default function Onboarding() {
                           <div className="space-y-1 leading-none">
                             <FormLabel className="text-sm font-normal text-foreground cursor-pointer">
                               I have read and agree to the{" "}
-                              <Link
-                                to="/terms-of-service"
-                                target="_blank"
+                              <button
+                                type="button"
+                                onClick={() => setShowTermsDialog(true)}
                                 className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
                               >
                                 Terms of Service
-                              </Link>{" "}
+                              </button>{" "}
                               and{" "}
-                              <Link
-                                to="/privacy-policy"
-                                target="_blank"
+                              <button
+                                type="button"
+                                onClick={() => setShowPrivacyDialog(true)}
                                 className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
                               >
                                 Privacy Policy
-                              </Link>
+                              </button>
                             </FormLabel>
                             <FormMessage className="text-xs" />
                           </div>
@@ -751,6 +760,175 @@ export default function Onboarding() {
           </div>
         </div>
       </div>
+
+      {/* Terms of Service Dialog */}
+      <Dialog open={showTermsDialog} onOpenChange={setShowTermsDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-white" />
+              </div>
+              Terms of Service
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto pr-2 space-y-6 text-sm text-muted-foreground">
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">1. Introduction</h3>
+              <p className="mb-2">
+                DiveMetric is a platform provided by <strong className="text-foreground">Kilimanjaro Innovation Labs Inc.</strong> ("we", "us", "our"), a company established under the laws of Delaware, USA.
+              </p>
+              <p>
+                These Platform Terms apply to all users of DiveMetric, our software applications, websites, mobile apps, and such other technologies which we may make available. By accessing and using DiveMetric, you accept and agree to the terms of this Agreement.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">2. Registration</h3>
+              <p className="mb-2">
+                In order to use certain parts of our Platform you may be required to register for an account by providing your name, phone number, location, email address and password.
+              </p>
+              <p>
+                You must ensure that the details provided by you on registration are correct and complete. You may cancel your registration at any time by contacting hello@divemetric.com.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">3. Passwords and Security</h3>
+              <p>
+                You should keep your password confidential and not disclose or share with anyone. We will be entitled to treat any action carried out through your account as being carried out by you. You must notify us immediately if you believe your account may have been compromised.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">4. Using the Platform</h3>
+              <p>
+                Our Platform is intended for use only by those who can access it from within the United States of America. All users must be at least 18 years old to use the DiveMetric platform.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">5. Prohibited Uses</h3>
+              <p className="mb-2">You must not:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Use any automated system to extract content for commercial purposes</li>
+                <li>Interfere with or damage the Platform</li>
+                <li>Use the Platform for any illegal or unauthorized purpose</li>
+                <li>Change, modify, or alter the Platform without authorization</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">6. Intellectual Property</h3>
+              <p>
+                Our Platform and all content displayed are protected by intellectual property rights. You may only view, print out, and use the Platform for your own personal, non-commercial use.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">7. Liability</h3>
+              <p>
+                We provide the Platform on an "as is" and "as available" basis. To the maximum extent permitted by law, our maximum liability to you is $50.
+              </p>
+            </section>
+
+            <section className="pb-4">
+              <h3 className="font-semibold text-foreground mb-2">8. Contact</h3>
+              <p>
+                For enquiries or complaints, please contact us at{" "}
+                <a href="mailto:hello@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                  hello@divemetric.com
+                </a>
+              </p>
+            </section>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Privacy Policy Dialog */}
+      <Dialog open={showPrivacyDialog} onOpenChange={setShowPrivacyDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 flex items-center justify-center">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              Privacy Policy
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto pr-2 space-y-6 text-sm text-muted-foreground">
+            <section>
+              <p>
+                <strong className="text-foreground">Kilimanjaro Innovation Labs Inc.</strong> ("Company," "we," "us," or "our") operates DiveMetric and has prepared this Privacy Policy to explain what personal information we collect, how we use and share that information.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">1. Personal Information We Collect</h3>
+              <ul className="list-disc pl-5 space-y-1">
+                <li><strong className="text-foreground">Identification Information:</strong> Name, email address, and phone number</li>
+                <li><strong className="text-foreground">Financial Information:</strong> Payment information (tokenized, not stored on our servers)</li>
+                <li><strong className="text-foreground">Communication Information:</strong> Information when you contact us</li>
+                <li><strong className="text-foreground">Internet Activity:</strong> Browser type, pages visited, navigation patterns</li>
+                <li><strong className="text-foreground">Device Information:</strong> Device name, operating system, and browser</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">2. Cookies</h3>
+              <p>
+                We use cookies to operate and administer our Site, gather usage data, and improve your experience. You can manage cookie preferences through your browser settings.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">3. How We Use Personal Information</h3>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>To provide you with the Service and respond to inquiries</li>
+                <li>To send administrative information</li>
+                <li>To analyze how you interact with our Service</li>
+                <li>To maintain and improve the Service</li>
+                <li>To prevent fraud and comply with legal obligations</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">4. Sharing and Disclosure</h3>
+              <p className="mb-2">We do not sell your personal information. We may share information with:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Vendors and service providers</li>
+                <li>In connection with business transfers</li>
+                <li>When required by law</li>
+                <li>With our affiliates</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">5. Data Retention</h3>
+              <p>
+                We keep personal information for as long as reasonably necessary for the purposes described in this Privacy Policy, or as required by law.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="font-semibold text-foreground mb-2">6. Security</h3>
+              <p>
+                We implement commercially reasonable technical, administrative, and organizational measures to protect personal information. However, no Internet transmission is ever fully secure.
+              </p>
+            </section>
+
+            <section className="pb-4">
+              <h3 className="font-semibold text-foreground mb-2">7. Contact Us</h3>
+              <p>
+                If you have any questions about our Privacy Policy, please contact us at{" "}
+                <a href="mailto:hello@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                  hello@divemetric.com
+                </a>
+              </p>
+            </section>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
