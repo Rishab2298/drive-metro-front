@@ -37,6 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { PhoneInput, countries } from "@/components/ui/phone-input";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5004";
@@ -86,6 +87,9 @@ const onboardingSchema = z.object({
     .min(1, "Phone number is required")
     .regex(/^[0-9]{7,15}$/, "Phone number must be 7-15 digits"),
   timezone: z.string().min(1, "Please select a timezone"),
+  agreeToTerms: z.boolean().refine((val) => val === true, {
+    message: "You must agree to the Terms of Service and Privacy Policy",
+  }),
 });
 
 const steps = [
@@ -108,7 +112,7 @@ const steps = [
     title: "Contact Details",
     description: "Communication preferences",
     icon: Phone,
-    fields: ["contactEmail", "countryCode", "phoneNumber", "timezone"],
+    fields: ["contactEmail", "countryCode", "phoneNumber", "timezone", "agreeToTerms"],
   },
 ];
 
@@ -136,6 +140,7 @@ export default function Onboarding() {
       countryCode: "US",
       phoneNumber: "",
       timezone: "America/Los_Angeles",
+      agreeToTerms: false,
     },
   });
 
@@ -644,6 +649,43 @@ export default function Onboarding() {
                             </SelectContent>
                           </Select>
                           <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="agreeToTerms"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border border-border p-4 bg-muted/30">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-0.5"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-sm font-normal text-foreground cursor-pointer">
+                              I have read and agree to the{" "}
+                              <Link
+                                to="/terms-of-service"
+                                target="_blank"
+                                className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+                              >
+                                Terms of Service
+                              </Link>{" "}
+                              and{" "}
+                              <Link
+                                to="/privacy-policy"
+                                target="_blank"
+                                className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+                              >
+                                Privacy Policy
+                              </Link>
+                            </FormLabel>
+                            <FormMessage className="text-xs" />
+                          </div>
                         </FormItem>
                       )}
                     />
