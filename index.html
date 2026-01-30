@@ -10,7 +10,13 @@
     <title>Divemetric</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Inline loading state shown until React hydrates -->
+      <div id="initial-loader" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#020617;flex-direction:column;gap:16px;">
+        <div style="width:40px;height:40px;border:3px solid rgba(99,102,241,0.2);border-top-color:#6366F1;border-radius:50%;animation:spin .8s linear infinite;"></div>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
