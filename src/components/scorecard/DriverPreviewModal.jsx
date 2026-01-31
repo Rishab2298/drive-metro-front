@@ -14,6 +14,9 @@ import {
   Lightbulb,
   AlertTriangle,
   Star,
+  Video,
+  ExternalLink,
+  ShieldAlert,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -21,6 +24,7 @@ import {
   SEVERITY_LABELS,
   TIER_COLORS,
   METRIC_EXPLANATIONS,
+  KEY_METRICS,
   parseHistoricalData,
   categorizeMetrics,
   getSeverityLevel,
@@ -213,6 +217,182 @@ const FeedbackDetailModal = ({ data, onClose }) => {
     </div>
   );
 };
+
+// Safety Event Detail Modal
+const SafetyEventDetailModal = ({ data, onClose }) => {
+  if (!data) return null;
+
+  return (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-1100 flex items-center justify-center p-4 bg-black/40"
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        className="bg-white rounded-2xl max-w-100 w-full max-h-[80vh] overflow-auto shadow-2xl"
+      >
+        {/* Header */}
+        <div className="p-5 border-b border-slate-200 bg-linear-to-br from-red-50 to-orange-50">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-linear-to-br from-red-500 to-red-600 flex items-center justify-center shadow-md">
+                <ShieldAlert size={20} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-[17px] font-bold text-slate-800">
+                  {data.label}
+                </h3>
+                <span className="text-xs text-red-600 font-semibold">
+                  {data.events?.length || 0} event{data.events?.length !== 1 ? 's' : ''} recorded
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center text-slate-400 hover:bg-black/10 hover:text-slate-600 transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* Events List */}
+        <div className="p-4 max-h-80 overflow-y-auto">
+          {data.events && data.events.length > 0 ? (
+            <div className="space-y-3">
+              {data.events.map((event, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {/* Top Row: Event ID & Date */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                        Event #{idx + 1}
+                      </span>
+                      {event.eventId && (
+                        <span className="text-[11px] font-mono text-slate-500 px-2 py-0.5 bg-slate-100 rounded">
+                          {event.eventId}
+                        </span>
+                      )}
+                    </div>
+                    {(event.dateTime || event.date) && (
+                      <span className="text-[11px] text-slate-500 font-medium">
+                        {event.dateTime || event.date}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Metric Subtype - Main highlight */}
+                  {event.metricSubtype && (
+                    <div className="mb-3 p-3 bg-linear-to-r from-red-50 to-orange-50 rounded-lg border-l-3 border-red-500">
+                      <span className="text-sm font-bold text-red-700">
+                        {event.metricSubtype}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Info Grid */}
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    {event.source && (
+                      <div className="p-2 bg-slate-50 rounded-lg">
+                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Source</div>
+                        <div className="text-xs font-medium text-slate-700">{event.source}</div>
+                      </div>
+                    )}
+                    {event.reviewDetails && (
+                      <div className="p-2 bg-slate-50 rounded-lg">
+                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Review Status</div>
+                        <div className={cn(
+                          "text-xs font-medium",
+                          event.reviewDetails.toLowerCase().includes('approved') ? "text-emerald-600" :
+                          event.reviewDetails.toLowerCase().includes('denied') ? "text-red-600" : "text-slate-700"
+                        )}>
+                          {event.reviewDetails}
+                        </div>
+                      </div>
+                    )}
+                    {event.programImpact && (
+                      <div className="p-2 bg-slate-50 rounded-lg">
+                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Impact</div>
+                        <div className="text-xs font-medium text-slate-700">{event.programImpact}</div>
+                      </div>
+                    )}
+                    {event.vin && (
+                      <div className="p-2 bg-slate-50 rounded-lg">
+                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Vehicle</div>
+                        <div className="text-xs font-mono text-slate-600">{event.vin.slice(-6)}</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Video Link Button */}
+                  {event.videoLink && (
+                    <a
+                      href={event.videoLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-2.5 bg-linear-to-r from-indigo-500 to-violet-500 text-white rounded-lg text-xs font-semibold hover:from-indigo-600 hover:to-violet-600 transition-all shadow-sm"
+                    >
+                      <Video size={14} />
+                      Watch Event Video
+                      <ExternalLink size={12} />
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-slate-400">
+              <ShieldAlert size={32} className="mx-auto mb-2 opacity-30" />
+              <p className="text-sm">No event details available</p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-slate-200 bg-slate-50">
+          <button
+            onClick={onClose}
+            className="w-full py-3 bg-slate-800 text-white rounded-xl text-sm font-semibold hover:bg-slate-900 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Safety Event Row - Severe styling with red gradient background
+const SafetyEventRow = ({ eventType, onClick }) => (
+  <div
+    onClick={onClick}
+    className="flex justify-between items-center py-4 px-4 pl-7 bg-severe-gradient border-l-[5px] border-red-500 cursor-pointer transition-all shadow-[0_4px_20px_rgba(220,38,38,0.35)] relative"
+  >
+    {/* Animated pulse border */}
+    <div className="absolute left-0 top-0 bottom-0 w-1.25 bg-red-500 animate-severe-pulse" />
+
+    <div className="flex items-center gap-3 flex-1">
+      <div className="w-7 h-7 rounded-lg bg-linear-to-br from-red-500 to-red-600 flex items-center justify-center shadow-[0_4px_12px_rgba(239,68,68,0.5)] animate-icon-pulse">
+        <ShieldAlert size={14} className="text-white" />
+      </div>
+      <span className="text-sm font-bold text-white drop-shadow-sm">
+        {eventType.label}
+      </span>
+      <Info size={12} className="opacity-50 text-white/50" />
+    </div>
+    <div className="flex items-center gap-3">
+      <span className="text-[10px] font-extrabold text-red-900 py-1.5 px-3 bg-linear-to-br from-red-200 to-red-300 rounded-full uppercase tracking-wide shadow-md border border-white/30">
+        SEVERE
+      </span>
+      <span className="text-lg font-black text-red-200 drop-shadow-md">
+        {eventType.count}
+      </span>
+    </div>
+  </div>
+);
 
 // Clickable Feedback Category Row - Severe styling with dark background
 const FeedbackCategoryRow = ({ category, onClick }) => (
@@ -480,8 +660,9 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
   const [view, setView] = useState('current');
   const [metricModal, setMetricModal] = useState(null);
   const [feedbackModal, setFeedbackModal] = useState(null);
+  const [safetyEventModal, setSafetyEventModal] = useState(null);
   const [expandedSections, setExpandedSections] = useState({
-    overall: true, safety: true, delivery: true, customer: true, dvic: true, standing: true
+    overall: true, safety: true, delivery: true, customer: true, dvic: true, standing: true, safetyEvents: true
   });
 
   const historicalData = parseHistoricalData(driver);
@@ -800,6 +981,96 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
             />
           )}
 
+          {/* Driver Safety Events Section - Only show if there are safety events */}
+          {(() => {
+            // Extract safety events from driver object
+            // Handle both nested format (safetyEvents: { Speeding: [...] })
+            // and flattened format (safetyEvents_Speeding_0_eventId: "...")
+            let safetyEvents = driver.safetyEvents || {};
+
+            // If safetyEvents is empty, try to reconstruct from flattened keys
+            if (Object.keys(safetyEvents).length === 0) {
+              const flattenedPattern = /^safetyEvents_([^_]+)_(\d+)_(.+)$/;
+              const reconstructed = {};
+
+              Object.entries(driver).forEach(([key, value]) => {
+                const match = key.match(flattenedPattern);
+                if (match) {
+                  const [, metricType, indexStr, field] = match;
+                  const index = parseInt(indexStr, 10);
+
+                  if (!reconstructed[metricType]) {
+                    reconstructed[metricType] = [];
+                  }
+
+                  if (!reconstructed[metricType][index]) {
+                    reconstructed[metricType][index] = {};
+                  }
+
+                  reconstructed[metricType][index][field] = value;
+                }
+              });
+
+              // Clean up any sparse arrays
+              Object.keys(reconstructed).forEach(metricType => {
+                reconstructed[metricType] = reconstructed[metricType].filter(Boolean);
+              });
+
+              safetyEvents = reconstructed;
+            }
+
+            const eventTypes = KEY_METRICS.safetyEventTypes
+              .map(type => {
+                const events = safetyEvents[type.key] || [];
+                return {
+                  key: type.key,
+                  label: type.label,
+                  count: events.length,
+                  events: events,
+                };
+              })
+              .filter(type => type.count > 0);
+
+            if (eventTypes.length === 0) return null;
+
+            return (
+              <div className="mb-3.5">
+                <button
+                  onClick={() => toggleSection('safetyEvents')}
+                  className={cn(
+                    "w-full flex items-center justify-between p-3.5 border cursor-pointer transition-all bg-linear-to-br from-red-50 to-red-100/80 border-red-200/50 shadow-md",
+                    expandedSections.safetyEvents !== false ? "rounded-t-[14px]" : "rounded-[14px]"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-linear-to-br from-red-500 to-red-600 flex items-center justify-center shadow-md">
+                      <ShieldAlert size={16} className="text-white" />
+                    </div>
+                    <span className="text-sm font-bold text-red-700">Driver Safety Events</span>
+                    <span className="text-[10px] font-bold text-white py-0.5 px-2 rounded-lg bg-red-500">
+                      {eventTypes.reduce((sum, t) => sum + t.count, 0)}
+                    </span>
+                  </div>
+                  <ChevronDown
+                    size={16}
+                    className={cn("text-red-600 transition-transform duration-300", expandedSections.safetyEvents !== false && "rotate-180")}
+                  />
+                </button>
+                {expandedSections.safetyEvents !== false && (
+                  <div className="bg-white rounded-b-[14px] border border-slate-200 border-t-0 overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+                    {eventTypes.map((eventType) => (
+                      <SafetyEventRow
+                        key={eventType.key}
+                        eventType={eventType}
+                        onClick={() => setSafetyEventModal(eventType)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
           {/* AI Feedback Section */}
           {driver.aiFeedback && Array.isArray(driver.aiFeedback) && driver.aiFeedback.length > 0 && (
             <div className="mb-3.5">
@@ -860,6 +1131,14 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
         <FeedbackDetailModal
           data={feedbackModal}
           onClose={() => setFeedbackModal(null)}
+        />
+      )}
+
+      {/* Safety Event Detail Modal */}
+      {safetyEventModal && (
+        <SafetyEventDetailModal
+          data={safetyEventModal}
+          onClose={() => setSafetyEventModal(null)}
         />
       )}
     </div>

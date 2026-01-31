@@ -91,6 +91,16 @@ const DOCUMENT_CONFIGS = [
     premium: true,
     specialInstructions: 'May not be available for all DSPs. Skip if not applicable to your operations.',
   },
+  {
+    id: 'safety-dashboard',
+    title: 'Safety Dashboard',
+    description: 'Detailed safety events with video links and review status',
+    metricsIncluded: 'Driver Safety Events: Distraction, Speeding, Following Distance, Sign/Signal, Seatbelt violations with event details.',
+    acceptedFileTypes: ['csv'],
+    exampleFileName: 'Safety_Dashboard_TRDC_DIN6_2026-W04.csv',
+    required: false,
+    premium: true,
+  },
 ];
 
 const CollapsibleSection = ({

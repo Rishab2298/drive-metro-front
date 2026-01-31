@@ -15,6 +15,10 @@ import {
   Phone,
   User,
   Hash,
+  RefreshCw,
+  Briefcase,
+  Award,
+  CalendarClock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -41,6 +45,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { PhoneInput, countries } from '@/components/ui/phone-input';
+import SyncDriversModal from '@/components/SyncDriversModal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
 
@@ -53,13 +58,18 @@ const ManageDrivers = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'inactive'
 
+  // Sync modal state
+  const [syncModalOpen, setSyncModalOpen] = useState(false);
+
   // Edit modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingDriver, setEditingDriver] = useState(null);
   const [editForm, setEditForm] = useState({
     email: '',
-    phone: '',
-    countryCode: 'US',
+    personalPhone: '',
+    personalPhoneCountryCode: 'US',
+    workPhone: '',
+    workPhoneCountryCode: 'US',
     isActive: true,
   });
   const [saving, setSaving] = useState(false);
@@ -83,30 +93,30 @@ const ManageDrivers = () => {
     return { countryCode: 'US', phoneNumber: phone.replace(/\D/g, '') };
   };
 
-  useEffect(() => {
-    const fetchDrivers = async () => {
-      try {
-        const token = await getToken();
-        const response = await fetch(`${API_URL}/api/drivers`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  const fetchDrivers = async () => {
+    try {
+      const token = await getToken();
+      const response = await fetch(`${API_URL}/api/drivers`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch drivers');
-        }
-
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        console.error('Error fetching drivers:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error('Failed to fetch drivers');
       }
-    };
 
+      const result = await response.json();
+      setData(result);
+    } catch (err) {
+      console.error('Error fetching drivers:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchDrivers();
   }, [getToken]);
 
@@ -142,12 +152,15 @@ const ManageDrivers = () => {
 
   // Open edit modal
   const handleEditDriver = (driver) => {
-    const { countryCode, phoneNumber } = parsePhoneNumber(driver.phone);
+    const personalParsed = parsePhoneNumber(driver.personalPhone);
+    const workParsed = parsePhoneNumber(driver.workPhone);
     setEditingDriver(driver);
     setEditForm({
       email: driver.email || '',
-      phone: phoneNumber,
-      countryCode: countryCode,
+      personalPhone: personalParsed.phoneNumber,
+      personalPhoneCountryCode: personalParsed.countryCode,
+      workPhone: workParsed.phoneNumber,
+      workPhoneCountryCode: workParsed.countryCode,
       isActive: driver.isActive,
     });
     setSaveError(null);
@@ -162,10 +175,14 @@ const ManageDrivers = () => {
     setSaveError(null);
 
     try {
-      // Combine country dial code with phone number
-      const selectedCountry = countries.find((c) => c.code === editForm.countryCode);
-      const dialCode = selectedCountry?.dialCode || '+1';
-      const fullPhoneNumber = editForm.phone ? `${dialCode}${editForm.phone}` : null;
+      // Combine country dial code with phone numbers
+      const personalCountry = countries.find((c) => c.code === editForm.personalPhoneCountryCode);
+      const personalDialCode = personalCountry?.dialCode || '+1';
+      const fullPersonalPhone = editForm.personalPhone ? `${personalDialCode}${editForm.personalPhone}` : null;
+
+      const workCountry = countries.find((c) => c.code === editForm.workPhoneCountryCode);
+      const workDialCode = workCountry?.dialCode || '+1';
+      const fullWorkPhone = editForm.workPhone ? `${workDialCode}${editForm.workPhone}` : null;
 
       const token = await getToken();
       const response = await fetch(`${API_URL}/api/drivers/${editingDriver.id}`, {
@@ -176,7 +193,8 @@ const ManageDrivers = () => {
         },
         body: JSON.stringify({
           email: editForm.email || null,
-          phone: fullPhoneNumber,
+          personalPhone: fullPersonalPhone,
+          workPhone: fullWorkPhone,
           isActive: editForm.isActive,
         }),
       });
@@ -330,6 +348,17 @@ const ManageDrivers = () => {
               className="pl-10"
             />
           </div>
+          <button
+            onClick={() => setSyncModalOpen(true)}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+              'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900',
+              'hover:bg-neutral-800 dark:hover:bg-neutral-100'
+            )}
+          >
+            <RefreshCw className="w-4 h-4" />
+            Sync Drivers
+          </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -410,13 +439,13 @@ const ManageDrivers = () => {
 
                   {/* Contact */}
                   <div className="col-span-3 hidden md:block">
-                    {driver.phone ? (
+                    {driver.workPhone ? (
                       <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                         <Phone className="w-3.5 h-3.5" />
-                        <span>{driver.phone}</span>
+                        <span>{driver.workPhone}</span>
                       </div>
                     ) : (
-                      <span className="text-sm text-red-500 dark:text-red-400">No phone number</span>
+                      <span className="text-sm text-red-500 dark:text-red-400">No work phone</span>
                     )}
                   </div>
 
@@ -508,7 +537,7 @@ const ManageDrivers = () => {
 
       {/* Edit Driver Modal */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Driver</DialogTitle>
             <DialogDescription>
@@ -519,7 +548,7 @@ const ManageDrivers = () => {
           {editingDriver && (
             <div className="space-y-6 py-4">
               {/* Read-only Driver Info */}
-              <div className="space-y-4 p-4 rounded-lg bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700">
+              <div className="space-y-3 p-4 rounded-lg bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700">
                 <div className="flex items-center gap-3">
                   <User className="w-4 h-4 text-neutral-500" />
                   <div>
@@ -538,6 +567,39 @@ const ManageDrivers = () => {
                     </p>
                   </div>
                 </div>
+                {editingDriver.position && (
+                  <div className="flex items-center gap-3">
+                    <Briefcase className="w-4 h-4 text-neutral-500" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Position</p>
+                      <p className="font-medium text-foreground">{editingDriver.position}</p>
+                    </div>
+                  </div>
+                )}
+                {editingDriver.qualifications && (
+                  <div className="flex items-center gap-3">
+                    <Award className="w-4 h-4 text-neutral-500" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Qualifications</p>
+                      <p className="font-medium text-foreground text-sm">{editingDriver.qualifications}</p>
+                    </div>
+                  </div>
+                )}
+                {editingDriver.idExpiration && (
+                  <div className="flex items-center gap-3">
+                    <CalendarClock className="w-4 h-4 text-neutral-500" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">ID Expiration</p>
+                      <p className="font-medium text-foreground">
+                        {new Date(editingDriver.idExpiration).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Editable Fields */}
@@ -559,18 +621,37 @@ const ManageDrivers = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="flex items-center gap-2">
+                  <Label htmlFor="personalPhone" className="flex items-center gap-2">
                     <Phone className="w-4 h-4 text-neutral-500" />
-                    Phone Number
+                    Personal Phone
                   </Label>
                   <PhoneInput
-                    value={editForm.phone}
+                    value={editForm.personalPhone}
                     onChange={(value) =>
-                      setEditForm((prev) => ({ ...prev, phone: value }))
+                      setEditForm((prev) => ({ ...prev, personalPhone: value }))
                     }
-                    selectedCountry={editForm.countryCode}
+                    selectedCountry={editForm.personalPhoneCountryCode}
                     onCountryChange={(code) =>
-                      setEditForm((prev) => ({ ...prev, countryCode: code }))
+                      setEditForm((prev) => ({ ...prev, personalPhoneCountryCode: code }))
+                    }
+                    placeholder="(555) 123-4567"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="workPhone" className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-neutral-500" />
+                    Work Phone
+                    <span className="text-xs text-muted-foreground">(used for SMS)</span>
+                  </Label>
+                  <PhoneInput
+                    value={editForm.workPhone}
+                    onChange={(value) =>
+                      setEditForm((prev) => ({ ...prev, workPhone: value }))
+                    }
+                    selectedCountry={editForm.workPhoneCountryCode}
+                    onCountryChange={(code) =>
+                      setEditForm((prev) => ({ ...prev, workPhoneCountryCode: code }))
                     }
                     placeholder="(555) 123-4567"
                   />
@@ -641,6 +722,13 @@ const ManageDrivers = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Sync Drivers Modal */}
+      <SyncDriversModal
+        isOpen={syncModalOpen}
+        onClose={() => setSyncModalOpen(false)}
+        onSyncComplete={fetchDrivers}
+      />
     </div>
   );
 };

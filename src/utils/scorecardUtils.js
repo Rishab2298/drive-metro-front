@@ -165,7 +165,15 @@ export const KEY_METRICS = {
     { key: 'overallStanding', label: 'Overall Standing', type: 'tier' },
     { key: 'tier', label: 'Performance Tier', type: 'tier' },
   ],
-  standing: ['overallStanding', 'tier']
+  standing: ['overallStanding', 'tier'],
+  // Safety event types from Safety Dashboard CSV
+  safetyEventTypes: [
+    { key: 'Distraction', label: 'Distraction' },
+    { key: 'Sign Signal', label: 'Sign/Signal Violation' },
+    { key: 'Speeding', label: 'Speeding' },
+    { key: 'Following Distance', label: 'Following Distance' },
+    { key: 'Seatbelt', label: 'Seatbelt' },
+  ],
 };
 
 // Metric explanations database (based on Amazon DSP scorecard documentation)

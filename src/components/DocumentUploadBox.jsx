@@ -77,12 +77,19 @@ const getAmazonDashboardUrl = (docId, stationCode, dspCode) => {
       dashboardId: 'c27da965-3178-411f-b485-ec9dcb1a335f',
       useCompanyId: true,
     },
+    'safety-dashboard': {
+      baseUrl: 'https://logistics.amazon.com/performance',
+      pageId: 'dsp_safety',
+      tabId: 'safety-dsp-weekly-tab',
+      timeFrame: 'Weekly',
+      includeCompanyId: true,
+    },
   };
 
   const config = urlConfigs[docId];
   if (!config) return null;
 
-  // Handle PPS Daily special case (interactive report)
+  // Handle PPS Daily / Paw Print special case (interactive report)
   if (config.useCompanyId) {
     if (!dspCode) return null;
     const params = new URLSearchParams({
@@ -102,6 +109,11 @@ const getAmazonDashboardUrl = (docId, stationCode, dspCode) => {
     timeFrame: config.timeFrame,
     to: timeParam,
   });
+
+  // Add companyId for safety-dashboard (different from interactive reports)
+  if (config.includeCompanyId && dspCode) {
+    params.set('companyId', dspCode);
+  }
 
   const hash = config.hash ? `#${config.hash}` : '';
   return `${config.baseUrl}?${params.toString()}${hash}`;
@@ -150,6 +162,11 @@ const getFilenamePattern = (docId, dspCode, stationCode) => {
       // Notification_on_Arri_12345.csv or Notification_on_Arri_-12345.csv
       pattern: /^Notification_on_Arri_-?.+\.csv$/,
       errorMessage: 'Invalid filename. Expected format: Notification_on_Arri_<Identifier>.csv',
+    },
+    'safety-dashboard': {
+      // Safety_Dashboard_TRDC_DIN6_2026-W04.csv
+      pattern: new RegExp(`^Safety_Dashboard_${dspCode}_${stationCode}_\\d{4}-W\\d{2}\\.csv$`),
+      errorMessage: `Invalid filename. Expected format: Safety_Dashboard_${dspCode}_${stationCode}_<Year>-W<WeekNumber>.csv`,
     },
   };
 
@@ -369,6 +386,7 @@ export function DocumentUploadBox({
       'pps-daily': `Daily_PPS_Report_-${today}.csv`,
       dvic: `US_${dspCode}_${stationCode}_${year}_week-${week}_${today}_DVIC_Time_Last_7_Days.xlsx`,
       'paw-print': `Notification_on_Arri_${today}.csv`,
+      'safety-dashboard': `Safety_Dashboard_${dspCode}_${stationCode}_${year}-W${weekPadded}.csv`,
     };
 
     return examples[id] || exampleFileName;
