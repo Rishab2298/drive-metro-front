@@ -121,42 +121,42 @@ const CollapsibleSection = ({
   const isComplete = uploadedCount === docs.length;
 
   return (
-    <div className="border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden">
+    <div className="border border-neutral-200 dark:border-neutral-800 rounded-xl sm:rounded-2xl overflow-hidden">
       {/* Header - Clickable */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'w-full flex items-center justify-between gap-4 p-5 text-left transition-colors',
+          'w-full flex items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 text-left transition-colors',
           'hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
           isOpen && 'border-b border-neutral-200 dark:border-neutral-800'
         )}
       >
-        <div className="flex items-center gap-4">
-          <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', iconClassName)}>
-            <Icon className="w-5 h-5" />
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+          <div className={cn('w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0', iconClassName)}>
+            <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <div className="flex items-center gap-3">
-              <h2 className="text-base font-semibold text-foreground">{title}</h2>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <h2 className="text-sm sm:text-base font-semibold text-foreground truncate">{title}</h2>
               {isComplete && (
-                <CheckCircle2 className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
+                <CheckCircle2 className="w-4 h-4 text-neutral-500 dark:text-neutral-400 shrink-0" />
               )}
             </div>
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">{description}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           {/* Progress Counter */}
           <div className="text-right">
-            <p className="text-lg font-semibold tabular-nums">
+            <p className="text-base sm:text-lg font-semibold tabular-nums">
               {uploadedCount}<span className="text-neutral-300 dark:text-neutral-600">/{docs.length}</span>
             </p>
           </div>
 
           {/* Chevron */}
           <div className={cn(
-            'w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center transition-transform duration-200',
+            'w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center transition-transform duration-200',
             isOpen && 'rotate-180'
           )}>
             <ChevronDown className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
@@ -170,7 +170,7 @@ const CollapsibleSection = ({
         isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
       )}>
         <div className="overflow-hidden">
-          <div className="p-5 pt-2">
+          <div className="p-3 sm:p-5 pt-2">
             <div className="space-y-1">
               {docs.map((doc, index) => (
                 <DocumentUploadBox
@@ -191,6 +191,9 @@ const CollapsibleSection = ({
   );
 };
 
+// Cortex 1.0 only shows these 4 document types
+const CORTEX_1_DOC_IDS = ['scorecard', 'weekly-overview', 'pod-quality', 'trailing-six-week'];
+
 const UploadScorecard = () => {
   const { getToken } = useAuth();
   const navigate = useNavigate();
@@ -204,6 +207,7 @@ const UploadScorecard = () => {
   const [dspError, setDspError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingError, setProcessingError] = useState(null);
+  const [isCortex1Mode, setIsCortex1Mode] = useState(false);
 
   // Fetch DSP info on mount
   useEffect(() => {
@@ -283,13 +287,20 @@ const UploadScorecard = () => {
     }
   };
 
-  const requiredDocs = DOCUMENT_CONFIGS.filter((doc) => doc.required);
-  const optionalDocs = DOCUMENT_CONFIGS.filter((doc) => !doc.required && !doc.premium);
-  const premiumDocs = DOCUMENT_CONFIGS.filter((doc) => doc.premium);
+  // Filter documents based on Cortex mode
+  const activeDocConfigs = isCortex1Mode
+    ? DOCUMENT_CONFIGS.filter((doc) => CORTEX_1_DOC_IDS.includes(doc.id))
+    : DOCUMENT_CONFIGS;
+
+  const requiredDocs = activeDocConfigs.filter((doc) => doc.required);
+  const optionalDocs = activeDocConfigs.filter((doc) => !doc.required && !doc.premium);
+  const premiumDocs = activeDocConfigs.filter((doc) => doc.premium);
 
   const requiredUploaded = requiredDocs.every((doc) => uploadedFiles[doc.id]);
-  const totalUploaded = Object.keys(uploadedFiles).length;
-  const totalDocs = DOCUMENT_CONFIGS.length;
+  const totalUploaded = Object.keys(uploadedFiles).filter((id) =>
+    activeDocConfigs.some((doc) => doc.id === id)
+  ).length;
+  const totalDocs = activeDocConfigs.length;
 
   const getCurrentWeek = () => {
     const now = new Date();
@@ -302,10 +313,10 @@ const UploadScorecard = () => {
   // Show loading state while fetching DSP info
   if (dspLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
-          <p className="text-sm text-muted-foreground">Loading DSP information...</p>
+          <p className="text-sm text-muted-foreground text-center">Loading DSP information...</p>
         </div>
       </div>
     );
@@ -314,7 +325,7 @@ const UploadScorecard = () => {
   // Show error state if DSP info failed to load
   if (dspError) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <div className="flex flex-col items-center gap-4 text-center max-w-md">
           <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
             <span className="text-red-600 dark:text-red-400 text-xl">!</span>
@@ -330,38 +341,73 @@ const UploadScorecard = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b border-neutral-200 dark:border-neutral-800">
-        <div className="max-w-4xl mx-auto px-6 py-10">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-            <div>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium mb-2">
-                Week {getCurrentWeek()}, {new Date().getFullYear()}
-              </p>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
-                Upload Weekly Reports
-              </h1>
-              <p className="text-muted-foreground max-w-md">
-                Import your Amazon DSP documents to generate driver scorecards and analytics.
-              </p>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+          <div className="flex flex-col gap-6">
+            {/* Title Row */}
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium mb-2">
+                  Week {getCurrentWeek()}, {new Date().getFullYear()}
+                </p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                  Upload Weekly Reports
+                </h1>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  Import your Amazon DSP documents to generate driver scorecards and analytics.
+                </p>
+              </div>
+
+              {/* Progress Counter */}
+              <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+                <div className="text-left sm:text-right">
+                  <p className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">
+                    {totalUploaded}<span className="text-neutral-300 dark:text-neutral-600">/{totalDocs}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground">documents uploaded</p>
+                </div>
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center">
+                  <FileStack className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-500 dark:text-neutral-400" />
+                </div>
+              </div>
             </div>
 
-            {/* Progress */}
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-2xl font-bold text-foreground tabular-nums">
-                  {totalUploaded}<span className="text-neutral-300 dark:text-neutral-600">/{totalDocs}</span>
-                </p>
-                <p className="text-xs text-muted-foreground">documents uploaded</p>
-              </div>
-              <div className="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center">
-                <FileStack className="w-6 h-6 text-neutral-500 dark:text-neutral-400" />
-              </div>
+            {/* Cortex Version Toggle */}
+            <div className="inline-flex items-center p-1 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 self-start">
+              <button
+                onClick={() => setIsCortex1Mode(true)}
+                className={cn(
+                  'px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1.5',
+                  isCortex1Mode
+                    ? 'bg-white dark:bg-neutral-900 text-foreground shadow-sm'
+                    : 'text-neutral-500 dark:text-neutral-400 hover:text-foreground'
+                )}
+              >
+                {isCortex1Mode && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                )}
+                {isCortex1Mode ? 'Cortex 1.0 is active' : 'Cortex 1.0'}
+              </button>
+              <button
+                onClick={() => setIsCortex1Mode(false)}
+                className={cn(
+                  'px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1.5',
+                  !isCortex1Mode
+                    ? 'bg-white dark:bg-neutral-900 text-foreground shadow-sm'
+                    : 'text-neutral-500 dark:text-neutral-400 hover:text-foreground'
+                )}
+              >
+                {!isCortex1Mode && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                )}
+                {!isCortex1Mode ? 'Cortex 2.0 is active' : 'Cortex 2.0'}
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8 space-y-4">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-3 sm:space-y-4">
         {/* Required Section */}
         <CollapsibleSection
           title="Required Documents"
@@ -407,8 +453,8 @@ const UploadScorecard = () => {
 
         {/* Processing Error */}
         {processingError && (
-          <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 mt-4">
-            <p className="text-sm text-red-700 dark:text-red-300">
+          <div className="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 mt-3 sm:mt-4">
+            <p className="text-xs sm:text-sm text-red-700 dark:text-red-300">
               <span className="font-semibold">Error:</span> {processingError}
             </p>
           </div>
@@ -417,37 +463,37 @@ const UploadScorecard = () => {
         {/* Action Footer */}
         <div
           className={cn(
-            'sticky bottom-6 p-5 rounded-2xl border transition-all duration-500 mt-8',
+            'sticky bottom-4 sm:bottom-6 p-4 sm:p-5 rounded-xl sm:rounded-2xl border transition-all duration-500 mt-6 sm:mt-8',
             requiredUploaded
               ? 'bg-neutral-900 dark:bg-white border-neutral-900 dark:border-white'
               : 'bg-card/80 border-neutral-200 dark:border-neutral-800 backdrop-blur-xl'
           )}
         >
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <div
                 className={cn(
-                  'w-12 h-12 rounded-xl flex items-center justify-center transition-colors',
+                  'w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center transition-colors shrink-0',
                   requiredUploaded
                     ? 'bg-neutral-800 dark:bg-neutral-100'
                     : 'bg-neutral-100 dark:bg-neutral-800'
                 )}
               >
                 {requiredUploaded ? (
-                  <CheckCircle2 className="w-6 h-6 text-white dark:text-neutral-900" />
+                  <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white dark:text-neutral-900" />
                 ) : (
-                  <Upload className="w-6 h-6 text-neutral-500 dark:text-neutral-400" />
+                  <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-500 dark:text-neutral-400" />
                 )}
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className={cn(
-                  'font-semibold',
+                  'text-sm sm:text-base font-semibold',
                   requiredUploaded ? 'text-white dark:text-neutral-900' : 'text-foreground'
                 )}>
                   {requiredUploaded ? 'Ready to process' : 'Upload required documents'}
                 </p>
                 <p className={cn(
-                  'text-sm',
+                  'text-xs sm:text-sm truncate',
                   requiredUploaded ? 'text-neutral-400 dark:text-neutral-500' : 'text-muted-foreground'
                 )}>
                   {requiredUploaded
@@ -461,7 +507,7 @@ const UploadScorecard = () => {
               disabled={!requiredUploaded || isProcessing}
               onClick={handleProcessDocuments}
               className={cn(
-                'px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2',
+                'w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2',
                 requiredUploaded && !isProcessing
                   ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800'
                   : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 cursor-not-allowed'
