@@ -19,8 +19,6 @@ import {
   Square,
   CheckSquare,
   Star,
-  Video,
-  ExternalLink,
   ShieldAlert,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -362,20 +360,6 @@ const SafetyEventDetailModal = ({ data, onClose }) => {
                       </div>
                     )}
                   </div>
-
-                  {/* Video Link Button */}
-                  {event.videoLink && (
-                    <a
-                      href={event.videoLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-2.5 bg-linear-to-r from-indigo-500 to-violet-500 text-white rounded-lg text-xs font-semibold hover:from-indigo-600 hover:to-violet-600 transition-all shadow-sm"
-                    >
-                      <Video size={14} />
-                      Watch Event Video
-                      <ExternalLink size={12} />
-                    </a>
-                  )}
                 </div>
               ))}
             </div>
