@@ -456,7 +456,7 @@ const ProblemSolutionSection = () => {
                       <p className="text-xs text-slate-500">Real-time driver insights</p>
                     </div>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex items-end gap-1 h-10">
                     {[40, 65, 45, 80, 60, 90, 75].map((h, i) => (
                       <div
                         key={i}

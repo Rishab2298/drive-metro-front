@@ -6,19 +6,20 @@ import { cn } from '@/lib/utils';
 import {
   Loader2,
   CreditCard,
-  Calendar,
   CheckCircle2,
   Clock,
   Crown,
-  Zap,
   Shield,
-  ArrowRight,
   ExternalLink,
   AlertTriangle,
   Sparkles,
 } from 'lucide-react';
 
-const PREMIUM_FEATURES = [
+const ALL_FEATURES = [
+  { name: 'DSP Scorecard Upload', description: 'Weekly performance scorecard PDF processing' },
+  { name: 'Weekly Overview Report', description: 'Dashboard export with driver metrics' },
+  { name: 'Customer Feedback Report', description: 'Negative delivery feedback breakdown' },
+  { name: 'POD Quality Report', description: 'Photo on Delivery metrics' },
   { name: '6-Week Trailing Report', description: 'Historical overview data for trend analysis' },
   { name: 'PPS Daily Report', description: 'Proper Park Sequence compliance metrics' },
   { name: 'DVIC Inspection Report', description: '7-day vehicle inspection timing data' },
@@ -26,14 +27,6 @@ const PREMIUM_FEATURES = [
   { name: 'Download PDF Scorecards', description: 'Generate professional PDF reports' },
   { name: 'Send SMS/Email', description: 'Share scorecards with drivers directly' },
   { name: 'AI-Powered Feedback', description: 'Personalized coaching for each driver' },
-];
-
-const FREE_FEATURES = [
-  { name: 'DSP Scorecard Upload', description: 'Weekly performance scorecard PDF' },
-  { name: 'Weekly Overview Report', description: 'Dashboard export with driver metrics' },
-  { name: 'Customer Feedback Report', description: 'Negative delivery feedback breakdown' },
-  { name: 'POD Quality Report', description: 'Photo on Delivery metrics' },
-  { name: 'Basic Analytics', description: 'View driver scorecards and metrics' },
 ];
 
 export default function Billing() {
@@ -215,13 +208,13 @@ export default function Billing() {
                     <Shield className="w-6 h-6 text-neutral-500" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground">Free Plan</h3>
-                    <p className="text-sm text-muted-foreground">Limited features</p>
+                    <h3 className="font-semibold text-foreground">No Active Subscription</h3>
+                    <p className="text-sm text-muted-foreground">Subscribe to access all features</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-foreground">$0</p>
-                  <p className="text-sm text-muted-foreground">forever</p>
+                  <p className="text-2xl font-bold text-foreground">$24.99</p>
+                  <p className="text-sm text-muted-foreground">per week</p>
                 </div>
               </div>
             )}
@@ -273,53 +266,37 @@ export default function Billing() {
           </div>
         </div>
 
-        {/* Features Comparison */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Free Features */}
-          <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
-            <div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800">
-              <h3 className="font-semibold text-foreground">Free Features</h3>
-              <p className="text-sm text-muted-foreground">Always available</p>
-            </div>
-            <div className="p-6">
-              <ul className="space-y-4">
-                {FREE_FEATURES.map((feature) => (
-                  <li key={feature.name} className="flex gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-foreground text-sm">{feature.name}</p>
-                      <p className="text-xs text-muted-foreground">{feature.description}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+        {/* All Features - Single Plan */}
+        <div className="rounded-2xl border-2 border-neutral-900 dark:border-white overflow-hidden">
+          <div className="bg-neutral-900 dark:bg-white px-6 py-5 border-b border-neutral-900 dark:border-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Crown className="w-5 h-5 text-amber-400 dark:text-amber-500" />
+                  <h3 className="font-semibold text-white dark:text-neutral-900">DiveMetric Plan</h3>
+                </div>
+                <p className="text-sm text-neutral-400 dark:text-neutral-500">Everything included, one simple price</p>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-white dark:text-neutral-900">$24.99</p>
+                <p className="text-sm text-neutral-400 dark:text-neutral-500">per week</p>
+              </div>
             </div>
           </div>
-
-          {/* Premium Features */}
-          <div className="rounded-2xl border-2 border-neutral-900 dark:border-white overflow-hidden">
-            <div className="bg-neutral-900 dark:bg-white px-6 py-4 border-b border-neutral-900 dark:border-white">
-              <div className="flex items-center gap-2">
-                <Crown className="w-5 h-5 text-amber-400 dark:text-amber-500" />
-                <h3 className="font-semibold text-white dark:text-neutral-900">Premium Features</h3>
-              </div>
-              <p className="text-sm text-neutral-400 dark:text-neutral-500">Unlock with subscription</p>
-            </div>
-            <div className="p-6">
-              <ul className="space-y-4">
-                {PREMIUM_FEATURES.map((feature) => (
-                  <li key={feature.name} className="flex gap-3">
-                    <Zap className={cn(
-                      'w-5 h-5 flex-shrink-0 mt-0.5',
-                      hasPremiumAccess ? 'text-amber-500' : 'text-neutral-300 dark:text-neutral-600'
-                    )} />
-                    <div>
-                      <p className="font-medium text-foreground text-sm">{feature.name}</p>
-                      <p className="text-xs text-muted-foreground">{feature.description}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+          <div className="p-6">
+            <div className="grid sm:grid-cols-2 gap-4">
+              {ALL_FEATURES.map((feature) => (
+                <div key={feature.name} className="flex gap-3">
+                  <CheckCircle2 className={cn(
+                    'w-5 h-5 flex-shrink-0 mt-0.5',
+                    hasPremiumAccess ? 'text-emerald-500' : 'text-neutral-400 dark:text-neutral-500'
+                  )} />
+                  <div>
+                    <p className="font-medium text-foreground text-sm">{feature.name}</p>
+                    <p className="text-xs text-muted-foreground">{feature.description}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
