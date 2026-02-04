@@ -3,14 +3,12 @@ import { useState } from 'react';
 import {
   Mail,
   Phone,
-  MapPin,
   Send,
   CheckCircle2,
   Building2,
   User,
   MessageSquare,
   Clock,
-  Headphones,
   Sparkles,
   ArrowRight,
   Users,
@@ -87,30 +85,6 @@ const ContactPage = () => {
     }
   };
 
-  const contactMethods = [
-    {
-      icon: Mail,
-      title: 'Email Us',
-      description: 'support@divemetric.com',
-      href: 'mailto:support@divemetric.com',
-      color: 'indigo',
-    },
-    {
-      icon: Phone,
-      title: 'Call Us',
-      description: '+1 (555) 123-4567',
-      href: 'tel:+15551234567',
-      color: 'emerald',
-    },
-    {
-      icon: MapPin,
-      title: 'Visit Us',
-      description: 'San Francisco, CA',
-      href: null,
-      color: 'violet',
-    },
-  ];
-
   const stats = [
     { icon: Users, value: '50K+', label: 'Drivers Managed' },
     { icon: Zap, value: '35%', label: 'Performance Boost' },
@@ -156,42 +130,6 @@ const ContactPage = () => {
                 </div>
               </div>
             ))}
-          </div>
-        </section>
-
-        {/* Contact Methods */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-          <div className="grid md:grid-cols-3 gap-6">
-            {contactMethods.map((method, i) => {
-              const colorClasses = {
-                indigo: 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-500/30',
-                emerald: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-500/30',
-                violet: 'bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 group-hover:bg-violet-200 dark:group-hover:bg-violet-500/30',
-              };
-              const Wrapper = method.href ? 'a' : 'div';
-              return (
-                <Wrapper
-                  key={i}
-                  href={method.href}
-                  className={cn(
-                    "group p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-lg hover:shadow-xl transition-all duration-300",
-                    method.href && "cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-500/30"
-                  )}
-                >
-                  <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-colors", colorClasses[method.color])}>
-                    <method.icon className="w-7 h-7" />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{method.title}</h3>
-                  <p className="text-slate-600 dark:text-slate-400">{method.description}</p>
-                  {method.href && (
-                    <div className="mt-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium text-sm">
-                      Contact now
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  )}
-                </Wrapper>
-              );
-            })}
           </div>
         </section>
 
@@ -407,31 +345,30 @@ const ContactPage = () => {
                 </div>
               </div>
 
-              {/* Support Hours */}
-              <div className="bg-white dark:bg-white/5 rounded-3xl shadow-xl border border-slate-200 dark:border-white/10 p-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center">
-                    <Headphones className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+              {/* Email Us */}
+              <a
+                href="mailto:support@divemetric.com"
+                className="block bg-white dark:bg-white/5 rounded-3xl shadow-xl border border-slate-200 dark:border-white/10 p-8 hover:shadow-2xl hover:border-indigo-300 dark:hover:border-indigo-500/30 transition-all duration-300 group"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-200 dark:group-hover:bg-indigo-500/30 transition-colors">
+                    <Mail className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                    Support Hours
+                    Email Us
                   </h3>
                 </div>
-                <div className="space-y-4 text-slate-600 dark:text-slate-400">
-                  <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-white/5">
-                    <span>Monday - Friday</span>
-                    <span className="font-semibold text-slate-900 dark:text-white">9:00 AM - 6:00 PM PST</span>
-                  </div>
-                  <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-white/5">
-                    <span>Saturday</span>
-                    <span className="font-semibold text-slate-900 dark:text-white">10:00 AM - 4:00 PM PST</span>
-                  </div>
-                  <div className="flex justify-between items-center py-3">
-                    <span>Sunday</span>
-                    <span className="font-semibold text-slate-500 dark:text-slate-400">Closed</span>
-                  </div>
+                <p className="text-slate-600 dark:text-slate-400 mb-4">
+                  Reach out to us directly via email for any inquiries or support.
+                </p>
+                <div className="text-indigo-600 dark:text-indigo-400 font-semibold">
+                  support@divemetric.com
                 </div>
-              </div>
+                <div className="mt-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium text-sm">
+                  Send email
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </a>
 
               {/* FAQ Prompt */}
               <div className="bg-slate-100 dark:bg-white/5 rounded-3xl p-8 border border-slate-200 dark:border-white/10">
