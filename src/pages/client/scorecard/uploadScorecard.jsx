@@ -353,7 +353,7 @@ const UploadScorecard = () => {
                   Upload Weekly Reports
                 </h1>
                 <p className="text-sm sm:text-base text-muted-foreground">
-                  Import your Amazon DSP documents to generate driver scorecards and analytics.
+                  Import your weekly scorecard report to generate driver scorecards and analytics.
                 </p>
               </div>
 
