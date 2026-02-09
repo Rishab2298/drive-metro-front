@@ -185,6 +185,34 @@ const TermsConditions = () => {
       ),
     },
     {
+      title: 'SMS Communications',
+      content: (
+        <>
+          <p className="mb-4">
+            <strong className="text-slate-900 dark:text-white">Program Name:</strong> DiveMetric Scorecard Notifications
+          </p>
+          <p className="mb-4">
+            <strong className="text-slate-900 dark:text-white">Program Description:</strong> If your employer (a Delivery Service Partner) adds you to the DiveMetric platform with your personal phone number, you may receive SMS text messages containing links to view your weekly performance scorecards.
+          </p>
+          <p className="mb-4">
+            <strong className="text-slate-900 dark:text-white">Message Frequency:</strong> Approximately 1 message per week when a new scorecard is available.
+          </p>
+          <p className="mb-4">
+            <strong className="text-slate-900 dark:text-white">Message and Data Rates:</strong> Message and data rates may apply. Please contact your wireless carrier for details about your text plan.
+          </p>
+          <p className="mb-4">
+            <strong className="text-slate-900 dark:text-white">Opt-Out:</strong> To stop receiving SMS messages, reply <strong>STOP</strong> to any message. You will receive a confirmation message and will no longer receive scorecard notifications via SMS.
+          </p>
+          <p className="mb-4">
+            <strong className="text-slate-900 dark:text-white">Help:</strong> For assistance, reply <strong>HELP</strong> to any message or contact us at <a href="mailto:hello@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">hello@divemetric.com</a>.
+          </p>
+          <p>
+            <strong className="text-slate-900 dark:text-white">Consent:</strong> By providing your phone number to your employer for use with DiveMetric, you consent to receive recurring automated text messages related to your performance scorecards. Consent is not a condition of employment.
+          </p>
+        </>
+      ),
+    },
+    {
       title: 'Links to Third Party Websites',
       content: (
         <>

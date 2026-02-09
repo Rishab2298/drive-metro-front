@@ -95,6 +95,31 @@ const PrivacyPolicy = () => {
       ),
     },
     {
+      title: 'SMS Communications',
+      content: (
+        <>
+          <p className="mb-4">
+            <strong className="text-slate-900 dark:text-white">Phone Number Collection:</strong> We collect personal phone numbers provided by your employer (Delivery Service Partner/DSP) to send you performance-related notifications via SMS text messages.
+          </p>
+          <p className="mb-4">
+            <strong className="text-slate-900 dark:text-white">How We Use Your Phone Number:</strong> Your phone number is used solely to send you weekly performance scorecard notifications containing a link to view your scorecard. We do not share your phone number with third parties for marketing purposes.
+          </p>
+          <p className="mb-4">
+            <strong className="text-slate-900 dark:text-white">Message Frequency:</strong> You will receive approximately 1 SMS message per week when a new scorecard is available.
+          </p>
+          <p className="mb-4">
+            <strong className="text-slate-900 dark:text-white">Opt-Out:</strong> You can opt-out of SMS messages at any time by replying <strong>STOP</strong> to any message. You will receive a confirmation and will no longer receive SMS notifications from DiveMetric.
+          </p>
+          <p className="mb-4">
+            <strong className="text-slate-900 dark:text-white">Help:</strong> For assistance with SMS messages, reply <strong>HELP</strong> to any message or contact us at <a href="mailto:hello@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">hello@divemetric.com</a>.
+          </p>
+          <p>
+            <strong className="text-slate-900 dark:text-white">Rates:</strong> Message and data rates may apply. Please contact your wireless carrier for details about your text plan.
+          </p>
+        </>
+      ),
+    },
+    {
       title: 'Cookies',
       content: (
         <>
