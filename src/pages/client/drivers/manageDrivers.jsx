@@ -68,8 +68,6 @@ const ManageDrivers = () => {
     email: '',
     personalPhone: '',
     personalPhoneCountryCode: 'US',
-    workPhone: '',
-    workPhoneCountryCode: 'US',
     isActive: true,
   });
   const [saving, setSaving] = useState(false);
@@ -153,14 +151,11 @@ const ManageDrivers = () => {
   // Open edit modal
   const handleEditDriver = (driver) => {
     const personalParsed = parsePhoneNumber(driver.personalPhone);
-    const workParsed = parsePhoneNumber(driver.workPhone);
     setEditingDriver(driver);
     setEditForm({
       email: driver.email || '',
       personalPhone: personalParsed.phoneNumber,
       personalPhoneCountryCode: personalParsed.countryCode,
-      workPhone: workParsed.phoneNumber,
-      workPhoneCountryCode: workParsed.countryCode,
       isActive: driver.isActive,
     });
     setSaveError(null);
@@ -175,14 +170,10 @@ const ManageDrivers = () => {
     setSaveError(null);
 
     try {
-      // Combine country dial code with phone numbers
+      // Combine country dial code with phone number
       const personalCountry = countries.find((c) => c.code === editForm.personalPhoneCountryCode);
       const personalDialCode = personalCountry?.dialCode || '+1';
       const fullPersonalPhone = editForm.personalPhone ? `${personalDialCode}${editForm.personalPhone}` : null;
-
-      const workCountry = countries.find((c) => c.code === editForm.workPhoneCountryCode);
-      const workDialCode = workCountry?.dialCode || '+1';
-      const fullWorkPhone = editForm.workPhone ? `${workDialCode}${editForm.workPhone}` : null;
 
       const token = await getToken();
       const response = await fetch(`${API_URL}/api/drivers/${editingDriver.id}`, {
@@ -194,7 +185,6 @@ const ManageDrivers = () => {
         body: JSON.stringify({
           email: editForm.email || null,
           personalPhone: fullPersonalPhone,
-          workPhone: fullWorkPhone,
           isActive: editForm.isActive,
         }),
       });
@@ -439,13 +429,13 @@ const ManageDrivers = () => {
 
                   {/* Contact */}
                   <div className="col-span-3 hidden md:block">
-                    {driver.workPhone ? (
+                    {driver.personalPhone ? (
                       <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                         <Phone className="w-3.5 h-3.5" />
-                        <span>{driver.workPhone}</span>
+                        <span>{driver.personalPhone}</span>
                       </div>
                     ) : (
-                      <span className="text-sm text-red-500 dark:text-red-400">No work phone</span>
+                      <span className="text-sm text-red-500 dark:text-red-400">No phone</span>
                     )}
                   </div>
 
@@ -624,6 +614,7 @@ const ManageDrivers = () => {
                   <Label htmlFor="personalPhone" className="flex items-center gap-2">
                     <Phone className="w-4 h-4 text-neutral-500" />
                     Personal Phone
+                    <span className="text-xs text-muted-foreground">(used for SMS)</span>
                   </Label>
                   <PhoneInput
                     value={editForm.personalPhone}
@@ -633,25 +624,6 @@ const ManageDrivers = () => {
                     selectedCountry={editForm.personalPhoneCountryCode}
                     onCountryChange={(code) =>
                       setEditForm((prev) => ({ ...prev, personalPhoneCountryCode: code }))
-                    }
-                    placeholder="(555) 123-4567"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="workPhone" className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-neutral-500" />
-                    Work Phone
-                    <span className="text-xs text-muted-foreground">(used for SMS)</span>
-                  </Label>
-                  <PhoneInput
-                    value={editForm.workPhone}
-                    onChange={(value) =>
-                      setEditForm((prev) => ({ ...prev, workPhone: value }))
-                    }
-                    selectedCountry={editForm.workPhoneCountryCode}
-                    onCountryChange={(code) =>
-                      setEditForm((prev) => ({ ...prev, workPhoneCountryCode: code }))
                     }
                     placeholder="(555) 123-4567"
                   />

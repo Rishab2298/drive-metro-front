@@ -39,6 +39,7 @@ export default function SyncDriversModal({ isOpen, onClose, onSyncComplete }) {
   const { getToken } = useAuth();
   const [countryCode, setCountryCode] = useState('US');
   const [file, setFile] = useState(null);
+  const [fileFormat, setFileFormat] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -47,6 +48,7 @@ export default function SyncDriversModal({ isOpen, onClose, onSyncComplete }) {
 
   const resetState = useCallback(() => {
     setFile(null);
+    setFileFormat(null);
     setError(null);
     setResults(null);
     setUploading(false);
@@ -59,14 +61,31 @@ export default function SyncDriversModal({ isOpen, onClose, onSyncComplete }) {
   }, [resetState, onClose]);
 
   const validateFile = (selectedFile) => {
-    if (!selectedFile) return 'No file selected';
-    if (selectedFile.name !== 'AssociateData.csv') {
-      return 'File must be named "AssociateData.csv"';
+    if (!selectedFile) return { error: 'No file selected' };
+
+    const fileName = selectedFile.name;
+
+    // Must be CSV
+    if (!fileName.toLowerCase().endsWith('.csv')) {
+      return { error: 'File must be a CSV file' };
     }
-    if (!selectedFile.type.includes('csv') && !selectedFile.name.endsWith('.csv')) {
-      return 'File must be a CSV file';
+
+    // Cortex 2.0: AssociateData (no space), with optional number suffix
+    // Examples: AssociateData.csv, AssociateData (1).csv, AssociateData 2.csv
+    const cortex2Pattern = /^AssociateData[\s()[\]\d]*\.csv$/i;
+
+    // Cortex 1.0: Associate Data (with space), with optional number suffix
+    // Examples: Associate Data.csv, Associate Data (5).csv
+    const cortex1Pattern = /^Associate Data[\s()[\]\d]*\.csv$/i;
+
+    if (cortex2Pattern.test(fileName)) {
+      return { format: 'cortex2' };
     }
-    return null;
+    if (cortex1Pattern.test(fileName)) {
+      return { format: 'cortex1' };
+    }
+
+    return { error: 'File must start with "AssociateData" or "Associate Data" and be a .csv file' };
   };
 
   const handleDrag = useCallback((e) => {
@@ -86,23 +105,27 @@ export default function SyncDriversModal({ isOpen, onClose, onSyncComplete }) {
     setError(null);
 
     const droppedFile = e.dataTransfer.files[0];
-    const validationError = validateFile(droppedFile);
-    if (validationError) {
-      setError(validationError);
+    const validation = validateFile(droppedFile);
+    if (validation.error) {
+      setError(validation.error);
+      setFileFormat(null);
       return;
     }
     setFile(droppedFile);
+    setFileFormat(validation.format);
   }, []);
 
   const handleFileSelect = useCallback((e) => {
     setError(null);
     const selectedFile = e.target.files[0];
-    const validationError = validateFile(selectedFile);
-    if (validationError) {
-      setError(validationError);
+    const validation = validateFile(selectedFile);
+    if (validation.error) {
+      setError(validation.error);
+      setFileFormat(null);
       return;
     }
     setFile(selectedFile);
+    setFileFormat(validation.format);
   }, []);
 
   const handleSync = async () => {
@@ -163,6 +186,7 @@ export default function SyncDriversModal({ isOpen, onClose, onSyncComplete }) {
         body: JSON.stringify({
           s3Key: key,
           countryCode,
+          format: fileFormat,
         }),
       });
 
@@ -377,7 +401,7 @@ export default function SyncDriversModal({ isOpen, onClose, onSyncComplete }) {
                     <div className="flex flex-col items-center gap-2">
                       <Upload className="w-10 h-10 text-neutral-400" />
                       <p className="font-medium text-foreground">
-                        Drop AssociateData.csv here
+                        Drop AssociateData.csv or Associate Data.csv here
                       </p>
                       <p className="text-sm text-muted-foreground">
                         or click to browse
@@ -386,7 +410,7 @@ export default function SyncDriversModal({ isOpen, onClose, onSyncComplete }) {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  File must be named exactly "AssociateData.csv"
+                  Supports Cortex 2.0 (AssociateData.csv) and Cortex 1.0 (Associate Data.csv)
                 </p>
               </div>
 
