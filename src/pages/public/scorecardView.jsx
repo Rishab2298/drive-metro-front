@@ -12,6 +12,7 @@ import {
   X,
   ArrowLeft,
   StickyNote,
+  Paperclip,
   AlertTriangle,
   Sparkles,
   Lightbulb,
@@ -948,7 +949,7 @@ const ScorecardView = () => {
         {/* Scrollable Content */}
         <div className="p-4 bg-slate-50 sm:bg-white">
         {/* Note from DSP */}
-        {scorecard.dspNote && (
+        {(scorecard.dspNote || scorecard.dspNoteAttachmentUrl) && (
           <div className="mb-3.5 p-4 bg-linear-to-br from-indigo-50 to-violet-100 rounded-[14px] border border-indigo-200/50 shadow-md">
             <div className="flex items-start gap-3.5">
               <div className="w-9 h-9 rounded-lg bg-linear-to-br from-indigo-500 to-violet-600 flex items-center justify-center shrink-0 shadow-lg">
@@ -958,9 +959,22 @@ const ScorecardView = () => {
                 <div className="text-xs font-bold text-indigo-700 uppercase tracking-wide mb-1.5">
                   Note from your DSP
                 </div>
-                <div className="text-[13px] text-slate-700 leading-relaxed">
-                  {scorecard.dspNote}
-                </div>
+                {scorecard.dspNote && (
+                  <div className="text-[13px] text-slate-700 leading-relaxed">
+                    {scorecard.dspNote}
+                  </div>
+                )}
+                {scorecard.dspNoteAttachmentUrl && (
+                  <a
+                    href={scorecard.dspNoteAttachmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 mt-2.5 px-3 py-2 bg-white rounded-lg border border-indigo-200 text-sm font-medium text-indigo-600 hover:bg-indigo-50 transition-colors shadow-sm"
+                  >
+                    <Paperclip size={14} />
+                    View Attachment
+                  </a>
+                )}
               </div>
             </div>
           </div>
