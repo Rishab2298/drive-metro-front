@@ -80,7 +80,7 @@ export const uploadAttachmentToS3 = async (uploadUrl, file) => {
 // Get presigned download URL for viewing attachment
 export const getAttachmentDownloadUrl = async (key, getToken) => {
   const token = await getToken();
-  const response = await fetch(`${API_URL}/api/s3/attachment-url/${encodeURIComponent(key)}`, {
+  const response = await fetch(`${API_URL}/api/s3/attachment-url?key=${encodeURIComponent(key)}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
