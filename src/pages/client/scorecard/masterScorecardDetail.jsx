@@ -1,6 +1,6 @@
 // MasterScorecardDetail - Main page for viewing master scorecard with all drivers
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { Loader2, ArrowLeft, Download, Search, ChevronRight } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import UpgradeModal from '@/components/UpgradeModal';
@@ -24,6 +24,8 @@ import {
 
 const MasterScorecardDetail = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const showJson = searchParams.get('json') === 'true';
   const { hasPremiumAccess } = useSubscription();
 
   // Data fetching
@@ -155,16 +157,11 @@ const MasterScorecardDetail = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Driver Scorecards</h2>
-            {rankedCount > 0 && (
+            {data?.drivers && data.drivers.filter(d => d.acknowledgedAt).length > 0 && (
               <p className="text-sm text-muted-foreground">
-                {rankedCount} drivers ranked (500+ packages) · {totalDrivers - rankedCount} not yet eligible
-                {data?.drivers && (
-                  <span className="ml-2">
-                    · <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                      {data.drivers.filter(d => d.acknowledgedAt).length} acknowledged
-                    </span>
-                  </span>
-                )}
+                <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                  {data.drivers.filter(d => d.acknowledgedAt).length} acknowledged
+                </span>
               </p>
             )}
           </div>
@@ -180,13 +177,15 @@ const MasterScorecardDetail = () => {
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent"
               />
             </div>
-            <button
-              onClick={handleDownloadJson}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium text-sm hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors whitespace-nowrap"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Export JSON</span>
-            </button>
+{showJson && (
+              <button
+                onClick={handleDownloadJson}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium text-sm hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors whitespace-nowrap"
+              >
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline">Export JSON</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -255,19 +254,21 @@ const MasterScorecardDetail = () => {
         )}
 
         {/* Raw JSON Preview */}
-        <div className="mt-8">
-          <details className="group">
-            <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              <ChevronRight className="w-4 h-4 group-open:rotate-90 transition-transform" />
-              View Raw JSON
-            </summary>
-            <div className="mt-4 p-4 rounded-xl bg-neutral-900 dark:bg-neutral-950 overflow-auto max-h-96">
-              <pre className="text-xs text-neutral-300 font-mono whitespace-pre-wrap">
-                {JSON.stringify(data, null, 2)}
-              </pre>
-            </div>
-          </details>
-        </div>
+        {showJson && (
+          <div className="mt-8">
+            <details className="group">
+              <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                <ChevronRight className="w-4 h-4 group-open:rotate-90 transition-transform" />
+                View Raw JSON
+              </summary>
+              <div className="mt-4 p-4 rounded-xl bg-neutral-900 dark:bg-neutral-950 overflow-auto max-h-96">
+                <pre className="text-xs text-neutral-300 font-mono whitespace-pre-wrap">
+                  {JSON.stringify(data, null, 2)}
+                </pre>
+              </div>
+            </details>
+          </div>
+        )}
       </div>
 
       {/* Preview Modal */}
@@ -284,6 +285,7 @@ const MasterScorecardDetail = () => {
             weekNumber: data?.weekNumber,
             year: data?.year,
           }}
+          getToken={getToken}
         />
       )}
 
@@ -293,14 +295,19 @@ const MasterScorecardDetail = () => {
           driver={noteDriver}
           onClose={() => setNoteDriver(null)}
           getToken={getToken}
-          onSave={(note) => {
+          onSave={(result) => {
             setData(prevData => {
               if (!prevData) return prevData;
               return {
                 ...prevData,
                 drivers: prevData.drivers.map(d =>
                   d.id === noteDriver.id
-                    ? { ...d, dspNote: note, dspNoteUpdatedAt: note ? new Date().toISOString() : null }
+                    ? {
+                        ...d,
+                        dspNote: result?.note || null,
+                        dspNoteUpdatedAt: result ? new Date().toISOString() : null,
+                        dspNoteAttachment: result?.attachmentKey || null
+                      }
                     : d
                 ),
               };

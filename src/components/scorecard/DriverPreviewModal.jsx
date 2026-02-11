@@ -17,7 +17,10 @@ import {
   Video,
   ExternalLink,
   ShieldAlert,
+  Paperclip,
+  Loader2,
 } from 'lucide-react';
+import { getAttachmentDownloadUrl } from '@/services/scorecardService';
 import { cn } from '@/lib/utils';
 import {
   SEVERITY_COLORS,
@@ -656,7 +659,7 @@ const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSe
 };
 
 // Main Driver Preview Modal
-export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, scorecardInfo }) => {
+export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, scorecardInfo, getToken }) => {
   const [view, setView] = useState('current');
   const [metricModal, setMetricModal] = useState(null);
   const [feedbackModal, setFeedbackModal] = useState(null);
@@ -664,6 +667,7 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
   const [expandedSections, setExpandedSections] = useState({
     overall: true, safety: true, delivery: true, customer: true, dvic: true, standing: true, safetyEvents: true
   });
+  const [loadingAttachment, setLoadingAttachment] = useState(false);
 
   const historicalData = parseHistoricalData(driver);
   const hasHistoricalData = historicalData.length > 0;
@@ -678,6 +682,20 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const handleViewAttachment = async () => {
+    if (!driver.dspNoteAttachment || !getToken) return;
+
+    setLoadingAttachment(true);
+    try {
+      const { downloadUrl } = await getAttachmentDownloadUrl(driver.dspNoteAttachment, getToken);
+      window.open(downloadUrl, '_blank');
+    } catch (err) {
+      console.error('Error fetching attachment URL:', err);
+    } finally {
+      setLoadingAttachment(false);
+    }
   };
 
   return (
@@ -821,7 +839,7 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
         {/* Scrollable Content */}
         <div className="p-4  max-h-[calc(90vh-380px)] overflow-y-auto">
           {/* Note from DSP */}
-          {driver.dspNote && (
+          {(driver.dspNote || driver.dspNoteAttachment) && (
             <div className="mb-3.5 p-4 bg-linear-to-br from-indigo-50 to-violet-100 rounded-[14px] border border-indigo-200/50 shadow-md">
               <div className="flex items-start gap-3.5">
                 <div className="w-9 h-9 rounded-lg bg-linear-to-br from-indigo-500 to-violet-600 flex items-center justify-center shrink-0 shadow-lg">
@@ -831,9 +849,26 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
                   <div className="text-xs font-bold text-indigo-700 uppercase tracking-wide mb-1.5">
                     Note from your DSP
                   </div>
-                  <div className="text-[13px] text-slate-700 leading-relaxed">
-                    {driver.dspNote}
-                  </div>
+                  {driver.dspNote && (
+                    <div className="text-[13px] text-slate-700 leading-relaxed">
+                      {driver.dspNote}
+                    </div>
+                  )}
+                  {driver.dspNoteAttachment && (
+                    <button
+                      onClick={handleViewAttachment}
+                      disabled={loadingAttachment}
+                      className="mt-2 flex items-center gap-2 px-3 py-2 bg-white rounded-lg text-xs font-semibold text-indigo-700 hover:bg-indigo-50 transition-colors shadow-sm border border-indigo-200 disabled:opacity-50"
+                    >
+                      {loadingAttachment ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Paperclip size={14} />
+                      )}
+                      View Attachment
+                      <ExternalLink size={12} />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

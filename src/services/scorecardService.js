@@ -20,8 +20,8 @@ export const fetchMasterScorecard = async (id, getToken) => {
   return response.json();
 };
 
-// Save note for a driver
-export const saveDriverNote = async (driverId, note, getToken) => {
+// Save note for a driver (with optional attachment)
+export const saveDriverNote = async (driverId, note, getToken, attachmentKey = null) => {
   const token = await getToken();
   const response = await fetch(`${API_URL}/api/scorecard/${driverId}/note`, {
     method: 'PUT',
@@ -29,12 +29,66 @@ export const saveDriverNote = async (driverId, note, getToken) => {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ note: note.trim() }),
+    body: JSON.stringify({ note: note.trim(), attachmentKey }),
   });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.error || `Failed to save note (${response.status})`);
+  }
+
+  return response.json();
+};
+
+// Get presigned URL for uploading note attachment
+export const getAttachmentUploadUrl = async (fileName, contentType, fileSize, getToken) => {
+  const token = await getToken();
+  const response = await fetch(`${API_URL}/api/s3/presign-attachment`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ fileName, contentType, fileSize }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Failed to get upload URL');
+  }
+
+  return response.json();
+};
+
+// Upload file to S3 using presigned URL
+export const uploadAttachmentToS3 = async (uploadUrl, file) => {
+  const response = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': file.type,
+    },
+    body: file,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to upload file');
+  }
+
+  return true;
+};
+
+// Get presigned download URL for viewing attachment
+export const getAttachmentDownloadUrl = async (key, getToken) => {
+  const token = await getToken();
+  const response = await fetch(`${API_URL}/api/s3/attachment-url/${encodeURIComponent(key)}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Failed to get download URL');
   }
 
   return response.json();
