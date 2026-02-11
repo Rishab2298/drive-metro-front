@@ -162,6 +162,25 @@ export const generateAIFeedback = async (scorecardIds, masterScorecardId, getTok
   return response.json();
 };
 
+// Poll AI feedback job status
+export const getAIFeedbackJobStatus = async (jobId, getToken) => {
+  const token = await getToken();
+  const response = await fetch(`${API_URL}/api/ai-feedback/job/${jobId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      return null; // Job expired or not found
+    }
+    throw new Error('Failed to fetch job status');
+  }
+
+  return response.json();
+};
+
 // Save bulk notes to drivers
 export const saveBulkNotes = async (drivers, note, getToken) => {
   const token = await getToken();

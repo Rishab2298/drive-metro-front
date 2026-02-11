@@ -11,11 +11,11 @@ import {
   Loader2,
   ChevronDown,
   Download,
+  CheckCircle2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { downloadBulkScorecardPDFs, downloadCombinedPDF } from '@/lib/generateScorecardPDF.jsx';
 import { sendBulkEmails, sendBulkSms, generateAIFeedback } from '@/services/scorecardService';
-import { API_URL } from '@/utils/scorecardUtils';
 
 export const DriverActionsBar = ({
   selectedDriverObjects,
@@ -29,16 +29,25 @@ export const DriverActionsBar = ({
   clearSelection,
   setData,
   setShowBulkNoteModal,
+  onAIFeedbackStart,
 }) => {
   const [showPdfDropdown, setShowPdfDropdown] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [sendingSms, setSendingSms] = useState(false);
   const [generatingAIFeedback, setGeneratingAIFeedback] = useState(false);
   const [aiFeedbackError, setAiFeedbackError] = useState(null);
-  const [aiFeedbackProcessing, setAiFeedbackProcessing] = useState(false);
-  const [aiFeedbackMessage, setAiFeedbackMessage] = useState(null);
 
   const rankedCount = Object.values(driverRanks).filter(r => r.eligible).length;
+
+  // Count drivers with/without AI feedback for rate limiting display
+  const driversWithAIFeedback = selectedDriverObjects.filter(d => d.aiFeedback && d.aiFeedback.length > 0).length;
+  const driversNeedingFeedback = selectedDriverObjects.length - driversWithAIFeedback;
+  const allHaveFeedback = driversNeedingFeedback === 0;
+
+  // Count drivers with/without SMS sent for rate limiting display
+  const driversWithSmsSent = selectedDriverObjects.filter(d => d.smsSentAt).length;
+  const driversNeedingSms = selectedDriverObjects.length - driversWithSmsSent;
+  const allHaveSmsSent = driversNeedingSms === 0;
 
   const handleBulkPDF = async () => {
     if (!hasPremiumAccess) {
@@ -130,11 +139,32 @@ export const DriverActionsBar = ({
     }
     if (selectedDriverObjects.length === 0) return;
 
-    const driversWithPhone = selectedDriverObjects.filter(d => d.phone);
-    const driversWithoutPhone = selectedDriverObjects.filter(d => !d.phone);
+    // Check how many drivers already have SMS sent (rate limiting)
+    const driversAlreadySent = selectedDriverObjects.filter(d => d.smsSentAt);
+    const driversNotSent = selectedDriverObjects.filter(d => !d.smsSentAt);
+
+    // If all drivers already have SMS sent, show error
+    if (driversNotSent.length === 0) {
+      toast.error(
+        `SMS already sent to all ${driversAlreadySent.length} selected driver${driversAlreadySent.length > 1 ? 's' : ''}`,
+        { duration: 4000 }
+      );
+      return;
+    }
+
+    // Warn if some drivers will be skipped due to already sent
+    if (driversAlreadySent.length > 0) {
+      toast.warning(
+        `${driversAlreadySent.length} driver${driversAlreadySent.length > 1 ? 's' : ''} already received SMS and will be skipped`,
+        { duration: 4000 }
+      );
+    }
+
+    const driversWithPhone = driversNotSent.filter(d => d.phone);
+    const driversWithoutPhone = driversNotSent.filter(d => !d.phone);
 
     if (driversWithPhone.length === 0) {
-      toast.error('None of the selected drivers have phone numbers');
+      toast.error('None of the remaining drivers have phone numbers');
       return;
     }
 
@@ -150,9 +180,22 @@ export const DriverActionsBar = ({
 
       if (result.successCount > 0) {
         toast.success(`Scorecard SMS sent to ${result.successCount} driver(s)`);
+
+        // Update local data to reflect smsSentAt
+        setData(prevData => ({
+          ...prevData,
+          drivers: prevData.drivers.map(d =>
+            scorecardIds.includes(d.id) && result.results?.find(r => r.scorecardId === d.id && r.success)
+              ? { ...d, smsSentAt: new Date().toISOString() }
+              : d
+          ),
+        }));
       }
       if (result.failCount > 0) {
         toast.error(`Failed to send ${result.failCount} SMS`);
+      }
+      if (result.skippedCount > 0) {
+        toast.info(`${result.skippedCount} already sent (skipped)`);
       }
 
       clearSelection();
@@ -176,84 +219,50 @@ export const DriverActionsBar = ({
     }
     if (selectedDriverObjects.length === 0) return;
 
+    // Check how many drivers already have AI feedback
+    const driversWithFeedback = selectedDriverObjects.filter(d => d.aiFeedback && d.aiFeedback.length > 0);
+    const driversWithoutFeedback = selectedDriverObjects.filter(d => !d.aiFeedback || d.aiFeedback.length === 0);
+
+    // If all drivers already have feedback, show error
+    if (driversWithoutFeedback.length === 0) {
+      toast.error(
+        `All ${driversWithFeedback.length} selected driver${driversWithFeedback.length > 1 ? 's' : ''} already have AI feedback`,
+        { duration: 4000 }
+      );
+      return;
+    }
+
+    // Warn if some drivers will be skipped
+    if (driversWithFeedback.length > 0) {
+      toast.warning(
+        `${driversWithFeedback.length} driver${driversWithFeedback.length > 1 ? 's' : ''} already have AI feedback and will be skipped`,
+        { duration: 4000 }
+      );
+    }
+
     setGeneratingAIFeedback(true);
     setAiFeedbackError(null);
-    setAiFeedbackMessage(null);
 
     try {
       const scorecardIds = selectedDriverObjects.map(d => d.id);
       const result = await generateAIFeedback(scorecardIds, masterScorecardId, getToken);
 
-      if (result.processing) {
-        setAiFeedbackProcessing(true);
-        setAiFeedbackMessage(`Generating AI feedback for ${result.driversQueued} drivers in background...`);
+      if (result.jobId) {
+        // Notify parent to show progress banner
+        onAIFeedbackStart?.({
+          jobId: result.jobId,
+          totalDrivers: result.totalDrivers,
+        });
         clearSelection();
 
+        const skippedMsg = result.skippedCount > 0
+          ? ` (${result.skippedCount} skipped)`
+          : '';
         toast.info(
-          `Generating AI feedback for ${result.driversQueued} driver${result.driversQueued > 1 ? 's' : ''}. Results will appear automatically as they're ready.`,
-          { duration: 6000, icon: '✨' }
+          `Generating AI feedback for ${result.totalDrivers} driver${result.totalDrivers > 1 ? 's' : ''}${skippedMsg}...`,
+          { duration: 3000, icon: '✨' }
         );
-
-        // Start polling to refresh data
-        const pollInterval = setInterval(async () => {
-          try {
-            const refreshToken = await getToken();
-            const refreshResponse = await fetch(`${API_URL}/api/master-scorecard/${masterScorecardId}`, {
-              headers: { Authorization: `Bearer ${refreshToken}` },
-            });
-            if (refreshResponse.ok) {
-              const refreshedData = await refreshResponse.json();
-              setData(refreshedData);
-
-              const driversWithFeedback = refreshedData.drivers.filter(
-                d => scorecardIds.includes(d.id) && d.aiFeedback
-              );
-
-              if (driversWithFeedback.length === scorecardIds.length) {
-                clearInterval(pollInterval);
-                setAiFeedbackProcessing(false);
-                setAiFeedbackMessage(null);
-                toast.success(
-                  `AI feedback generated for ${scorecardIds.length} driver${scorecardIds.length > 1 ? 's' : ''}!`,
-                  { duration: 4000 }
-                );
-              }
-            }
-          } catch (pollErr) {
-            console.error('Polling error:', pollErr);
-          }
-        }, 5000);
-
-        setTimeout(() => {
-          clearInterval(pollInterval);
-          setAiFeedbackProcessing(false);
-          if (aiFeedbackMessage) {
-            setAiFeedbackMessage('AI feedback generation may still be in progress. Refresh to see updates.');
-          }
-        }, 120000);
-
-      } else if (result.feedback) {
-        setData(prevData => ({
-          ...prevData,
-          drivers: prevData.drivers.map(driver => {
-            const feedbackItem = result.feedback.find(
-              f => f.driverId === driver.driverId ||
-                   f.driverId === driver.transporterId ||
-                   f.driverName === driver.name
-            );
-            if (feedbackItem) {
-              return {
-                ...driver,
-                aiFeedback: feedbackItem.feedback,
-                aiFeedbackUpdatedAt: new Date().toISOString(),
-              };
-            }
-            return driver;
-          }),
-        }));
-        clearSelection();
       }
-
     } catch (err) {
       console.error('Error generating AI feedback:', err);
       setAiFeedbackError(err.message);
@@ -324,11 +333,29 @@ export const DriverActionsBar = ({
           </button>
           <button
             onClick={handleBulkSMS}
-            disabled={sendingSms}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 dark:bg-neutral-900/10 hover:bg-white/20 dark:hover:bg-neutral-900/20 text-white dark:text-neutral-900 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={sendingSms || allHaveSmsSent}
+            title={allHaveSmsSent ? 'SMS already sent to all selected drivers' : driversWithSmsSent > 0 ? `${driversWithSmsSent} driver(s) will be skipped (already sent)` : ''}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              allHaveSmsSent
+                ? 'bg-neutral-500/20 text-white/60 dark:text-neutral-500'
+                : 'bg-white/10 dark:bg-neutral-900/10 hover:bg-white/20 dark:hover:bg-neutral-900/20 text-white dark:text-neutral-900'
+            }`}
           >
-            {sendingSms ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
-            {sendingSms ? 'Sending...' : 'Send SMS'}
+            {sendingSms ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : allHaveSmsSent ? (
+              <CheckCircle2 className="w-4 h-4" />
+            ) : (
+              <MessageSquare className="w-4 h-4" />
+            )}
+            {sendingSms
+              ? 'Sending...'
+              : allHaveSmsSent
+                ? 'Already Sent'
+                : driversWithSmsSent > 0
+                  ? `Send SMS (${driversNeedingSms})`
+                  : 'Send SMS'
+            }
           </button>
           <button
             onClick={handleBulkNotes}
@@ -339,15 +366,29 @@ export const DriverActionsBar = ({
           </button>
           <button
             onClick={handleGenerateAIFeedback}
-            disabled={generatingAIFeedback}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-linear-to-r from-purple-500/20 to-indigo-500/20 hover:from-purple-500/30 hover:to-indigo-500/30 text-white dark:text-neutral-900 text-sm font-medium transition-all border border-purple-400/30 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={generatingAIFeedback || allHaveFeedback}
+            title={allHaveFeedback ? 'All selected drivers already have AI feedback' : driversWithAIFeedback > 0 ? `${driversWithAIFeedback} driver(s) will be skipped (already have feedback)` : ''}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all border disabled:opacity-50 disabled:cursor-not-allowed ${
+              allHaveFeedback
+                ? 'bg-neutral-500/20 border-neutral-400/30 text-white/60 dark:text-neutral-500'
+                : 'bg-linear-to-r from-purple-500/20 to-indigo-500/20 hover:from-purple-500/30 hover:to-indigo-500/30 text-white dark:text-neutral-900 border-purple-400/30'
+            }`}
           >
             {generatingAIFeedback ? (
               <Loader2 className="w-4 h-4 animate-spin" />
+            ) : allHaveFeedback ? (
+              <CheckCircle2 className="w-4 h-4" />
             ) : (
               <Sparkles className="w-4 h-4" />
             )}
-            {generatingAIFeedback ? 'Generating...' : 'Generate AI Feedback'}
+            {generatingAIFeedback
+              ? 'Generating...'
+              : allHaveFeedback
+                ? 'Already Generated'
+                : driversWithAIFeedback > 0
+                  ? `Generate AI Feedback (${driversNeedingFeedback})`
+                  : 'Generate AI Feedback'
+            }
           </button>
           <button
             onClick={clearSelection}
@@ -365,19 +406,6 @@ export const DriverActionsBar = ({
           <button
             onClick={() => setAiFeedbackError(null)}
             className="text-red-300 hover:text-red-100"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-      {/* AI Feedback Processing Message */}
-      {aiFeedbackMessage && (
-        <div className="mt-3 p-3 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center gap-3">
-          {aiFeedbackProcessing && <Loader2 className="w-4 h-4 animate-spin text-purple-300" />}
-          <p className="text-sm text-purple-200 dark:text-purple-400 flex-1">{aiFeedbackMessage}</p>
-          <button
-            onClick={() => setAiFeedbackMessage(null)}
-            className="text-purple-300 hover:text-purple-100"
           >
             <X className="w-4 h-4" />
           </button>

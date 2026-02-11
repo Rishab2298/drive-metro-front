@@ -19,6 +19,7 @@ import {
   DriverPreviewModal,
   AddNoteModal,
   BulkNoteModal,
+  AIFeedbackProgressBanner,
 } from '@/components/scorecard';
 
 const MasterScorecardDetail = () => {
@@ -55,6 +56,9 @@ const MasterScorecardDetail = () => {
   const [noteDriver, setNoteDriver] = useState(null);
   const [showBulkNoteModal, setShowBulkNoteModal] = useState(false);
 
+  // AI Feedback job state
+  const [aiFeedbackJob, setAiFeedbackJob] = useState(null);
+
   // Upgrade modal state
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeFeatureName, setUpgradeFeatureName] = useState('');
@@ -62,6 +66,31 @@ const MasterScorecardDetail = () => {
   const promptUpgrade = (featureName) => {
     setUpgradeFeatureName(featureName);
     setShowUpgradeModal(true);
+  };
+
+  // AI Feedback handlers
+  const handleAIFeedbackStart = ({ jobId, totalDrivers }) => {
+    setAiFeedbackJob({ jobId, totalDrivers });
+  };
+
+  const handleAIFeedbackComplete = async () => {
+    // Refresh data to get the new AI feedback
+    try {
+      const token = await getToken();
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5004'}/api/master-scorecard/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const refreshedData = await response.json();
+        setData(refreshedData);
+      }
+    } catch (err) {
+      console.error('Error refreshing data:', err);
+    }
+  };
+
+  const handleAIFeedbackDismiss = () => {
+    setAiFeedbackJob(null);
   };
 
   // Download JSON
@@ -161,6 +190,17 @@ const MasterScorecardDetail = () => {
           </div>
         </div>
 
+        {/* AI Feedback Progress Banner - Persistent */}
+        {aiFeedbackJob && (
+          <AIFeedbackProgressBanner
+            jobId={aiFeedbackJob.jobId}
+            totalDrivers={aiFeedbackJob.totalDrivers}
+            getToken={getToken}
+            onComplete={handleAIFeedbackComplete}
+            onDismiss={handleAIFeedbackDismiss}
+          />
+        )}
+
         {/* Bulk Actions Toolbar */}
         {selectedDrivers.size > 0 && (
           <DriverActionsBar
@@ -175,6 +215,7 @@ const MasterScorecardDetail = () => {
             clearSelection={clearSelection}
             setData={setData}
             setShowBulkNoteModal={setShowBulkNoteModal}
+            onAIFeedbackStart={handleAIFeedbackStart}
           />
         )}
 

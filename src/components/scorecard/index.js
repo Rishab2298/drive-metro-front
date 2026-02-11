@@ -9,3 +9,4 @@ export { ScorecardHeader } from './ScorecardHeader';
 export { DriverActionsBar } from './DriverActionsBar';
 export { DriverRow } from './DriverRow';
 export { DriversTable } from './DriversTable';
+export { AIFeedbackProgressBanner } from './AIFeedbackProgressBanner';
