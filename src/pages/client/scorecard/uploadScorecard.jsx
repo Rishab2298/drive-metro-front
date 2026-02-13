@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth, useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { DocumentUploadBox } from '@/components/DocumentUploadBox';
 import { useSubscription } from '@/contexts/SubscriptionContext';
-import { cn } from '@/lib/utils';
+import { cn, getAvailableScorecardWeek } from '@/lib/utils';
 import { Upload, CheckCircle2, FileStack, Zap, Star, ChevronDown, Loader2, Lock } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
@@ -115,6 +115,7 @@ const CollapsibleSection = ({
   defaultOpen = false,
   dspInfo,
   hasPremiumAccess = true,
+  cortexVersion = "2",
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const uploadedCount = docs.filter((d) => uploadedFiles[d.id]).length;
@@ -181,6 +182,7 @@ const CollapsibleSection = ({
                   isUploaded={!!uploadedFiles[doc.id]}
                   dspInfo={dspInfo}
                   hasPremiumAccess={hasPremiumAccess}
+                  cortexVersion={cortexVersion}
                 />
               ))}
             </div>
@@ -196,8 +198,13 @@ const CORTEX_1_DOC_IDS = ['scorecard', 'weekly-overview', 'pod-quality', 'traili
 
 const UploadScorecard = () => {
   const { getToken } = useAuth();
+  const { user } = useUser();
   const navigate = useNavigate();
   const { hasPremiumAccess, isLoading: subscriptionLoading } = useSubscription();
+
+  // Determine cortex version from user metadata (defaults to "2" for new users)
+  const cortexVersion = user?.publicMetadata?.cortex || "2";
+  const isCortex1Mode = cortexVersion === "1";
 
   // While subscription is loading, assume premium access (for trial users)
   const effectivePremiumAccess = subscriptionLoading ? true : hasPremiumAccess;
@@ -207,7 +214,6 @@ const UploadScorecard = () => {
   const [dspError, setDspError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingError, setProcessingError] = useState(null);
-  const [isCortex1Mode, setIsCortex1Mode] = useState(false);
 
   // Fetch DSP info on mount
   useEffect(() => {
@@ -302,13 +308,8 @@ const UploadScorecard = () => {
   ).length;
   const totalDocs = activeDocConfigs.length;
 
-  const getCurrentWeek = () => {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), 0, 1);
-    const diff = now - start;
-    const oneWeek = 604800000;
-    return Math.ceil(diff / oneWeek);
-  };
+  // Get the available scorecard week (accounts for Wednesday release schedule)
+  const { week: availableWeek, year: availableYear } = getAvailableScorecardWeek();
 
   // Show loading state while fetching DSP info
   if (dspLoading) {
@@ -347,7 +348,7 @@ const UploadScorecard = () => {
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium mb-2">
-                  Week {getCurrentWeek()}, {new Date().getFullYear()}
+                  Week {availableWeek}, {availableYear}
                 </p>
                 <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
                   Upload Weekly Reports
@@ -371,37 +372,6 @@ const UploadScorecard = () => {
               </div>
             </div>
 
-            {/* Cortex Version Toggle */}
-            <div className="inline-flex items-center p-1 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 self-start">
-              <button
-                onClick={() => setIsCortex1Mode(true)}
-                className={cn(
-                  'px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1.5',
-                  isCortex1Mode
-                    ? 'bg-white dark:bg-neutral-900 text-foreground shadow-sm'
-                    : 'text-neutral-500 dark:text-neutral-400 hover:text-foreground'
-                )}
-              >
-                {isCortex1Mode && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                )}
-                {isCortex1Mode ? 'Cortex 1.0 is active' : 'Cortex 1.0'}
-              </button>
-              <button
-                onClick={() => setIsCortex1Mode(false)}
-                className={cn(
-                  'px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1.5',
-                  !isCortex1Mode
-                    ? 'bg-white dark:bg-neutral-900 text-foreground shadow-sm'
-                    : 'text-neutral-500 dark:text-neutral-400 hover:text-foreground'
-                )}
-              >
-                {!isCortex1Mode && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                )}
-                {!isCortex1Mode ? 'Cortex 2.0 is active' : 'Cortex 2.0'}
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -420,6 +390,7 @@ const UploadScorecard = () => {
           indexOffset={0}
           defaultOpen={true}
           dspInfo={dspInfo}
+          cortexVersion={cortexVersion}
         />
 
         {/* Optional Section */}
@@ -434,6 +405,7 @@ const UploadScorecard = () => {
           indexOffset={requiredDocs.length}
           defaultOpen={false}
           dspInfo={dspInfo}
+          cortexVersion={cortexVersion}
         />
 
         {/* Premium Section */}
@@ -449,6 +421,7 @@ const UploadScorecard = () => {
           defaultOpen={false}
           dspInfo={dspInfo}
           hasPremiumAccess={effectivePremiumAccess}
+          cortexVersion={cortexVersion}
         />
 
         {/* Processing Error */}

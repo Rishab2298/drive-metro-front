@@ -1347,15 +1347,20 @@ const PricingSection = () => {
     'DVIC Inspection Report',
     'Download PDF Scorecards',
     'SMS & Email Distribution',
-    'AI-Powered Coaching Notes',
     'Engagement Tracking & Analytics',
+  ];
+
+  const aiAddonFeatures = [
+    'AI-Powered Coaching Notes',
+    'Personalized Driver Feedback',
+    'Performance Improvement Tips',
   ];
 
   return (
     <section id="pricing" className="relative py-24 overflow-hidden">
       {/* Background handled by GlobalBackground */}
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <AnimatedSection className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 mb-6">
             <Crown className="w-4 h-4 text-amber-600 dark:text-amber-400" />
@@ -1373,64 +1378,125 @@ const PricingSection = () => {
           </p>
         </AnimatedSection>
 
-        <AnimatedSection delay={0.2}>
-          <GradientBorderCard className="max-w-xl mx-auto">
-            <div>
-              {/* Header */}
-              <div className="relative bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500 p-8 text-center overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.15),transparent_60%)]" />
-                <div className="relative z-10">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-4">
-                    <Sparkles className="w-4 h-4 text-white" />
-                    <span className="text-sm font-bold text-white">30-Day Free Trial</span>
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {/* Main Plan Card */}
+          <AnimatedSection delay={0.2}>
+            <GradientBorderCard className="h-full">
+              <div className="h-full flex flex-col">
+                {/* Header */}
+                <div className="relative bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500 p-6 text-center overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.15),transparent_60%)]" />
+                  <div className="relative z-10">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm mb-3">
+                      <Sparkles className="w-3 h-3 text-white" />
+                      <span className="text-xs font-bold text-white">30-Day Free Trial</span>
+                    </div>
+                    <div className="flex items-baseline justify-center gap-2 mb-1">
+                      <span className="text-4xl font-black text-white">$24.99</span>
+                      <span className="text-lg text-white/70 font-medium">/week</span>
+                    </div>
+                    <p className="text-white/60 text-xs">Billed weekly after trial</p>
                   </div>
-                  <div className="flex items-baseline justify-center gap-2 mb-1">
-                    <span className="text-6xl font-black text-white">$24.99</span>
-                    <span className="text-xl text-white/70 font-medium">/week</span>
+                </div>
+
+                {/* Features */}
+                <div className="p-5 flex-1 flex flex-col">
+                  <div className="mb-5 flex-1">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-5 h-5 rounded-md bg-linear-to-br from-amber-400 to-amber-500 flex items-center justify-center">
+                        <Crown className="w-2.5 h-2.5 text-white" />
+                      </div>
+                      <span className="font-bold text-slate-900 dark:text-white text-sm">Premium Features</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {premiumFeatures.map((feature, i) => (
+                        <div key={i} className="flex items-center gap-2 p-1.5">
+                          <div className="w-4 h-4 rounded-full bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center shrink-0">
+                            <CheckCircle2 className="w-2.5 h-2.5 text-white" />
+                          </div>
+                          <span className="text-slate-600 dark:text-slate-300 text-xs">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-white/60 text-sm">Billed weekly after trial</p>
+
+                  <Link to="/sign-up">
+                    <button className="w-full group relative py-3 rounded-xl font-bold text-white text-sm overflow-hidden shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-shadow">
+                      <div className="absolute inset-0 bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500" />
+                      <div className="absolute inset-0 bg-linear-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <span className="relative flex items-center justify-center gap-2">
+                        Start Your Free Trial
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    </button>
+                  </Link>
+
+                  <p className="text-center text-xs text-slate-500 mt-3">
+                    No credit card required. Cancel anytime.
+                  </p>
                 </div>
               </div>
+            </GradientBorderCard>
+          </AnimatedSection>
 
-              {/* Features */}
-              <div className="p-6">
-                <div className="mb-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-6 h-6 rounded-md bg-linear-to-br from-amber-400 to-amber-500 flex items-center justify-center">
-                      <Crown className="w-3 h-3 text-white" />
+          {/* AI Add-on Card */}
+          <AnimatedSection delay={0.3}>
+            <div className="relative h-full rounded-2xl border-2 border-purple-400/50 dark:border-purple-500/50 bg-white dark:bg-slate-900 overflow-hidden">
+              <div className="h-full flex flex-col">
+                {/* Header */}
+                <div className="relative bg-gradient-to-r from-purple-500 to-indigo-600 p-6 text-center overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.15),transparent_60%)]" />
+                  <div className="relative z-10">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm mb-3">
+                      <Sparkles className="w-3 h-3 text-white" />
+                      <span className="text-xs font-bold text-white">Optional Add-on</span>
                     </div>
-                    <span className="font-bold text-slate-900 dark:text-white">Premium Features</span>
-                  </div>
-                  <div className="space-y-2">
-                    {premiumFeatures.map((feature, i) => (
-                      <div key={i} className="flex items-center gap-3 p-2">
-                        <div className="w-5 h-5 rounded-full bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center shrink-0">
-                          <CheckCircle2 className="w-3 h-3 text-white" />
-                        </div>
-                        <span className="text-slate-600 dark:text-slate-300 text-sm">{feature}</span>
-                      </div>
-                    ))}
+                    <div className="flex items-baseline justify-center gap-2 mb-1">
+                      <span className="text-lg text-white/70 font-medium">+</span>
+                      <span className="text-4xl font-black text-white">$6.99</span>
+                      <span className="text-lg text-white/70 font-medium">/week</span>
+                    </div>
+                    <p className="text-white/60 text-xs">AI Coaching Add-on</p>
                   </div>
                 </div>
 
-                <Link to="/sign-up">
-                  <button className="w-full group relative py-4 rounded-xl font-bold text-white text-lg overflow-hidden shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-shadow">
-                    <div className="absolute inset-0 bg-linear-to-r from-indigo-500 via-violet-500 to-pink-500" />
-                    <div className="absolute inset-0 bg-linear-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <span className="relative flex items-center justify-center gap-2">
-                      Start Your Free Trial
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </span>
-                  </button>
-                </Link>
+                {/* Features */}
+                <div className="p-5 flex-1 flex flex-col">
+                  <div className="mb-5 flex-1">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-5 h-5 rounded-md bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center">
+                        <Brain className="w-2.5 h-2.5 text-white" />
+                      </div>
+                      <span className="font-bold text-slate-900 dark:text-white text-sm">AI Features</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {aiAddonFeatures.map((feature, i) => (
+                        <div key={i} className="flex items-center gap-2 p-1.5">
+                          <div className="w-4 h-4 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center shrink-0">
+                            <CheckCircle2 className="w-2.5 h-2.5 text-white" />
+                          </div>
+                          <span className="text-slate-600 dark:text-slate-300 text-xs">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
 
-                <p className="text-center text-xs text-slate-500 mt-4">
-                  No credit card required. Cancel anytime.
-                </p>
+                    <div className="mt-4 p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+                      <p className="text-xs text-purple-700 dark:text-purple-300">
+                        Our AI analyzes each driver's metrics and generates personalized coaching notes with actionable improvement tips.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-center py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                      Add anytime from your billing page
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-          </GradientBorderCard>
-        </AnimatedSection>
+          </AnimatedSection>
+        </div>
       </div>
     </section>
   );

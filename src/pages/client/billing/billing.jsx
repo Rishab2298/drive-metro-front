@@ -26,7 +26,12 @@ const ALL_FEATURES = [
   { name: 'Paw Print Compliance', description: 'At-stop safety notification compliance' },
   { name: 'Download PDF Scorecards', description: 'Generate professional PDF reports' },
   { name: 'Send SMS/Email', description: 'Share scorecards with drivers directly' },
-  { name: 'AI-Powered Feedback', description: 'Personalized coaching for each driver' },
+];
+
+const AI_ADDON_FEATURES = [
+  { name: 'AI-Powered Coaching Notes', description: 'Personalized improvement suggestions for each driver' },
+  { name: 'Performance Insights', description: 'AI analysis of driver strengths and areas to improve' },
+  { name: 'Actionable Feedback', description: 'Specific tips to help drivers improve their metrics' },
 ];
 
 export default function Billing() {
@@ -39,23 +44,36 @@ export default function Billing() {
     trialDaysRemaining,
     isTrialExpired,
     isSubscribed,
+    hasAIAccess,
+    aiAddonStatus,
+    aiTrialInfo,
+    isAiTrial,
     createCheckoutSession,
     openCustomerPortal,
+    createAIAddonCheckout,
     refreshSubscription,
   } = useSubscription();
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isAIProcessing, setIsAIProcessing] = useState(false);
 
   // Handle success/cancel from Stripe checkout
   useEffect(() => {
     const success = searchParams.get('success');
     const canceled = searchParams.get('canceled');
+    const aiSuccess = searchParams.get('ai_success');
+    const aiCanceled = searchParams.get('ai_canceled');
 
     if (success === 'true') {
       toast.success('Subscription activated! Thank you for subscribing.');
       refreshSubscription();
     } else if (canceled === 'true') {
       toast.info('Checkout canceled. You can try again anytime.');
+    } else if (aiSuccess === 'true') {
+      toast.success('AI Coaching add-on activated! You can now generate AI feedback.');
+      refreshSubscription();
+    } else if (aiCanceled === 'true') {
+      toast.info('AI add-on checkout canceled. You can try again anytime.');
     }
   }, [searchParams, refreshSubscription]);
 
@@ -76,6 +94,16 @@ export default function Billing() {
     } catch (err) {
       toast.error(err.message || 'Failed to open billing portal. Please try again.');
       setIsProcessing(false);
+    }
+  };
+
+  const handleAddAIAddon = async () => {
+    setIsAIProcessing(true);
+    try {
+      await createAIAddonCheckout();
+    } catch (err) {
+      toast.error(err.message || 'Failed to start AI add-on checkout. Please try again.');
+      setIsAIProcessing(false);
     }
   };
 
@@ -263,6 +291,117 @@ export default function Billing() {
                 </button>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* AI Coaching Add-on Card */}
+        <div className="rounded-2xl border-2 border-purple-500/50 dark:border-purple-400/50 overflow-hidden">
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-5 border-b border-purple-500/50">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Sparkles className="w-5 h-5 text-purple-200" />
+                  <h3 className="font-semibold text-white">AI Coaching Add-on</h3>
+                  {hasAIAccess && aiAddonStatus === 'ACTIVE' && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
+                      <CheckCircle2 className="w-3 h-3" />
+                      Active
+                    </span>
+                  )}
+                  {isAiTrial && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-400/30 text-amber-100">
+                      <Clock className="w-3 h-3" />
+                      {aiTrialInfo?.type === 'grace_period' ? 'Free Access' : 'Trial'}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-purple-200">AI-powered personalized driver feedback</p>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-white">$6.99</p>
+                <p className="text-sm text-purple-200">per week</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6">
+            <div className="mb-6">
+              <div className="grid gap-3">
+                {AI_ADDON_FEATURES.map((feature) => (
+                  <div key={feature.name} className="flex gap-3">
+                    <CheckCircle2 className={cn(
+                      'w-5 h-5 flex-shrink-0 mt-0.5',
+                      hasAIAccess ? 'text-purple-500' : 'text-neutral-400 dark:text-neutral-500'
+                    )} />
+                    <div>
+                      <p className="font-medium text-foreground text-sm">{feature.name}</p>
+                      <p className="text-xs text-muted-foreground">{feature.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Trial/Grace Period Warning */}
+            {isAiTrial && aiTrialInfo && (
+              <div className="mb-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                      {aiTrialInfo.type === 'grace_period'
+                        ? `Free AI access ends in ${aiTrialInfo.daysRemaining} day${aiTrialInfo.daysRemaining !== 1 ? 's' : ''}`
+                        : `AI trial ends in ${aiTrialInfo.daysRemaining} day${aiTrialInfo.daysRemaining !== 1 ? 's' : ''}`
+                      }
+                    </p>
+                    <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                      Subscribe now to keep generating AI feedback for your drivers.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Subscribe Button - show for non-subscribers and trial users */}
+            {(!hasAIAccess || isAiTrial) && (
+              <button
+                onClick={handleAddAIAddon}
+                disabled={isAIProcessing || !hasPremiumAccess}
+                title={!hasPremiumAccess ? 'Requires active main subscription' : ''}
+                className={cn(
+                  'w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all',
+                  'bg-gradient-to-r from-purple-600 to-indigo-600 text-white',
+                  'hover:from-purple-700 hover:to-indigo-700',
+                  'disabled:opacity-50 disabled:cursor-not-allowed'
+                )}
+              >
+                {isAIProcessing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    {isAiTrial ? 'Subscribe to AI Coaching - $6.99/week' : 'Add AI Coaching - $6.99/week'}
+                  </>
+                )}
+              </button>
+            )}
+
+            {!hasPremiumAccess && !hasAIAccess && (
+              <p className="mt-2 text-xs text-center text-muted-foreground">
+                Requires an active DiveMetric subscription
+              </p>
+            )}
+
+            {hasAIAccess && aiAddonStatus === 'ACTIVE' && (
+              <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+                <CheckCircle2 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                  AI Coaching is active on your account
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

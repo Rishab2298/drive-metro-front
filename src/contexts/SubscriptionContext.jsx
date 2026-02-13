@@ -72,6 +72,18 @@ export function SubscriptionProvider({ children }) {
   // Helper: Is subscription active (paid)?
   const isSubscribed = subscription?.status === 'ACTIVE';
 
+  // Helper: Has AI addon access?
+  const hasAIAccess = subscription?.hasAIAccess ?? false;
+
+  // Helper: AI addon status
+  const aiAddonStatus = subscription?.aiAddonStatus ?? null;
+
+  // Helper: AI trial info (for users on trial/grace period, not paid)
+  const aiTrialInfo = subscription?.aiTrialInfo ?? null;
+
+  // Helper: Is AI access from trial/grace period (not paid)?
+  const isAiTrial = hasAIAccess && aiAddonStatus !== 'ACTIVE' && aiTrialInfo !== null;
+
   // Helper: Create checkout session and redirect to Stripe
   const createCheckoutSession = async () => {
     try {
@@ -122,6 +134,31 @@ export function SubscriptionProvider({ children }) {
     }
   };
 
+  // Helper: Create AI addon checkout session and redirect to Stripe
+  const createAIAddonCheckout = async () => {
+    try {
+      const token = await getToken();
+      const response = await fetch(`${API_URL}/api/billing/create-ai-addon-checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create AI addon checkout session');
+      }
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (err) {
+      console.error('Error creating AI addon checkout session:', err);
+      throw err;
+    }
+  };
+
   const value = {
     subscription,
     isLoading,
@@ -132,9 +169,14 @@ export function SubscriptionProvider({ children }) {
     isTrialExpiringSoon,
     isTrialExpired,
     isSubscribed,
+    hasAIAccess,
+    aiAddonStatus,
+    aiTrialInfo,
+    isAiTrial,
     refreshSubscription: fetchSubscription,
     createCheckoutSession,
     openCustomerPortal,
+    createAIAddonCheckout,
   };
 
   return (

@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { cn, getAvailableScorecardWeek } from '@/lib/utils';
 import {
   Upload,
   X,
@@ -13,19 +13,16 @@ import {
   Lock,
   Crown,
   ExternalLink,
+  HelpCircle,
 } from 'lucide-react';
+import { ExportGuideDialog } from '@/components/ExportGuideDialog';
 
-// Generate dynamic Amazon DSP Dashboard URLs based on document type, station code, dsp code, and current week
+// Generate dynamic Amazon DSP Dashboard URLs based on document type, station code, dsp code, and available scorecard week
 const getAmazonDashboardUrl = (docId, stationCode, dspCode) => {
   if (!stationCode) return null;
 
-  // Get current week and year
-  const now = new Date();
-  const year = now.getFullYear();
-  const startOfYear = new Date(year, 0, 1);
-  const days = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000));
-  const week = Math.ceil((days + startOfYear.getDay() + 1) / 7);
-  const weekPadded = String(week).padStart(2, '0');
+  // Get available scorecard week (accounts for Wednesday release schedule)
+  const { weekPadded, year } = getAvailableScorecardWeek();
   const timeParam = `${year}-W${weekPadded}`;
 
   const urlConfigs = {
@@ -82,7 +79,6 @@ const getAmazonDashboardUrl = (docId, stationCode, dspCode) => {
       pageId: 'dsp_safety',
       tabId: 'safety-dsp-weekly-tab',
       timeFrame: 'Weekly',
-      includeCompanyId: true,
     },
   };
 
@@ -188,6 +184,7 @@ export function DocumentUploadBox({
   index = 0,
   dspInfo,
   hasPremiumAccess = true,
+  cortexVersion = "2",
 }) {
   const { getToken } = useAuth();
   const navigate = useNavigate();
@@ -201,6 +198,7 @@ export function DocumentUploadBox({
   const [isDragging, setIsDragging] = useState(false);
   const [validationError, setValidationError] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const fileInputRef = useRef(null);
   const uploadTriggeredRef = useRef(false);
 
@@ -355,26 +353,15 @@ export function DocumentUploadBox({
     return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
   };
 
-  // Get current week number and year
-  const getCurrentWeekAndYear = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const start = new Date(year, 0, 1);
-    const diff = now - start;
-    const oneWeek = 604800000;
-    const week = Math.ceil(diff / oneWeek);
-    const weekPadded = String(week).padStart(2, '0');
-    return { week, weekPadded, year };
-  };
-
   // Generate dynamic example filename based on document type and DSP info
+  // Uses the available scorecard week (accounts for Wednesday release schedule)
   const getDynamicExampleFilename = () => {
     if (!dspInfo?.dspCode || !dspInfo?.stationCode) {
       return exampleFileName; // Fallback to static example
     }
 
     const { dspCode, stationCode } = dspInfo;
-    const { week, weekPadded, year } = getCurrentWeekAndYear();
+    const { week, weekPadded, year } = getAvailableScorecardWeek();
     const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
 
     const examples = {
@@ -452,11 +439,23 @@ export function DocumentUploadBox({
           <p className="text-xs text-muted-foreground line-clamp-1">{description}</p>
         </div>
 
-        {/* Right side: File type badge + Chevron + Upload button */}
+        {/* Right side: File type badge + Help + Chevron + Upload button */}
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
             {acceptLabel}
           </span>
+
+          {/* Where to Find Help Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setGuideOpen(true);
+            }}
+            className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 transition-all"
+            title="Where to find this document"
+          >
+            <HelpCircle className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
+          </button>
 
           <div
             className={cn(
@@ -720,6 +719,15 @@ export function DocumentUploadBox({
           </div>
         </div>
       </div>
+
+      {/* Export Guide Dialog */}
+      <ExportGuideDialog
+        open={guideOpen}
+        onOpenChange={setGuideOpen}
+        docId={id}
+        cortexVersion={cortexVersion}
+        dspInfo={dspInfo}
+      />
     </div>
   );
 }

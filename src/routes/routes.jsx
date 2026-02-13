@@ -10,6 +10,7 @@ const SignIn = lazy(() => import("../pages/public/signIn"));
 const SignUp = lazy(() => import("../pages/public/signUp"));
 const ScorecardSamplesDemo = lazy(() => import("../pages/public/ScorecardSamplesDemo"));
 const ScorecardView = lazy(() => import("../pages/public/scorecardView"));
+const ShortCodeRedirect = lazy(() => import("../pages/public/ShortCodeRedirect"));
 const SampleScorecard = lazy(() => import("../pages/public/SampleScorecard"));
 const HowScoringWorks = lazy(() => import("../pages/public/HowScoringWorks"));
 const ContactPage = lazy(() => import("../pages/public/ContactPage"));
@@ -50,6 +51,7 @@ const routeConfig = [
   { path: "/sign-up", component: SignUp, wrapper: PublicRoute },
   { path: "/scorecard-samples", component: ScorecardSamplesDemo },
   { path: "/scorecard/:id", component: ScorecardView },
+  { path: "/s/:shortCode", component: ShortCodeRedirect },
   { path: "/sample-scorecard", component: SampleScorecard },
   { path: "/how-scoring-works", component: HowScoringWorks },
   { path: "/contact", component: ContactPage, wrapper: PublicRoute },

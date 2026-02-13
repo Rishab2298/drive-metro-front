@@ -25,7 +25,9 @@ export const DriverActionsBar = ({
   masterScorecardId,
   getToken,
   hasPremiumAccess,
+  hasAIAccess,
   promptUpgrade,
+  promptAIUpgrade,
   clearSelection,
   setData,
   setShowBulkNoteModal,
@@ -213,8 +215,8 @@ export const DriverActionsBar = ({
   };
 
   const handleGenerateAIFeedback = async () => {
-    if (!hasPremiumAccess) {
-      promptUpgrade('AI Feedback');
+    if (!hasAIAccess) {
+      promptAIUpgrade?.('AI Feedback');
       return;
     }
     if (selectedDriverObjects.length === 0) return;

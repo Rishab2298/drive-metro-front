@@ -4,6 +4,7 @@ import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { Loader2, ArrowLeft, Download, Search, ChevronRight } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import UpgradeModal from '@/components/UpgradeModal';
+import AIAddonModal from '@/components/AIAddonModal';
 
 // Hooks
 import { useScorecardData } from '@/hooks/useScorecardData';
@@ -26,7 +27,7 @@ const MasterScorecardDetail = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const showJson = searchParams.get('json') === 'true';
-  const { hasPremiumAccess } = useSubscription();
+  const { hasPremiumAccess, hasAIAccess } = useSubscription();
 
   // Data fetching
   const { loading, error, data, setData, getToken } = useScorecardData(id);
@@ -65,9 +66,18 @@ const MasterScorecardDetail = () => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeFeatureName, setUpgradeFeatureName] = useState('');
 
+  // AI addon modal state
+  const [showAIAddonModal, setShowAIAddonModal] = useState(false);
+  const [aiAddonFeatureName, setAiAddonFeatureName] = useState('');
+
   const promptUpgrade = (featureName) => {
     setUpgradeFeatureName(featureName);
     setShowUpgradeModal(true);
+  };
+
+  const promptAIUpgrade = (featureName) => {
+    setAiAddonFeatureName(featureName);
+    setShowAIAddonModal(true);
   };
 
   // AI Feedback handlers
@@ -210,7 +220,9 @@ const MasterScorecardDetail = () => {
             masterScorecardId={id}
             getToken={getToken}
             hasPremiumAccess={hasPremiumAccess}
+            hasAIAccess={hasAIAccess}
             promptUpgrade={promptUpgrade}
+            promptAIUpgrade={promptAIUpgrade}
             clearSelection={clearSelection}
             setData={setData}
             setShowBulkNoteModal={setShowBulkNoteModal}
@@ -344,6 +356,13 @@ const MasterScorecardDetail = () => {
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         featureName={upgradeFeatureName}
+      />
+
+      {/* AI Addon Modal */}
+      <AIAddonModal
+        isOpen={showAIAddonModal}
+        onClose={() => setShowAIAddonModal(false)}
+        featureName={aiAddonFeatureName}
       />
     </div>
   );
