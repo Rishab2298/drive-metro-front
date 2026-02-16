@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { cn, getAvailableScorecardWeek } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, FileText, ExternalLink } from 'lucide-react';
 import {
@@ -53,15 +53,33 @@ const getDynamicFilename = (docId, dspInfo) => {
   return filenames[docId] || null;
 };
 
-// Step image component - displays actual image or placeholder
+// Step image component - displays actual image or placeholder with loading state
 const StepImage = ({ stepNumber, title, imagePath }) => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Reset loading state when imagePath changes
+  useEffect(() => {
+    setIsLoading(true);
+  }, [imagePath]);
+
   if (imagePath) {
     return (
       <div className="w-full rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-700">
+        {/* Loading skeleton */}
+        {isLoading && (
+          <div className="w-full aspect-video bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+            <div className="animate-spin w-8 h-8 border-2 border-neutral-300 dark:border-neutral-600 border-t-neutral-600 dark:border-t-neutral-300 rounded-full" />
+          </div>
+        )}
+        {/* Actual image - hidden until loaded */}
         <img
           src={imagePath}
           alt={`Step ${stepNumber}: ${title}`}
-          className="w-full h-auto object-contain"
+          className={cn(
+            "w-full h-auto object-contain",
+            isLoading && "hidden"
+          )}
+          onLoad={() => setIsLoading(false)}
         />
       </div>
     );
