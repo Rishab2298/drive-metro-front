@@ -116,6 +116,7 @@ export const KEY_METRICS = {
   deliveryTrailing: [
     { key: 'dcr', label: 'Delivery Completion Rate', format: 'percent' },
     { key: 'dcrTier', label: 'DCR Tier', type: 'tier' },
+    { key: 'dcrScore', label: 'DCR Score' },
     { key: 'pod', label: 'Photo-On-Delivery', format: 'percent' },
     { key: 'podTier', label: 'POD Tier', type: 'tier' },
     { key: 'podScore', label: 'POD Score' },
@@ -388,6 +389,7 @@ export const METRIC_DISPLAY_NAMES = {
   photoOnDeliveryAcceptance: 'Photo-On-Delivery Acceptance',
   dcr: 'Delivery Completion Rate',
   dcrTier: 'DCR Tier',
+  dcrScore: 'DCR Score',
   pod: 'Photo-On-Delivery Acceptance',
   podTier: 'POD Tier',
   podScore: 'POD Score',
