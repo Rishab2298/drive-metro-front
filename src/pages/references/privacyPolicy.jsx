@@ -111,7 +111,7 @@ const PrivacyPolicy = () => {
             <strong className="text-slate-900 dark:text-white">Opt-Out:</strong> You can opt-out of SMS messages at any time by replying <strong>STOP</strong> to any message. You will receive a confirmation and will no longer receive SMS notifications from DiveMetric.
           </p>
           <p className="mb-4">
-            <strong className="text-slate-900 dark:text-white">Help:</strong> For assistance with SMS messages, reply <strong>HELP</strong> to any message or contact us at <a href="mailto:hello@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">hello@divemetric.com</a>.
+            <strong className="text-slate-900 dark:text-white">Help:</strong> For assistance with SMS messages, reply <strong>HELP</strong> to any message or contact us at <a href="mailto:support@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">support@divemetric.com</a>.
           </p>
           <p>
             <strong className="text-slate-900 dark:text-white">Rates:</strong> Message and data rates may apply. Please contact your wireless carrier for details about your text plan.
@@ -335,11 +335,11 @@ const PrivacyPolicy = () => {
                 If you have any questions about our Privacy Policy or information practices, please feel free to contact us at:
               </p>
               <a
-                href="mailto:hello@divemetric.com"
+                href="mailto:support@divemetric.com"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 text-white font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 hover:scale-105"
               >
                 <Mail className="w-4 h-4" />
-                hello@divemetric.com
+                support@divemetric.com
               </a>
               <p className="mt-6 text-sm text-slate-500 dark:text-slate-600">
                 DiveMetric is a brand of Kilimanjaro Innovation Labs Inc.

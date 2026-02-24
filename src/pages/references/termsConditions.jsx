@@ -72,7 +72,7 @@ const TermsConditions = () => {
             Names, email addresses and profile pictures must not: (i) be obscene or offensive, (ii) infringe any third party rights, or (iii) otherwise (in our absolute discretion) be considered inappropriate.
           </p>
           <p>
-            You may cancel your registration and/or ask us to deactivate your account at any time by submitting a support request to <a href="mailto:hello@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">hello@divemetric.com</a>. If you do so, you must immediately stop using the Platform. We will delete your account within 30 days of receiving your request (subject to certain data we need to retain for legal and financial record keeping purposes).
+            You may cancel your registration and/or ask us to deactivate your account at any time by submitting a support request to <a href="mailto:support@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">support@divemetric.com</a>. If you do so, you must immediately stop using the Platform. We will delete your account within 30 days of receiving your request (subject to certain data we need to retain for legal and financial record keeping purposes).
           </p>
         </>
       ),
@@ -204,7 +204,7 @@ const TermsConditions = () => {
             <strong className="text-slate-900 dark:text-white">Opt-Out:</strong> To stop receiving SMS messages, reply <strong>STOP</strong> to any message. You will receive a confirmation message and will no longer receive scorecard notifications via SMS.
           </p>
           <p className="mb-4">
-            <strong className="text-slate-900 dark:text-white">Help:</strong> For assistance, reply <strong>HELP</strong> to any message or contact us at <a href="mailto:hello@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">hello@divemetric.com</a>.
+            <strong className="text-slate-900 dark:text-white">Help:</strong> For assistance, reply <strong>HELP</strong> to any message or contact us at <a href="mailto:support@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">support@divemetric.com</a>.
           </p>
           <p>
             <strong className="text-slate-900 dark:text-white">Consent:</strong> By providing your phone number to your employer for use with DiveMetric, you consent to receive recurring automated text messages related to your performance scorecards. Consent is not a condition of employment.
@@ -370,11 +370,11 @@ const TermsConditions = () => {
                 If you have an enquiry or complaint about our Platform, please contact us. We will try to answer your inquiry or resolve any complaint as soon as possible.
               </p>
               <a
-                href="mailto:hello@divemetric.com"
+                href="mailto:support@divemetric.com"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 text-white font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 hover:scale-105"
               >
                 <Mail className="w-4 h-4" />
-                hello@divemetric.com
+                support@divemetric.com
               </a>
               <p className="mt-6 text-sm text-slate-500 dark:text-slate-600">
                 DiveMetric is a brand of Kilimanjaro Innovation Labs Inc.

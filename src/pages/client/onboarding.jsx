@@ -789,7 +789,7 @@ export default function Onboarding() {
                 In order to use certain parts of our Platform you may be required to register for an account by providing your name, phone number, location, email address and password.
               </p>
               <p>
-                You must ensure that the details provided by you on registration are correct and complete. You may cancel your registration at any time by contacting hello@divemetric.com.
+                You must ensure that the details provided by you on registration are correct and complete. You may cancel your registration at any time by contacting support@divemetric.com.
               </p>
             </section>
 
@@ -836,8 +836,8 @@ export default function Onboarding() {
               <h3 className="font-semibold text-foreground mb-2">8. Contact</h3>
               <p>
                 For enquiries or complaints, please contact us at{" "}
-                <a href="mailto:hello@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-                  hello@divemetric.com
+                <a href="mailto:support@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                  support@divemetric.com
                 </a>
               </p>
             </section>
@@ -921,8 +921,8 @@ export default function Onboarding() {
               <h3 className="font-semibold text-foreground mb-2">7. Contact Us</h3>
               <p>
                 If you have any questions about our Privacy Policy, please contact us at{" "}
-                <a href="mailto:hello@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-                  hello@divemetric.com
+                <a href="mailto:support@divemetric.com" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                  support@divemetric.com
                 </a>
               </p>
             </section>

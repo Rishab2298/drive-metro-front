@@ -8,6 +8,7 @@ import {
   Moon,
 } from "lucide-react"
 import { useTheme } from "next-themes"
+import { useClerk } from "@clerk/clerk-react"
 
 import {
   Avatar,
@@ -35,9 +36,14 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const { theme, setTheme } = useTheme()
+  const { signOut } = useClerk()
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark")
+  }
+
+  const handleLogout = () => {
+    signOut({ redirectUrl: '/' })
   }
 
   return (
@@ -89,7 +95,7 @@ export function NavUser({
             </DropdownMenuGroup>
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>
