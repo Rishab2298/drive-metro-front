@@ -97,6 +97,9 @@ const onboardingSchema = z.object({
   agreeToTerms: z.boolean().refine((val) => val === true, {
     message: "You must agree to the Terms of Service and Privacy Policy",
   }),
+  smsOptIn: z.boolean().refine((val) => val === true, {
+    message: "You must consent to SMS notifications to send scorecards to drivers",
+  }),
 });
 
 const steps = [
@@ -119,7 +122,7 @@ const steps = [
     title: "Contact Details",
     description: "Communication preferences",
     icon: Phone,
-    fields: ["contactEmail", "countryCode", "phoneNumber", "timezone", "agreeToTerms"],
+    fields: ["contactEmail", "countryCode", "phoneNumber", "timezone", "agreeToTerms", "smsOptIn"],
   },
 ];
 
@@ -150,6 +153,7 @@ export default function Onboarding() {
       phoneNumber: "",
       timezone: "America/Los_Angeles",
       agreeToTerms: false,
+      smsOptIn: false,
     },
   });
 
@@ -211,6 +215,7 @@ export default function Onboarding() {
           contactEmail: data.contactEmail,
           phoneNumber: fullPhoneNumber,
           timezone: data.timezone,
+          smsOptIn: data.smsOptIn,
         }),
       });
 
@@ -693,6 +698,46 @@ export default function Onboarding() {
                                 Privacy Policy
                               </button>
                             </FormLabel>
+                            <FormMessage className="text-xs" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* SMS Opt-In Checkbox with CTIA Disclosures */}
+                    <FormField
+                      control={form.control}
+                      name="smsOptIn"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border border-border p-4 bg-muted/30">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-0.5"
+                            />
+                          </FormControl>
+                          <div className="space-y-2 leading-none">
+                            <FormLabel className="text-sm font-normal text-foreground cursor-pointer">
+                              I consent to DiveMetric sending SMS notifications to my drivers for weekly scorecard delivery.
+                            </FormLabel>
+                            <div className="text-xs text-muted-foreground space-y-1">
+                              <p><strong>SMS Type:</strong> Weekly performance scorecard notifications</p>
+                              <p><strong>Frequency:</strong> Up to 4 messages per month per driver</p>
+                              <p><strong>Message & data rates may apply.</strong></p>
+                              <p>Drivers can reply <strong>STOP</strong> to unsubscribe or <strong>HELP</strong> for assistance.</p>
+                              <p>
+                                View our{" "}
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPrivacyDialog(true)}
+                                  className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+                                >
+                                  Privacy Policy
+                                </button>
+                                {" "}for more information.
+                              </p>
+                            </div>
                             <FormMessage className="text-xs" />
                           </div>
                         </FormItem>
