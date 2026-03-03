@@ -1205,7 +1205,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-indigo-200/40 text-sm font-medium">
-            &copy; {new Date().getFullYear()} DiveMetric. All rights reserved.
+            &copy; {new Date().getFullYear()} Kilimanjaro Innovation Labs Inc. | All Rights Reserved
           </p>
           <div className="flex items-center gap-4">
             {['twitter', 'linkedin', 'github'].map((social) => (

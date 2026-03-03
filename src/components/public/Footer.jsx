@@ -83,7 +83,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="pt-8 border-t border-slate-200 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-slate-500 dark:text-slate-600 text-sm">
-            &copy; {new Date().getFullYear()} DiveMetric. All rights reserved.
+            &copy; {new Date().getFullYear()} Kilimanjaro Innovation Labs Inc. | All Rights Reserved
           </p>
         </div>
       </div>
