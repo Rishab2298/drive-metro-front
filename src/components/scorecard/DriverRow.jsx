@@ -21,7 +21,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Dropdown, DropdownItem } from './Dropdown';
 import { downloadScorecardPDF } from '@/lib/generateScorecardPDF.jsx';
-import { sendDriverEmail, generateAIFeedback } from '@/services/scorecardService';
+import { sendDriverEmail, sendDriverSms, generateAIFeedback } from '@/services/scorecardService';
 import { STANDING_COLORS, getDriverName, API_URL } from '@/utils/scorecardUtils';
 
 export const DriverRow = ({
@@ -43,6 +43,7 @@ export const DriverRow = ({
 }) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [sendingSms, setSendingSms] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
 
   const rank = rankInfo?.rank;
@@ -59,14 +60,38 @@ export const DriverRow = ({
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
-  const handleShareSMS = () => {
+  const handleShareSMS = async () => {
     if (!hasPremiumAccess) {
       promptUpgrade('Send SMS');
       return;
     }
-    const scorecardUrl = `${window.location.origin}/scorecard/${driver.id}`;
-    const message = `Hi ${driverName}, here's your weekly scorecard: ${scorecardUrl}`;
-    window.open(`sms:?body=${encodeURIComponent(message)}`);
+
+    if (!driver.phone) {
+      toast.error('This driver does not have a phone number');
+      return;
+    }
+
+    if (driver.smsSentAt) {
+      toast.info('Scorecard SMS already sent to this driver');
+      return;
+    }
+
+    setSendingSms(true);
+    try {
+      await sendDriverSms(driver.id, getToken);
+      toast.success(`Scorecard SMS sent to ${driverName}`);
+      setData(prev => ({
+        ...prev,
+        drivers: prev.drivers.map(d =>
+          d.id === driver.id ? { ...d, smsSentAt: new Date().toISOString() } : d
+        ),
+      }));
+    } catch (err) {
+      console.error('SMS send error:', err);
+      toast.error(err.message || 'Failed to send SMS');
+    } finally {
+      setSendingSms(false);
+    }
   };
 
   const handleShareEmail = async () => {
@@ -279,9 +304,11 @@ export const DriverRow = ({
                 onClick={() => { handleCopyLink(); close(); }}
               />
               <DropdownItem
-                icon={MessageSquare}
-                label="SMS"
+                icon={sendingSms ? Loader2 : MessageSquare}
+                label={sendingSms ? 'Sending...' : 'SMS'}
                 onClick={() => { handleShareSMS(); close(); }}
+                disabled={sendingSms}
+                iconClassName={sendingSms ? 'animate-spin' : ''}
               />
               <DropdownItem
                 icon={sendingEmail ? Loader2 : Mail}
