@@ -245,7 +245,7 @@ const HeroSection = () => {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 dark:bg-emerald-400" />
             </div>
             <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-200">
-              Trusted by 200+ DSPs
+              Trusted by DSPs
             </span>
           </div>
 
@@ -280,12 +280,12 @@ const HeroSection = () => {
                 </span>
               </button>
             </Link>
-            <Link to="/contact" className="group flex items-center gap-3 px-6 py-4 rounded-xl font-semibold text-slate-700 dark:text-white text-lg border border-slate-300 dark:border-white/20 hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-300">
+            {/* <Link to="/contact" className="group flex items-center gap-3 px-6 py-4 rounded-xl font-semibold text-slate-700 dark:text-white text-lg border border-slate-300 dark:border-white/20 hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-300">
               <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-white/10 flex items-center justify-center group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-colors">
                 <Calendar className="w-4 h-4 text-slate-700 dark:text-white" />
               </div>
               Book a Demo Session
-            </Link>
+            </Link> */}
           </div>
 
           {/* Quick stats */}
@@ -293,7 +293,7 @@ const HeroSection = () => {
             {[
               { label: '50K+ Drivers', icon: Users, color: 'indigo' },
               { label: '35% Boost', icon: TrendingUp, color: 'emerald' },
-              { label: '4.9/5 Rating', icon: Star, color: 'amber' },
+
             ].map((item, i) => (
               <div
                 key={i}
@@ -1637,7 +1637,7 @@ const CTASection = () => {
                   Ready to Transform
                   <br />
                   <span className="bg-linear-to-r from-indigo-300 via-violet-300 to-pink-300 bg-clip-text text-transparent">
-                    Your DSP?
+                    Your Performace?
                   </span>
                 </h2>
 
@@ -1659,10 +1659,10 @@ const CTASection = () => {
                       </span>
                     </button>
                   </Link>
-                  <Link to="/contact" className="group flex items-center gap-3 px-8 py-5 rounded-2xl font-semibold text-white text-lg border-2 border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-300">
+                  {/* <Link to="/contact" className="group flex items-center gap-3 px-8 py-5 rounded-2xl font-semibold text-white text-lg border-2 border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-300">
                     <Calendar className="w-5 h-5 text-white" />
                     Book a Demo
-                  </Link>
+                  </Link> */}
                 </div>
 
                 {/* Trust indicators */}
