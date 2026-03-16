@@ -318,7 +318,7 @@ export default function Billing() {
                 <p className="text-sm text-purple-200">AI-powered personalized driver feedback</p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-white">$6.99</p>
+                <p className="text-2xl font-bold text-white">$9.99</p>
                 <p className="text-sm text-purple-200">per week</p>
               </div>
             </div>
@@ -382,7 +382,7 @@ export default function Billing() {
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4" />
-                    {isAiTrial ? 'Subscribe to AI Coaching - $6.99/week' : 'Add AI Coaching - $6.99/week'}
+                    {isAiTrial ? 'Subscribe to AI Coaching - $9.99/week' : 'Add AI Coaching - $9.99/week'}
                   </>
                 )}
               </button>

@@ -108,7 +108,7 @@ export default function AIAddonModal({ isOpen, onClose, featureName }) {
 
           {/* Price */}
           <div className="flex items-baseline gap-1 mb-6">
-            <span className="text-3xl font-bold text-foreground">$6.99</span>
+            <span className="text-3xl font-bold text-foreground">$9.99</span>
             <span className="text-muted-foreground">/ week</span>
           </div>
 

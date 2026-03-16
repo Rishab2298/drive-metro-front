@@ -1453,7 +1453,7 @@ const PricingSection = () => {
                     </div>
                     <div className="flex items-baseline justify-center gap-2 mb-1">
                       <span className="text-lg text-white/70 font-medium">+</span>
-                      <span className="text-4xl font-black text-white">$6.99</span>
+                      <span className="text-4xl font-black text-white">$9.99</span>
                       <span className="text-lg text-white/70 font-medium">/week</span>
                     </div>
                     <p className="text-white/60 text-xs">AI Coaching Add-on</p>
