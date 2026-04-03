@@ -35,11 +35,11 @@ export function NavUser({
   user
 }) {
   const { isMobile } = useSidebar()
-  const { theme, setTheme } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme()
   const { signOut } = useClerk()
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
+    setTheme(resolvedTheme === "dark" ? "light" : "dark")
   }
 
   const handleLogout = () => {
@@ -89,8 +89,8 @@ export function NavUser({
                 Upgrade to Pro
               </DropdownMenuItem>
               <DropdownMenuItem onClick={toggleTheme}>
-                {theme === "dark" ? <Sun /> : <Moon />}
-                {theme === "dark" ? "Light Mode" : "Dark Mode"}
+                {resolvedTheme === "dark" ? <Sun /> : <Moon />}
+                {resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}
               </DropdownMenuItem>
             </DropdownMenuGroup>
 

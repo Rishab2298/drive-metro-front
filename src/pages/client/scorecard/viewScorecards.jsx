@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Loader2,
@@ -8,9 +9,14 @@ import {
   ChevronRight,
   Plus,
   Trophy,
+  Trash2,
 } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@clerk/clerk-react';
 import { cn } from '@/lib/utils';
 import { useMasterScorecards } from '@/hooks/useScorecard';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
 
 // Standing badge colors
 const STANDING_COLORS = {
@@ -24,9 +30,32 @@ const STANDING_COLORS = {
 
 const ViewScorecards = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { getToken } = useAuth();
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Use TanStack Query hook - handles loading, error, and caching automatically
   const { data, isLoading: loading, error } = useMasterScorecards();
+
+  const handleDelete = async () => {
+    if (!confirmDeleteId) return;
+    setDeleting(true);
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API_URL}/api/master-scorecard/${confirmDeleteId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to delete');
+      queryClient.invalidateQueries({ queryKey: ['masterScorecards'] });
+      setConfirmDeleteId(null);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   // Format date range
   const formatDateRange = (weekStart, weekEnd) => {
@@ -216,7 +245,16 @@ const ViewScorecards = () => {
                     </span>
                   </div>
 
-                  <ChevronRight className="w-5 h-5 text-neutral-400" />
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(scorecard.id); }}
+                      className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      title="Delete scorecard"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <ChevronRight className="w-5 h-5 text-neutral-400" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -244,6 +282,35 @@ const ViewScorecards = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Delete Scorecard?</h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              This will permanently delete this weekly scorecard and all driver data for that week. This cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                disabled={deleting}
+                className="px-4 py-2 rounded-lg text-sm font-medium border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {deleting && <Loader2 className="w-4 h-4 animate-spin" />}
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
