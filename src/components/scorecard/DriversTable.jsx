@@ -18,11 +18,15 @@ export const DriversTable = ({
   setSearchQuery,
   setPreviewDriver,
   setNoteDriver,
+  setData,
   hasPremiumAccess,
   promptUpgrade,
   getToken,
 }) => {
   const totalDrivers = data?.drivers?.length || 0;
+
+  const rankedDrivers = sortedDrivers.filter(d => d.includeInRanking !== false);
+  const excludedDrivers = sortedDrivers.filter(d => d.includeInRanking === false);
 
   return (
     <div className="border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden">
@@ -70,7 +74,7 @@ export const DriversTable = ({
 
       {/* Table Body */}
       <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-        {sortedDrivers.map((driver, index) => (
+        {rankedDrivers.map((driver, index) => (
           <DriverRow
             key={driver.id || driver.transporterId || index}
             driver={driver}
@@ -82,12 +86,43 @@ export const DriversTable = ({
             onSelect={handleSelectDriver}
             onPreview={setPreviewDriver}
             onEditNote={setNoteDriver}
+            setData={setData}
             hasPremiumAccess={hasPremiumAccess}
             promptUpgrade={promptUpgrade}
             getToken={getToken}
           />
         ))}
       </div>
+
+      {/* Not Ranked Section */}
+      {excludedDrivers.length > 0 && (
+        <>
+          <div className="px-5 py-2.5 bg-neutral-50 dark:bg-neutral-800/30 border-t border-neutral-200 dark:border-neutral-700 flex items-center gap-2">
+            <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">Not Ranked</span>
+            <span className="text-xs text-neutral-400 dark:text-neutral-600">({excludedDrivers.length})</span>
+          </div>
+          <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+            {excludedDrivers.map((driver, index) => (
+              <DriverRow
+                key={driver.id || driver.transporterId || index}
+                driver={driver}
+                index={index}
+                rankInfo={driverRanks[driver.transporterId]}
+                rankedCount={rankedCount}
+                data={data}
+                isSelected={selectedDrivers.has(driver.transporterId)}
+                onSelect={handleSelectDriver}
+                onPreview={setPreviewDriver}
+                onEditNote={setNoteDriver}
+                setData={setData}
+                hasPremiumAccess={hasPremiumAccess}
+                promptUpgrade={promptUpgrade}
+                getToken={getToken}
+              />
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Empty State */}
       {(!data?.drivers || data.drivers.length === 0) && (

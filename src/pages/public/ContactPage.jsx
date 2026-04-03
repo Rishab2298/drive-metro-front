@@ -1,399 +1,370 @@
-// Contact Us Page
-import { useState } from 'react';
+import { useState } from 'react'
 import {
-  Mail,
-  Phone,
-  Send,
-  CheckCircle2,
-  Building2,
-  User,
-  MessageSquare,
-  Clock,
-  Sparkles,
-  ArrowRight,
-  Users,
-  Zap,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import Header from '@/components/public/Header';
-import Footer from '@/components/public/Footer';
+  Mail, Phone, Send, CheckCircle2, Building2,
+  User, MessageSquare, Clock, ArrowRight, Users, Zap, Star,
+} from 'lucide-react'
+import Header from '@/components/public/Header'
+import Footer from '@/components/public/Footer'
+import useReveal from '../components/useReveal'
 
-// Background component matching HomePage
-const GlobalBackground = () => (
-  <div className="fixed inset-0 pointer-events-none -z-10">
-    <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-[#0c0a1d] dark:to-slate-950" />
-    <div className="absolute top-0 left-1/4 w-[1000px] h-[1000px] rounded-full bg-gradient-to-br from-indigo-400/10 dark:from-indigo-600/20 to-transparent blur-[150px]" />
-    <div className="absolute top-[30%] right-0 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-violet-400/8 dark:from-violet-600/15 to-transparent blur-[120px]" />
-    <div className="absolute bottom-0 right-1/4 w-[700px] h-[700px] rounded-full bg-gradient-to-br from-pink-400/8 dark:from-pink-500/10 to-transparent blur-[100px]" />
+function Reveal({ children, className = '', delay = 0 }) {
+  const [ref, visible] = useReveal()
+  return (
     <div
-      className="absolute inset-0 opacity-[0.015] dark:opacity-[0.02]"
-      style={{
-        backgroundImage: `
-          linear-gradient(rgba(99, 102, 241, 0.5) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(99, 102, 241, 0.5) 1px, transparent 1px)
-        `,
-        backgroundSize: '80px 80px',
-      }}
-    />
-  </div>
-);
+      ref={ref}
+      className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  )
+}
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    company: '',
-    phone: '',
-    subject: '',
-    message: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState('');
+    name: '', email: '', company: '', phone: '', subject: '', message: '',
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value })
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError('');
-
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError('')
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5004';
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5004'
       const response = await fetch(`${apiUrl}/api/contact`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message');
-      }
-
-      setIsSubmitted(true);
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Failed to send message')
+      setIsSubmitted(true)
     } catch (err) {
-      console.error('Contact form error:', err);
-      setError(err.message || 'Failed to send message. Please try again.');
+      console.error('Contact form error:', err)
+      setError(err.message || 'Failed to send message. Please try again.')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
-  const stats = [
-    { icon: Users, value: '50K+', label: 'Drivers Managed' },
-    { icon: Zap, value: '35%', label: 'Performance Boost' },
-    { icon: Clock, value: '24h', label: 'Response Time' },
-  ];
+  const inputClass = "w-full px-4 py-3.5 bg-apple-gray border border-apple-border/60 rounded-xl text-[14px] text-apple-dark placeholder:text-apple-border focus:outline-none focus:ring-2 focus:ring-apple-blue/30 focus:border-apple-blue transition"
+  const inputWithIconClass = "w-full pl-11 pr-4 py-3.5 bg-apple-gray border border-apple-border/60 rounded-xl text-[14px] text-apple-dark placeholder:text-apple-border focus:outline-none focus:ring-2 focus:ring-apple-blue/30 focus:border-apple-blue transition"
+  const labelClass = "block text-[12px] font-semibold text-apple-mid uppercase tracking-wide mb-1.5"
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 overflow-x-hidden relative isolate">
-      <GlobalBackground />
+    <>
       <Header />
+      <div className="pt-16">
 
-      <main className="relative z-10 pt-32 pb-20">
-        {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-          <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-sm font-medium mb-6">
-              <Sparkles className="w-4 h-4" />
-              We'd love to hear from you
+        {/* ── Hero ───────────────────────────────────────────── */}
+        <section className="relative overflow-hidden bg-white">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:64px_64px] opacity-60" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-blue-50/90 to-transparent rounded-full blur-3xl pointer-events-none" />
+          {/* Subtle side glows */}
+          <div className="absolute top-16 left-0 w-72 h-72 bg-blue-50/60 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-16 right-0 w-72 h-72 bg-indigo-50/60 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative max-w-3xl mx-auto px-6 pt-14 pb-10 md:pt-20 md:pb-16 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full text-[13px] font-semibold text-apple-blue mb-8 animate-fade-up">
+              <span className="w-2 h-2 rounded-full bg-apple-blue animate-pulse" />
+              Talk to a DSP Specialist
             </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold mb-6">
-              <span className="text-slate-900 dark:text-white">Get in </span>
-              <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 bg-clip-text text-transparent">
-                Touch
-              </span>
+
+            <h1
+              className="text-[36px] sm:text-[48px] md:text-[64px] font-black leading-tight tracking-[-3px] text-apple-dark mb-5 animate-fade-up"
+              style={{ animationDelay: '80ms' }}
+            >
+              Let's talk<br />
+              <span className="text-apple-blue">DSP performance.</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 leading-relaxed">
-              Have questions about DiveMetric? Want to see a demo? Our team is here to help you
-              transform your fleet's performance.
+
+            <p
+              className="text-[17px] text-apple-mid leading-relaxed mb-10 animate-fade-up"
+              style={{ animationDelay: '160ms' }}
+            >
+              Schedule a live demo, ask a question, or get a walkthrough<br className="hidden md:block" /> with one of our DSP specialists.
             </p>
+
+            {/* Quick stats */}
+            <div className="flex flex-wrap justify-center gap-3 animate-fade-up" style={{ animationDelay: '240ms' }}>
+              {[
+                { icon: Users, value: '500+', label: 'DSP owners trust us' },
+                { icon: Zap,   value: '35%',  label: 'avg performance boost' },
+                { icon: Clock, value: '< 2hr', label: 'response time' },
+              ].map(({ icon: Icon, value, label }) => (
+                <div key={label} className="flex items-center gap-3 px-5 py-3 bg-white rounded-2xl border border-apple-border/60 shadow-apple-sm">
+                  <div className="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+                    <Icon className="w-4 h-4 text-apple-blue" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-[15px] font-bold text-apple-dark leading-none">{value}</div>
+                    <div className="text-[11px] text-apple-light mt-0.5">{label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Stats */}
-          <div className="flex flex-wrap justify-center gap-8 mt-12">
-            {stats.map((stat, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-sm"
-              >
-                <stat.icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                <div>
-                  <div className="text-xl font-bold text-slate-900 dark:text-white">{stat.value}</div>
-                  <div className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</div>
-                </div>
-              </div>
-            ))}
-          </div>
         </section>
 
-        {/* Main Content */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-5 gap-12">
-            {/* Contact Form */}
-            <div className="lg:col-span-3">
-              <div className="bg-white dark:bg-white/5 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 p-8 md:p-10">
-                {isSubmitted ? (
-                  <div className="text-center py-16">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center mx-auto mb-8 shadow-lg shadow-emerald-500/30">
-                      <CheckCircle2 className="w-12 h-12 text-white" />
-                    </div>
-                    <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-                      Message Sent!
-                    </h2>
-                    <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
-                      Thank you for reaching out. Our team will get back to you within 24 hours.
-                    </p>
-                    <button
-                      onClick={() => {
-                        setIsSubmitted(false);
-                        setFormData({ name: '', email: '', company: '', phone: '', subject: '', message: '' });
-                      }}
-                      className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold hover:from-indigo-700 hover:to-violet-700 transition-all shadow-lg shadow-indigo-500/25"
-                    >
-                      Send Another Message
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="mb-8">
-                      <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                        Send us a Message
-                      </h2>
-                      <p className="text-slate-600 dark:text-slate-400">
-                        Fill out the form below and we'll get back to you shortly.
-                      </p>
-                    </div>
+        {/* ── Form + Sidebar ─────────────────────────────────── */}
+        <section className="bg-apple-gray py-12 md:py-20">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="grid lg:grid-cols-5 gap-8 items-start">
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="grid sm:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                            Full Name *
-                          </label>
-                          <div className="relative">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                            <input
-                              type="text"
-                              name="name"
-                              required
-                              value={formData.name}
-                              onChange={handleChange}
-                              className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                              placeholder="John Doe"
-                            />
-                          </div>
+              {/* Form */}
+              <Reveal className="lg:col-span-3">
+                <div className="bg-white rounded-3xl shadow-apple-lg overflow-hidden">
+                  {/* Blue accent top bar */}
+                  <div className="h-1.5 bg-apple-blue w-full" />
+
+                  <div className="p-8">
+                    {isSubmitted ? (
+                      <div className="text-center py-14">
+                        <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-emerald-50/50">
+                          <CheckCircle2 className="w-10 h-10 text-emerald-500" />
                         </div>
-
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                            Email *
-                          </label>
-                          <div className="relative">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                            <input
-                              type="email"
-                              name="email"
-                              required
-                              value={formData.email}
-                              onChange={handleChange}
-                              className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                              placeholder="john@example.com"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid sm:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                            Company Name
-                          </label>
-                          <div className="relative">
-                            <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                            <input
-                              type="text"
-                              name="company"
-                              value={formData.company}
-                              onChange={handleChange}
-                              className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                              placeholder="Acme Inc."
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                            Phone Number
-                          </label>
-                          <div className="relative">
-                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                            <input
-                              type="tel"
-                              name="phone"
-                              value={formData.phone}
-                              onChange={handleChange}
-                              className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                              placeholder="+1 (555) 123-4567"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                          Subject *
-                        </label>
-                        <select
-                          name="subject"
-                          required
-                          value={formData.subject}
-                          onChange={handleChange}
-                          className="w-full px-4 py-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                        <h3 className="text-[26px] font-black text-apple-dark mb-3">Message sent!</h3>
+                        <p className="text-[15px] text-apple-mid leading-relaxed max-w-sm mx-auto mb-8">
+                          We'll be in touch within 2 hours. In the meantime, feel free to{' '}
+                          <a href="/pricing" className="text-apple-blue hover:underline">start your free trial</a>.
+                        </p>
+                        <button
+                          onClick={() => {
+                            setIsSubmitted(false)
+                            setFormData({ name: '', email: '', company: '', phone: '', subject: '', message: '' })
+                          }}
+                          className="px-7 py-3.5 bg-apple-gray text-apple-dark font-semibold text-[14px] rounded-full hover:bg-apple-border/40 transition"
                         >
-                          <option value="">Select a topic</option>
-                          <option value="general">General Inquiry</option>
-                          <option value="demo">Request a Demo</option>
-                          <option value="support">Technical Support</option>
-                          <option value="sales">Sales Question</option>
-                          <option value="partnership">Partnership Opportunity</option>
-                          <option value="feedback">Feedback</option>
-                          <option value="other">Other</option>
-                        </select>
+                          Send another message
+                        </button>
                       </div>
+                    ) : (
+                      <form onSubmit={handleSubmit} className="space-y-5">
+                        <div className="mb-7">
+                          <h2 className="text-[22px] font-black text-apple-dark">Get in touch</h2>
+                          <p className="text-[13px] text-apple-light mt-1">We'll respond within 2 business hours.</p>
+                        </div>
 
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className={labelClass}>Full Name *</label>
+                            <div className="relative">
+                              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-apple-light" />
+                              <input type="text" name="name" required value={formData.name} onChange={handleChange} placeholder="John Doe" className={inputWithIconClass} />
+                            </div>
+                          </div>
+                          <div>
+                            <label className={labelClass}>Email *</label>
+                            <div className="relative">
+                              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-apple-light" />
+                              <input type="email" name="email" required value={formData.email} onChange={handleChange} placeholder="you@yourdsp.com" className={inputWithIconClass} />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className={labelClass}>Company / DSP Name</label>
+                            <div className="relative">
+                              <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-apple-light" />
+                              <input type="text" name="company" value={formData.company} onChange={handleChange} placeholder="FleetPro DSP" className={inputWithIconClass} />
+                            </div>
+                          </div>
+                          <div>
+                            <label className={labelClass}>Phone</label>
+                            <div className="relative">
+                              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-apple-light" />
+                              <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 123-4567" className={inputWithIconClass} />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className={labelClass}>Topic *</label>
+                          <select name="subject" required value={formData.subject} onChange={handleChange} className={inputClass}>
+                            <option value="">Select a topic</option>
+                            <option value="demo">Request a Demo</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="support">Technical Support</option>
+                            <option value="sales">Sales Question</option>
+                            <option value="partnership">Partnership Opportunity</option>
+                            <option value="feedback">Feedback</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className={labelClass}>Message *</label>
+                          <div className="relative">
+                            <MessageSquare className="absolute left-3.5 top-4 w-4 h-4 text-apple-light" />
+                            <textarea
+                              name="message" rows={5} required value={formData.message} onChange={handleChange}
+                              placeholder="Tell us about your fleet size, current challenges, or what you'd like to see in the demo..."
+                              className={`${inputWithIconClass} resize-none`}
+                            />
+                          </div>
+                        </div>
+
+                        {error && (
+                          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-[13px]">
+                            {error}
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className={`w-full flex items-center justify-center gap-2.5 py-4 rounded-full font-bold text-[16px] text-white transition-all duration-200 shadow-apple hover:shadow-apple-lg active:scale-[0.98] ${
+                            isSubmitting ? 'bg-apple-light cursor-not-allowed' : 'bg-apple-blue hover:bg-apple-blueDark'
+                          }`}
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              Sending...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4" />
+                              Send Message
+                            </>
+                          )}
+                        </button>
+
+                        <p className="text-center text-[12px] text-apple-light">
+                          We respect your privacy. Your information is never shared.
+                        </p>
+                      </form>
+                    )}
+                  </div>
+                </div>
+              </Reveal>
+
+              {/* Sidebar */}
+              <div className="lg:col-span-2 space-y-4">
+
+                {/* Response time card */}
+                <Reveal>
+                  <div className="bg-apple-blue rounded-3xl p-7 text-white relative overflow-hidden">
+                    {/* Subtle pattern */}
+                    <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06)_0%,transparent_60%)]" />
+                    <div className="relative">
+                      <div className="flex items-center gap-3 mb-5">
+                        <div className="w-11 h-11 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+                          <Clock className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-[16px] font-bold">Quick Response</p>
+                          <p className="text-white/60 text-[12px]">Mon–Fri, 9am–6pm PT</p>
+                        </div>
+                      </div>
+                      <p className="text-[44px] font-black tracking-tight leading-none mb-1">{'< 2hrs'}</p>
+                      <p className="text-white/60 text-[13px] mb-5">typical response during business hours</p>
+                      <div className="pt-5 border-t border-white/20 space-y-2.5">
+                        {['Dedicated support team', 'Personalized walkthroughs', 'No sales pressure'].map((t) => (
+                          <div key={t} className="flex items-center gap-2.5">
+                            <CheckCircle2 className="w-4 h-4 text-blue-200 shrink-0" />
+                            <span className="text-white/90 text-[13px]">{t}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </Reveal>
+
+                {/* Email */}
+                <Reveal delay={80}>
+                  <a
+                    href="mailto:hello@divemetric.com"
+                    className="flex items-center gap-4 bg-white rounded-3xl p-6 shadow-apple hover:shadow-apple-lg border border-apple-border/40 hover:border-apple-blue/20 transition-all duration-300 group"
+                  >
+                    <div className="w-11 h-11 bg-blue-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
+                      <Mail className="w-5 h-5 text-apple-blue" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[15px] font-bold text-apple-dark">Email Us</p>
+                      <p className="text-[13px] text-apple-blue truncate">hello@divemetric.com</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-apple-light group-hover:text-apple-blue group-hover:translate-x-0.5 transition-all shrink-0" />
+                  </a>
+                </Reveal>
+
+                {/* Testimonial */}
+                <Reveal delay={160}>
+                  <div className="bg-white rounded-3xl p-6 shadow-apple border border-apple-border/40">
+                    <div className="flex gap-1 mb-4">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                    <p className="text-[13px] text-apple-mid leading-relaxed mb-4 italic">
+                      "The team was super responsive — had a demo booked same day. Within a week we were sending scorecards to all 47 drivers automatically."
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-apple-blue flex items-center justify-center text-white text-[11px] font-bold shrink-0">
+                        MR
+                      </div>
                       <div>
-                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                          Message *
-                        </label>
-                        <div className="relative">
-                          <MessageSquare className="absolute left-4 top-4 w-5 h-5 text-slate-400" />
-                          <textarea
-                            name="message"
-                            rows={5}
-                            required
-                            value={formData.message}
-                            onChange={handleChange}
-                            className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
-                            placeholder="How can we help you?"
-                          />
-                        </div>
+                        <p className="text-[13px] font-semibold text-apple-dark">Michael R.</p>
+                        <p className="text-[11px] text-apple-light">DSP Owner · Sumner, WA</p>
                       </div>
-
-                      {error && (
-                        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">
-                          {error}
-                        </div>
-                      )}
-
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className={cn(
-                          "w-full flex items-center justify-center gap-3 px-8 py-5 rounded-xl font-bold text-white text-lg transition-all",
-                          isSubmitting
-                            ? "bg-slate-400 cursor-not-allowed"
-                            : "bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 hover:from-indigo-700 hover:via-violet-700 hover:to-pink-700 shadow-xl shadow-indigo-500/25 hover:shadow-2xl hover:shadow-indigo-500/30"
-                        )}
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-                            Sending...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="w-5 h-5" />
-                            Send Message
-                          </>
-                        )}
-                      </button>
-                    </form>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Response time */}
-              <div className="bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-3xl p-8 text-white shadow-2xl shadow-indigo-500/20">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <Clock className="w-8 h-8" />
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-bold">Quick Response</h3>
-                    <p className="text-white/80">We typically respond within 24 hours</p>
-                  </div>
-                </div>
-                <div className="mt-6 pt-6 border-t border-white/20">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-300" />
-                    <span className="text-white/90">Dedicated support team</span>
-                  </div>
-                  <div className="flex items-center gap-3 mt-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-300" />
-                    <span className="text-white/90">Personalized assistance</span>
-                  </div>
-                </div>
-              </div>
+                </Reveal>
 
-              {/* Email Us */}
-              <a
-                href="mailto:support@divemetric.com"
-                className="block bg-white dark:bg-white/5 rounded-3xl shadow-xl border border-slate-200 dark:border-white/10 p-8 hover:shadow-2xl hover:border-indigo-300 dark:hover:border-indigo-500/30 transition-all duration-300 group"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-200 dark:group-hover:bg-indigo-500/30 transition-colors">
-                    <Mail className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                    Email Us
-                  </h3>
-                </div>
-                <p className="text-slate-600 dark:text-slate-400 mb-4">
-                  Reach out to us directly via email for any inquiries or support.
-                </p>
-                <div className="text-indigo-600 dark:text-indigo-400 font-semibold">
-                  support@divemetric.com
-                </div>
-                <div className="mt-4 flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium text-sm">
-                  Send email
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </a>
+                {/* FAQ */}
+                <Reveal delay={240}>
+                  <a
+                    href="/faq"
+                    className="flex items-center gap-4 bg-white rounded-3xl p-6 shadow-apple hover:shadow-apple-lg border border-apple-border/40 hover:border-amber-300/40 transition-all duration-300 group"
+                  >
+                    <div className="w-11 h-11 bg-amber-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-amber-100 transition-colors text-xl">
+                      ❓
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-[15px] font-bold text-apple-dark">Browse the FAQ</p>
+                      <p className="text-[12px] text-apple-light">Quick answers to common questions</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-apple-light group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all shrink-0" />
+                  </a>
+                </Reveal>
 
-              {/* FAQ Prompt */}
-              <div className="bg-slate-100 dark:bg-white/5 rounded-3xl p-8 border border-slate-200 dark:border-white/10">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">
-                  Looking for answers?
-                </h3>
-                <p className="text-slate-600 dark:text-slate-400 mb-4">
-                  Check out our help center for quick answers to common questions.
-                </p>
-                <a
-                  href="#"
-                  className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:gap-3 transition-all"
-                >
-                  Visit Help Center
-                  <ArrowRight className="w-4 h-4" />
-                </a>
               </div>
             </div>
           </div>
         </section>
-      </main>
 
+        {/* ── Orange CTA strip ───────────────────────────────── */}
+        <section className="bg-[#E8734A] py-12 md:py-16 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06)_0%,transparent_60%)]" />
+          <div className="relative max-w-3xl mx-auto px-6 text-center">
+            <Reveal>
+              <p className="text-white/80 text-[17px] font-medium mb-3">
+                Not ready to talk yet?
+              </p>
+              <p className="text-white text-[20px] font-bold mb-6">
+                Start your free 30-day trial — no credit card, setup in under 5 minutes.
+              </p>
+              <a
+                href="/pricing"
+                className="inline-flex items-center gap-2 px-7 py-3.5 bg-apple-dark text-white font-semibold text-[15px] rounded-full hover:bg-white hover:text-apple-dark transition-all duration-200"
+              >
+                Start Free Trial <ArrowRight className="w-4 h-4" />
+              </a>
+            </Reveal>
+          </div>
+        </section>
+
+      </div>
       <Footer />
-    </div>
-  );
-};
+    </>
+  )
+}
 
-export default ContactPage;
+export default ContactPage

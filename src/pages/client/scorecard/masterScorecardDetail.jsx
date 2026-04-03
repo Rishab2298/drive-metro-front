@@ -245,6 +245,7 @@ const MasterScorecardDetail = () => {
           setSearchQuery={setSearchQuery}
           setPreviewDriver={setPreviewDriver}
           setNoteDriver={setNoteDriver}
+          setData={setData}
           hasPremiumAccess={hasPremiumAccess}
           promptUpgrade={promptUpgrade}
           getToken={getToken}

@@ -8,14 +8,14 @@ import { Upload, CheckCircle2, FileStack, Zap, Star, ChevronDown, Loader2, Lock 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
 
-const DOCUMENT_CONFIGS = [
+const getDocumentConfigs = (region = 'US') => [
   {
     id: 'scorecard',
     title: 'DSP Scorecard',
     description: 'Weekly performance scorecard PDF from Amazon Logistics',
     metricsIncluded: 'Overall DSP level scores. Beginning Oct 15th, 2025, no driver data or metrics are imported from the PDF scorecard.',
     acceptedFileTypes: ['pdf'],
-    exampleFileName: 'US_TRDC_DIN6_Week2_2026_en_DSPScorecard.pdf',
+    exampleFileName: `${region}_TRDC_DIN6_Week2_2026_en_DSPScorecard.pdf`,
     required: true,
     premium: false,
   },
@@ -55,7 +55,7 @@ const DOCUMENT_CONFIGS = [
     description: 'Photo on Delivery metrics and reject analysis',
     metricsIncluded: 'POD count, opportunities, rejects, and detailed reject category breakdown for quality tracking.',
     acceptedFileTypes: ['pdf'],
-    exampleFileName: 'US-TRDC-DIN6-Week2-2026NA-DA-POD-Details.pdf',
+    exampleFileName: `${region}-TRDC-DIN6-Week2-2026NA-DA-POD-Details.pdf`,
     required: false,
     premium: false,
   },
@@ -76,7 +76,7 @@ const DOCUMENT_CONFIGS = [
     description: '7-day vehicle inspection timing data',
     metricsIncluded: '7-Day Trailing of DVIC inspection times to monitor pre-trip compliance.',
     acceptedFileTypes: ['xlsx'],
-    exampleFileName: 'US_TRDC_DIN6_2026_week-2_20260115_DVIC_Time_Last_7_Days.xlsx',
+    exampleFileName: `${region}_TRDC_DIN6_2026_week-2_20260115_DVIC_Time_Last_7_Days.xlsx`,
     required: false,
     premium: true,
   },
@@ -293,10 +293,11 @@ const UploadScorecard = () => {
     }
   };
 
-  // Filter documents based on Cortex mode
+  // Filter documents based on Cortex mode, using region-specific filenames
+  const dspRegion = dspInfo?.region || 'US';
   const activeDocConfigs = isCortex1Mode
-    ? DOCUMENT_CONFIGS.filter((doc) => CORTEX_1_DOC_IDS.includes(doc.id))
-    : DOCUMENT_CONFIGS;
+    ? getDocumentConfigs(dspRegion).filter((doc) => CORTEX_1_DOC_IDS.includes(doc.id))
+    : getDocumentConfigs(dspRegion);
 
   const requiredDocs = activeDocConfigs.filter((doc) => doc.required);
   const optionalDocs = activeDocConfigs.filter((doc) => !doc.required && !doc.premium);

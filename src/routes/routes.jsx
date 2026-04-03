@@ -3,9 +3,14 @@ import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "../components/ProtectedRoute";
 import PublicRoute from "../components/PublicRoute";
 import ClientAppLayout from "../components/layouts/ClientAppLayout";
+import Home from "../pages/public/Home";
+import HomePage from "../pages/public/HomePage";
+import LandingPage from "../pages/public/LandingPage";
+import HomePageOld from "../pages/public/homeOld";
+import Features from "../pages/public/Features";
 
 // Lazy-load all page components for code splitting
-const HomePage = lazy(() => import("../pages/public/HomePage"));
+
 const SignIn = lazy(() => import("../pages/public/signIn"));
 const SignUp = lazy(() => import("../pages/public/signUp"));
 const ScorecardSamplesDemo = lazy(() => import("../pages/public/ScorecardSamplesDemo"));
@@ -27,6 +32,11 @@ const Billing = lazy(() => import("../pages/client/billing/billing"));
 const DriverScorecard = lazy(() => import("../sampleScorecard"));
 const PrivacyPolicy = lazy(() => import("../pages/references/privacyPolicy"));
 const TermsConditions = lazy(() => import("../pages/references/termsConditions"));
+const NewLandingPage = lazy(() => import("../pages/public/LandingPage"));
+const NewFeaturesPage = lazy(() => import("../pages/public/Features"));
+const NewAIFeaturesPage = lazy(() => import("../pages/public/AICoaching"));
+const NewPricingPage = lazy(() => import("../pages/public/Pricing"));
+const NewFAQPage = lazy(() => import("../pages/public/FAQ"));
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -45,8 +55,9 @@ const wrapRoute = (Component, Wrapper, Layout) => {
 };
 
 const routeConfig = [
-  { path: "/", component:  HomePage , wrapper: PublicRoute },
-  { path: "/home", component: HomePage, wrapper: PublicRoute },
+  { path: "/", component:  Home , wrapper: PublicRoute },
+  { path: "/home", component: HomePageOld, wrapper: PublicRoute },
+  { path: "/homes", component: LandingPage, wrapper: PublicRoute },
   { path: "/sign-in", component: SignIn, wrapper: PublicRoute },
   { path: "/sign-up", component: SignUp, wrapper: PublicRoute },
   { path: "/scorecard-samples", component: ScorecardSamplesDemo },
@@ -68,6 +79,11 @@ const routeConfig = [
   { path: "/driver-scorecard", component: DriverScorecard, wrapper: ProtectedRoute, layout: ClientAppLayout },
   { path: "/privacy-policy", component: PrivacyPolicy, wrapper: PublicRoute },
   { path: "/terms-of-service", component: TermsConditions, wrapper: PublicRoute },
+  { path: "/new-home", component: NewLandingPage, wrapper: PublicRoute },
+  { path: "/features", component: Features, wrapper: PublicRoute },
+  { path: "/ai-features", component: NewAIFeaturesPage, wrapper: PublicRoute },
+  { path: "/pricing", component: NewPricingPage, wrapper: PublicRoute },
+  { path: "/faq", component: NewFAQPage, wrapper: PublicRoute },
 ];
 
 export const router = createBrowserRouter(

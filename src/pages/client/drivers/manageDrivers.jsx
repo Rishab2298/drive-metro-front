@@ -214,6 +214,33 @@ const ManageDrivers = () => {
     }
   };
 
+  // Toggle driver include-in-ranking directly
+  const handleToggleRanking = async (driver) => {
+    try {
+      const token = await getToken();
+      const response = await fetch(`${API_URL}/api/drivers/${driver.id}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ includeInRanking: !driver.includeInRanking }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update ranking status');
+
+      const updatedDriver = await response.json();
+      setData((prevData) => ({
+        ...prevData,
+        drivers: prevData.drivers.map((d) =>
+          d.id === driver.id ? { ...d, ...updatedDriver.driver } : d
+        ),
+      }));
+    } catch (err) {
+      console.error('Error toggling ranking status:', err);
+    }
+  };
+
   // Toggle driver active status directly
   const handleToggleStatus = async (driver) => {
     try {
@@ -383,9 +410,10 @@ const ManageDrivers = () => {
             <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800 text-xs font-medium text-muted-foreground uppercase tracking-wider">
               <div className="col-span-3">Driver</div>
               <div className="col-span-2">Employee ID</div>
-              <div className="col-span-3">Contact</div>
-              <div className="col-span-2">Added</div>
+              <div className="col-span-2">Contact</div>
+              <div className="col-span-1">Added</div>
               <div className="col-span-1">Status</div>
+              <div className="col-span-2">In Ranking</div>
               <div className="col-span-1"></div>
             </div>
 
@@ -428,11 +456,11 @@ const ManageDrivers = () => {
                   </div>
 
                   {/* Contact */}
-                  <div className="col-span-3 hidden md:block">
+                  <div className="col-span-2 hidden md:block">
                     {driver.personalPhone ? (
                       <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                         <Phone className="w-3.5 h-3.5" />
-                        <span>{driver.personalPhone}</span>
+                        <span className="truncate">{driver.personalPhone}</span>
                       </div>
                     ) : (
                       <span className="text-sm text-red-500 dark:text-red-400">No phone</span>
@@ -440,9 +468,9 @@ const ManageDrivers = () => {
                   </div>
 
                   {/* Added Date */}
-                  <div className="col-span-2 hidden md:flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{formatDate(driver.createdAt)}</span>
+                  <div className="col-span-1 hidden md:flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Calendar className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">{formatDate(driver.createdAt)}</span>
                   </div>
 
                   {/* Status */}
@@ -457,6 +485,22 @@ const ManageDrivers = () => {
                     >
                       {driver.isActive ? 'Active' : 'Inactive'}
                     </Badge>
+                  </div>
+
+                  {/* Include in Ranking Toggle */}
+                  <div className="col-span-2 hidden md:flex items-center gap-2">
+                    <Switch
+                      checked={driver.includeInRanking !== false}
+                      onCheckedChange={() => handleToggleRanking(driver)}
+                    />
+                    <span className={cn(
+                      'text-xs font-medium',
+                      driver.includeInRanking !== false
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-neutral-400 dark:text-neutral-500'
+                    )}>
+                      {driver.includeInRanking !== false ? 'Ranked' : 'Excluded'}
+                    </span>
                   </div>
 
                   {/* Actions */}

@@ -1,94 +1,89 @@
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 
-const Footer = () => {
-  const footerLinks = {
-    Product: [
-      { name: 'Features', href: '/home#features' },
-      { name: 'Pricing', href: '/home#pricing' },
-      { name: 'Sample Scorecard', href: '/sample-scorecard' },
-    ],
-    Account: [
-      { name: 'Sign In', href: '/sign-in' },
-      { name: 'Sign Up', href: '/sign-up' },
-    ],
-    Support: [
-      { name: 'Contact Us', href: '/contact' },
-    ],
-    Legal: [
-      { name: 'Privacy Policy', href: '/privacy-policy' },
-      { name: 'Terms of Service', href: '/terms-of-service' },
-    ],
-  };
+const LINKS = {
+  Product: [
+    { name: 'Features',         href: '/features' },
+    { name: 'AI Features',      href: '/ai-features' },
+    { name: 'Pricing',          href: '/pricing' },
+    { name: 'Sample Scorecard', href: '/sample-scorecard' },
+  ],
+  Learn: [
+    { name: 'How It Works',     href: '/how-scoring-works' },
+    { name: 'FAQ',              href: '/faq' },
+    { name: 'Contact Us',       href: '/contact' },
+  ],
+  Account: [
+    { name: 'Sign In',          href: '/sign-in' },
+    { name: 'Sign Up',          href: '/sign-up' },
+  ],
+  Legal: [
+    { name: 'Privacy Policy',   href: '/privacy-policy' },
+    { name: 'Terms of Service', href: '/terms-of-service' },
+  ],
+};
 
+export default function Footer() {
   return (
-    <footer className="relative bg-slate-100 dark:bg-slate-950 border-t border-slate-200 dark:border-white/5">
-      <div
-        className="absolute inset-0 opacity-[0.015] dark:opacity-[0.02]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(99, 102, 241, 0.5) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(99, 102, 241, 0.5) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px',
-        }}
-      />
+    <footer className="bg-apple-dark">
+      <div className="max-w-6xl mx-auto px-6 pt-16 pb-10">
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-8">
-          {/* Brand */}
-          <div className="max-w-xs">
-            <Link to="/" className="flex items-center gap-3 mb-4 group">
-              <img src={logo} alt="DiveMetric Logo" className="h-8 w-8" />
-              <span className="text-lg font-bold text-slate-900 dark:text-white">
-                DiveMetric
-              </span>
+        {/* Main grid */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-12 pb-12 border-b border-white/10">
+
+          {/* Brand — 2 cols */}
+          <div className="md:col-span-2">
+            <Link to="/" className="inline-flex items-center gap-2.5 mb-5 group">
+              <img src={logo} alt="DiveMetric" className="h-7 w-7 opacity-90 group-hover:opacity-100 transition-opacity duration-200" />
+              <span className="text-[17px] font-bold tracking-[-0.5px] text-white">DiveMetric</span>
             </Link>
-            <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
-              Transforming last-mile delivery performance through intelligent scorecards and AI-powered insights.
+
+            <p className="text-[14px] text-white/50 leading-relaxed max-w-60 mb-7">
+              The scorecard platform built for Amazon DSP owners. Hit Fantastic+ every week.
             </p>
+
+            <Link
+              to="/sign-up"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-apple-blue hover:bg-apple-blueDark text-white text-[14px] font-semibold rounded-full shadow-[0_2px_8px_rgba(0,122,255,0.35)] hover:shadow-[0_4px_16px_rgba(0,122,255,0.4)] transition-all duration-150 active:scale-95"
+            >
+              Try 30 Days Free →
+            </Link>
           </div>
 
-          {/* Links */}
-          <div className="flex flex-wrap gap-12">
-            {Object.entries(footerLinks).map(([title, links]) => (
-              <div key={title}>
-                <h4 className="font-semibold text-slate-900 dark:text-white text-sm mb-3">{title}</h4>
-                <ul className="space-y-2">
-                  {links.map((link) => (
-                    <li key={link.name}>
-                      {link.href.startsWith('/') ? (
-                        <Link
-                          to={link.href}
-                          className="text-slate-600 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white text-sm transition-colors"
-                        >
-                          {link.name}
-                        </Link>
-                      ) : (
-                        <a
-                          href={link.href}
-                          className="text-slate-600 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white text-sm transition-colors"
-                        >
-                          {link.name}
-                        </a>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          {/* Link columns */}
+          {Object.entries(LINKS).map(([title, links]) => (
+            <div key={title}>
+              <h4 className="text-[11px] font-bold uppercase tracking-widest text-white/30 mb-4">
+                {title}
+              </h4>
+              <ul className="space-y-3">
+                {links.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      to={link.href}
+                      className="text-[14px] font-medium text-white/55 hover:text-white transition-colors duration-150"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        {/* Bottom */}
-        <div className="pt-8 border-t border-slate-200 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-slate-500 dark:text-slate-600 text-sm">
-            &copy; {new Date().getFullYear()} Kilimanjaro Innovation Labs Inc. | All Rights Reserved
+        {/* Bottom bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-8">
+          <p className="text-[13px] text-white/30">
+            © {new Date().getFullYear()} Kilimanjaro Innovation Labs Inc. All rights reserved.
           </p>
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <p className="text-[13px] text-white/30">Trusted by 500+ DSP owners Globally</p>
+          </div>
         </div>
+
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

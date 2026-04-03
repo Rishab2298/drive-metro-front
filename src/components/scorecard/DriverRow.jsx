@@ -15,6 +15,7 @@ import {
   Loader2,
   Sparkles,
   UserMinus,
+  UserCheck,
   Settings2,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -23,6 +24,8 @@ import { Dropdown, DropdownItem } from './Dropdown';
 import { downloadScorecardPDF } from '@/lib/generateScorecardPDF.jsx';
 import { sendDriverEmail, sendDriverSms, generateAIFeedback } from '@/services/scorecardService';
 import { STANDING_COLORS, getDriverName, API_URL } from '@/utils/scorecardUtils';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
 
 export const DriverRow = ({
   driver,
@@ -45,10 +48,12 @@ export const DriverRow = ({
   const [sendingEmail, setSendingEmail] = useState(false);
   const [sendingSms, setSendingSms] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
+  const [togglingRank, setTogglingRank] = useState(false);
 
-  const rank = rankInfo?.rank;
-  const score = rankInfo?.score;
-  const isEligible = rankInfo?.eligible;
+  const isExcluded = driver.includeInRanking === false;
+  const rank = isExcluded ? null : rankInfo?.rank;
+  const score = isExcluded ? null : rankInfo?.score;
+  const isEligible = isExcluded ? false : rankInfo?.eligible;
   const packages = parseInt(driver.packagesDelivered) || 0;
   const tier = driver.overallStanding || driver.tier || 'N/A';
   const driverName = getDriverName(driver);
@@ -136,8 +141,33 @@ export const DriverRow = ({
     });
   };
 
-  const handleRemoveRanking = () => {
-    alert('Remove ranking coming soon!');
+  const handleToggleRanking = async () => {
+    if (!driver.driverId) return;
+    const newValue = !isExcluded; // toggle: false→true or true→false
+    setTogglingRank(true);
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API_URL}/api/drivers/${driver.driverId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ includeInRanking: newValue }),
+      });
+      if (!res.ok) throw new Error('Failed to update');
+      // Update local state so ranks recompute immediately
+      if (setData) {
+        setData(prev => ({
+          ...prev,
+          drivers: prev.drivers.map(d =>
+            d.driverId === driver.driverId ? { ...d, includeInRanking: newValue } : d
+          ),
+        }));
+      }
+      toast.success(newValue ? `${driverName} included in ranking` : `${driverName} removed from ranking`);
+    } catch (err) {
+      toast.error('Failed to update ranking status');
+    } finally {
+      setTogglingRank(false);
+    }
   };
 
   const handleOverrideTier = () => {
@@ -151,7 +181,7 @@ export const DriverRow = ({
         isSelected
           ? 'bg-neutral-100 dark:bg-neutral-800/50'
           : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/30',
-        !isEligible && 'opacity-80'
+        (isExcluded || !isEligible) && 'opacity-75'
       )}
     >
       {/* Checkbox + Rank */}
@@ -171,7 +201,9 @@ export const DriverRow = ({
         </button>
         <div className={cn(
           'w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs',
-          !isEligible
+          isExcluded
+            ? 'bg-neutral-50 dark:bg-neutral-900/50 text-neutral-300 dark:text-neutral-600 border border-dashed border-neutral-200 dark:border-neutral-800'
+            : !isEligible
             ? 'bg-neutral-100 dark:bg-neutral-900 text-neutral-400 border border-dashed border-neutral-300 dark:border-neutral-700'
             : rank === 1
             ? 'bg-amber-100 text-amber-700'
@@ -181,7 +213,7 @@ export const DriverRow = ({
             ? 'bg-orange-100 text-orange-700'
             : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300'
         )}>
-          {isEligible ? rank : '—'}
+          {isExcluded ? '—' : isEligible ? rank : '—'}
         </div>
       </div>
 
@@ -223,7 +255,11 @@ export const DriverRow = ({
           )}
         </div>
         <p className="text-sm text-muted-foreground mt-0.5">
-          {isEligible ? (
+          {isExcluded ? (
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 text-xs font-medium">
+              Not Ranked
+            </span>
+          ) : isEligible ? (
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400" />
               Score: {score?.toFixed(1) || '-'}
@@ -274,9 +310,11 @@ export const DriverRow = ({
                 onClick={() => { onEditNote(driver); close(); }}
               />
               <DropdownItem
-                icon={UserMinus}
-                label="Remove Ranking"
-                onClick={() => { handleRemoveRanking(); close(); }}
+                icon={togglingRank ? Loader2 : isExcluded ? UserCheck : UserMinus}
+                label={togglingRank ? 'Updating...' : isExcluded ? 'Include in Ranking' : 'Remove from Ranking'}
+                onClick={() => { handleToggleRanking(); close(); }}
+                disabled={togglingRank}
+                iconClassName={togglingRank ? 'animate-spin' : ''}
               />
               <DropdownItem
                 icon={Settings2}

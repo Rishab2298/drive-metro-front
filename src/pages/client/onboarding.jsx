@@ -1,5 +1,5 @@
 import { useAuth, useUser } from "@clerk/clerk-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -17,6 +17,7 @@ import {
   Sun,
   Moon,
   FileText,
+  Info,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
@@ -100,6 +101,7 @@ const onboardingSchema = z.object({
   smsOptIn: z.boolean().refine((val) => val === true, {
     message: "You must consent to SMS notifications to send scorecards to drivers",
   }),
+  region: z.string().min(1, "Please select your DSP operating region"),
 });
 
 const steps = [
@@ -108,7 +110,7 @@ const steps = [
     title: "Business Details",
     description: "DSP identification",
     icon: Briefcase,
-    fields: ["dspCode", "stationCode", "companyName"],
+    fields: ["dspCode", "stationCode", "companyName", "region"],
   },
   {
     id: 2,
@@ -136,6 +138,7 @@ export default function Onboarding() {
   const [error, setError] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState([]);
+  const [showWaitlist, setShowWaitlist] = useState(false);
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
 
@@ -154,6 +157,7 @@ export default function Onboarding() {
       timezone: "America/Los_Angeles",
       agreeToTerms: false,
       smsOptIn: false,
+      region: "US",
     },
   });
 
@@ -194,6 +198,14 @@ export default function Onboarding() {
     setIsSubmitting(true);
     setError(null);
 
+    // Non-NA region: skip API call, show waitlist confirmation
+    const nonNaRegions = ["GB", "EU", "AU", "OTHER"];
+    if (nonNaRegions.includes(data.region)) {
+      setShowWaitlist(true);
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const token = await getToken();
       const selectedCountry = countries.find((c) => c.code === data.countryCode);
@@ -216,6 +228,7 @@ export default function Onboarding() {
           phoneNumber: fullPhoneNumber,
           timezone: data.timezone,
           smsOptIn: data.smsOptIn,
+          region: data.region,
         }),
       });
 
@@ -403,6 +416,35 @@ export default function Onboarding() {
         {/* Form Area */}
         <div className="flex-1 flex items-center justify-center p-6 md:p-12">
           <div className="w-full max-w-xl">
+            {showWaitlist ? (
+              <div className="text-center animate-in fade-in slide-in-from-bottom-4 duration-500 py-8">
+                <div className="flex justify-center mb-6">
+                  <div className="w-20 h-20 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shadow-lg shadow-emerald-500/10">
+                    <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+                  </div>
+                </div>
+                <h1 className="text-3xl font-bold text-foreground tracking-tight mb-3">
+                  You're on the list!
+                </h1>
+                <p className="text-muted-foreground text-base leading-relaxed mb-8 max-w-md mx-auto">
+                  Thanks for your interest in DiveMetric. Your request has been registered —
+                  one of our team members will reach out within 1 business day to walk you
+                  through the onboarding process for your region.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <Button
+                    asChild
+                    className="h-11 px-8 rounded-full bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-lg shadow-indigo-500/25"
+                  >
+                    <Link to="/contact">Schedule a Call</Link>
+                  </Button>
+                  <Button asChild variant="outline" className="h-11 px-8 rounded-full border-border hover:bg-muted">
+                    <Link to="/">Back to Home</Link>
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <>
             {/* Step Header */}
             <div className="mb-8">
               <div className="flex items-center justify-between">
@@ -518,6 +560,45 @@ export default function Onboarding() {
                             />
                           </FormControl>
                           <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="region"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-foreground font-medium">
+                            DSP Operating Region
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="h-11 bg-card border-border text-foreground focus:border-indigo-400 focus:ring-indigo-400/20 transition-all">
+                                <SelectValue placeholder="Select your operating region" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="US">United States</SelectItem>
+                              <SelectItem value="CA">Canada</SelectItem>
+                              <SelectItem value="GB">United Kingdom</SelectItem>
+                              <SelectItem value="EU">Europe</SelectItem>
+                              <SelectItem value="AU">Australia / New Zealand</SelectItem>
+                              <SelectItem value="OTHER">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-xs" />
+
+                          {["GB", "EU", "AU", "OTHER"].includes(field.value) && (
+                            <div className="mt-3 flex gap-3 rounded-lg border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-900/20 p-3.5">
+                              <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                              <p className="text-sm text-amber-800 dark:text-amber-300 leading-snug">
+                                Our scorecard format is currently optimized for US &amp; Canada.
+                                Don't worry — submit your details and our team will reach out to
+                                confirm compatibility for your region.
+                              </p>
+                            </div>
+                          )}
                         </FormItem>
                       )}
                     />
@@ -802,6 +883,8 @@ export default function Onboarding() {
                 Contact support
               </a>
             </p>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -468,7 +468,10 @@ export const getQualityGroup = (driver) => {
 export const calculateDriverRanks = (drivers) => {
   if (!drivers || drivers.length === 0) return { rankMap: {}, rankedCount: 0 };
 
-  const sorted = [...drivers].sort((a, b) => {
+  // Only rank drivers who have includeInRanking !== false
+  const eligible = drivers.filter(d => d.includeInRanking !== false);
+
+  const sorted = [...eligible].sort((a, b) => {
     const tierA = TIER_ORDER[a.overallStanding || a.tier] ?? 5;
     const tierB = TIER_ORDER[b.overallStanding || b.tier] ?? 5;
     if (tierA !== tierB) return tierA - tierB;
@@ -511,6 +514,13 @@ export const calculateDriverRanks = (drivers) => {
       score: Math.round(score * 100) / 100,
       eligible: true
     };
+  });
+
+  // Mark excluded drivers explicitly
+  drivers.forEach(driver => {
+    if (driver.includeInRanking === false) {
+      rankMap[driver.transporterId] = { rank: null, score: null, eligible: false, excluded: true };
+    }
   });
 
   return { rankMap, rankedCount };
