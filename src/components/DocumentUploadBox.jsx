@@ -117,50 +117,41 @@ const getAmazonDashboardUrl = (docId, stationCode, dspCode) => {
 
 // Filename validation patterns for each document type
 // These patterns use placeholders that will be replaced with actual DSP info
-const getFilenamePattern = (docId, dspCode, stationCode) => {
+const getFilenamePattern = (docId, dspCode, stationCode, region = 'US') => {
   const patterns = {
     scorecard: {
-      // US_TRDC_DIN6_Week2_2026_en_DSPScorecard.pdf
-      pattern: new RegExp(`^US_${dspCode}_${stationCode}_Week\\d{1,2}_\\d{4}_en_DSPScorecard\\.pdf$`),
-      errorMessage: `Invalid filename. Expected format: US_${dspCode}_${stationCode}_Week<Number>_<Year>_en_DSPScorecard.pdf`,
+      pattern: new RegExp(`^${region}_${dspCode}_${stationCode}_Week\\d{1,2}_\\d{4}_en_DSPScorecard\\.pdf$`),
+      errorMessage: `Invalid filename. Expected format: ${region}_${dspCode}_${stationCode}_Week<Number>_<Year>_en_DSPScorecard.pdf`,
     },
     'weekly-overview': {
-      // DSP_Overview_Dashboard_TRDC_DIN6_2026-W02.csv
       pattern: new RegExp(`^DSP_Overview_Dashboard_${dspCode}_${stationCode}_\\d{4}-W\\d{2}\\.csv$`),
       errorMessage: `Invalid filename. Expected format: DSP_Overview_Dashboard_${dspCode}_${stationCode}_<Year>-W<WeekNumber>.csv`,
     },
     'trailing-six-week': {
-      // DSP_Overview_Dashboard_Trailing_Six_Week_TRDC_DIN6_2026-W02.csv
       pattern: new RegExp(`^DSP_Overview_Dashboard_Trailing_Six_Week_${dspCode}_${stationCode}_\\d{4}-W\\d{2}\\.csv$`),
       errorMessage: `Invalid filename. Expected format: DSP_Overview_Dashboard_Trailing_Six_Week_${dspCode}_${stationCode}_<Year>-W<WeekNumber>.csv`,
     },
     'negative-feedback': {
-      // DSP_Customer_Delivery_Feedback_negative_DIN6_2026-W02.csv
       pattern: new RegExp(`^DSP_Customer_Delivery_Feedback_negative_${stationCode}_\\d{4}-W\\d{2}\\.csv$`),
       errorMessage: `Invalid filename. Expected format: DSP_Customer_Delivery_Feedback_negative_${stationCode}_<Year>-W<WeekNumber>.csv`,
     },
     'pod-quality': {
-      // US-TRDC-DIN6-Week2-2026NA-DA-POD-Details.pdf
-      pattern: new RegExp(`^US-${dspCode}-${stationCode}-Week\\d{1,2}-\\d{4}NA-DA-POD-Details\\.pdf$`),
-      errorMessage: `Invalid filename. Expected format: US-${dspCode}-${stationCode}-Week<Number>-<Year>NA-DA-POD-Details.pdf`,
+      pattern: new RegExp(`^${region}-${dspCode}-${stationCode}-Week\\d{1,2}-\\d{4}NA-DA-POD-Details\\.pdf$`),
+      errorMessage: `Invalid filename. Expected format: ${region}-${dspCode}-${stationCode}-Week<Number>-<Year>NA-DA-POD-Details.pdf`,
     },
     'pps-daily': {
-      // Daily_PPS_Report_-1234567890.csv
       pattern: /^Daily_PPS_Report_-.+\.csv$/,
       errorMessage: 'Invalid filename. Expected format: Daily_PPS_Report_-<Identifier>.csv',
     },
     dvic: {
-      // US_TRDC_DIN6_2026_week-2_20260115_DVIC_Time_Last_7_Days.xlsx
-      pattern: new RegExp(`^US_${dspCode}_${stationCode}_\\d{4}_week-\\d{1,2}_.+_DVIC_Time_Last_7_Days\\.xlsx$`),
-      errorMessage: `Invalid filename. Expected format: US_${dspCode}_${stationCode}_<Year>_week-<Number>_<Identifier>_DVIC_Time_Last_7_Days.xlsx`,
+      pattern: new RegExp(`^${region}_${dspCode}_${stationCode}_\\d{4}_week-\\d{1,2}_.+_DVIC_Time_Last_7_Days\\.xlsx$`),
+      errorMessage: `Invalid filename. Expected format: ${region}_${dspCode}_${stationCode}_<Year>_week-<Number>_<Identifier>_DVIC_Time_Last_7_Days.xlsx`,
     },
     'paw-print': {
-      // Notification_on_Arri_12345.csv or Notification_on_Arri_-12345.csv
       pattern: /^Notification_on_Arri_-?.+\.csv$/,
       errorMessage: 'Invalid filename. Expected format: Notification_on_Arri_<Identifier>.csv',
     },
     'safety-dashboard': {
-      // Safety_Dashboard_TRDC_DIN6_2026-W04.csv
       pattern: new RegExp(`^Safety_Dashboard_${dspCode}_${stationCode}_\\d{4}-W\\d{2}\\.csv$`),
       errorMessage: `Invalid filename. Expected format: Safety_Dashboard_${dspCode}_${stationCode}_<Year>-W<WeekNumber>.csv`,
     },
@@ -224,7 +215,7 @@ export function DocumentUploadBox({
 
     // Check filename pattern if DSP info is available
     if (dspInfo?.dspCode && dspInfo?.stationCode) {
-      const patternConfig = getFilenamePattern(id, dspInfo.dspCode, dspInfo.stationCode);
+      const patternConfig = getFilenamePattern(id, dspInfo.dspCode, dspInfo.stationCode, dspInfo.region || 'US');
       if (patternConfig && !patternConfig.pattern.test(fileName)) {
         return patternConfig.errorMessage;
       }
@@ -360,18 +351,18 @@ export function DocumentUploadBox({
       return exampleFileName; // Fallback to static example
     }
 
-    const { dspCode, stationCode } = dspInfo;
+    const { dspCode, stationCode, region = 'US' } = dspInfo;
     const { week, weekPadded, year } = getAvailableScorecardWeek();
     const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
 
     const examples = {
-      scorecard: `US_${dspCode}_${stationCode}_Week${week}_${year}_en_DSPScorecard.pdf`,
+      scorecard: `${region}_${dspCode}_${stationCode}_Week${week}_${year}_en_DSPScorecard.pdf`,
       'weekly-overview': `DSP_Overview_Dashboard_${dspCode}_${stationCode}_${year}-W${weekPadded}.csv`,
       'trailing-six-week': `DSP_Overview_Dashboard_Trailing_Six_Week_${dspCode}_${stationCode}_${year}-W${weekPadded}.csv`,
       'negative-feedback': `DSP_Customer_Delivery_Feedback_negative_${stationCode}_${year}-W${weekPadded}.csv`,
-      'pod-quality': `US-${dspCode}-${stationCode}-Week${week}-${year}NA-DA-POD-Details.pdf`,
+      'pod-quality': `${region}-${dspCode}-${stationCode}-Week${week}-${year}NA-DA-POD-Details.pdf`,
       'pps-daily': `Daily_PPS_Report_-${today}.csv`,
-      dvic: `US_${dspCode}_${stationCode}_${year}_week-${week}_${today}_DVIC_Time_Last_7_Days.xlsx`,
+      dvic: `${region}_${dspCode}_${stationCode}_${year}_week-${week}_${today}_DVIC_Time_Last_7_Days.xlsx`,
       'paw-print': `Notification_on_Arri_${today}.csv`,
       'safety-dashboard': `Safety_Dashboard_${dspCode}_${stationCode}_${year}-W${weekPadded}.csv`,
     };
