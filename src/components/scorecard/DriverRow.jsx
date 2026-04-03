@@ -25,8 +25,6 @@ import { downloadScorecardPDF } from '@/lib/generateScorecardPDF.jsx';
 import { sendDriverEmail, sendDriverSms, generateAIFeedback } from '@/services/scorecardService';
 import { STANDING_COLORS, getDriverName, API_URL } from '@/utils/scorecardUtils';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
-
 export const DriverRow = ({
   driver,
   index,
