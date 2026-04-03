@@ -161,6 +161,7 @@ export const DriverRow = ({
         }));
       }
       toast.success(newValue ? `${driverName} included in ranking` : `${driverName} removed from ranking`);
+      toast.info('Rankings are updating across all scorecards in the background. This may take a moment to reflect.', { duration: 5000 });
     } catch (err) {
       toast.error('Failed to update ranking status');
     } finally {
