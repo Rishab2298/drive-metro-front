@@ -1,4 +1,4 @@
-import { useAuth, useUser } from "@clerk/clerk-react";
+import { useAuth, useUser, useClerk } from "@clerk/clerk-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -131,6 +131,7 @@ const steps = [
 export default function Onboarding() {
   const { user, isLoaded } = useUser();
   const { getToken } = useAuth();
+  const { signOut } = useClerk();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { refreshSubscription } = useSubscription();
@@ -433,13 +434,13 @@ export default function Onboarding() {
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Button
-                    asChild
+                    onClick={() => signOut({ redirectUrl: '/' })}
                     className="h-11 px-8 rounded-full bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-lg shadow-indigo-500/25"
                   >
-                    <Link to="/contact">Schedule a Call</Link>
+                    Log Out
                   </Button>
                   <Button asChild variant="outline" className="h-11 px-8 rounded-full border-border hover:bg-muted">
-                    <Link to="/">Back to Home</Link>
+                    <Link to="/">Go to Home Page</Link>
                   </Button>
                 </div>
               </div>
