@@ -589,16 +589,6 @@ export default function Onboarding() {
                           </Select>
                           <FormMessage className="text-xs" />
 
-                          {["GB", "EU", "AU", "OTHER"].includes(field.value) && (
-                            <div className="mt-3 flex gap-3 rounded-lg border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-900/20 p-3.5">
-                              <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-                              <p className="text-sm text-amber-800 dark:text-amber-300 leading-snug">
-                                Our scorecard format is currently optimized for US &amp; Canada.
-                                Don't worry — submit your details and our team will reach out to
-                                confirm compatibility for your region.
-                              </p>
-                            </div>
-                          )}
                         </FormItem>
                       )}
                     />
