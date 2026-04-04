@@ -468,8 +468,8 @@ export const getQualityGroup = (driver) => {
 export const calculateDriverRanks = (drivers) => {
   if (!drivers || drivers.length === 0) return { rankMap: {}, rankedCount: 0 };
 
-  // Only rank drivers who have includeInRanking !== false
-  const eligible = drivers.filter(d => d.includeInRanking !== false);
+  // Only rank drivers who have includeInRanking !== false and are not excluded from this week
+  const eligible = drivers.filter(d => d.includeInRanking !== false && !d.excludedFromRanking);
 
   const sorted = [...eligible].sort((a, b) => {
     const tierA = TIER_ORDER[a.overallStanding || a.tier] ?? 5;
@@ -518,7 +518,7 @@ export const calculateDriverRanks = (drivers) => {
 
   // Mark excluded drivers explicitly
   drivers.forEach(driver => {
-    if (driver.includeInRanking === false) {
+    if (driver.includeInRanking === false || driver.excludedFromRanking) {
       rankMap[driver.transporterId] = { rank: null, score: null, eligible: false, excluded: true };
     }
   });

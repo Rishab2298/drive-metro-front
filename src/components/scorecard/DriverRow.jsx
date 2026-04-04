@@ -48,7 +48,7 @@ export const DriverRow = ({
   const [generatingAI, setGeneratingAI] = useState(false);
   const [togglingRank, setTogglingRank] = useState(false);
 
-  const isExcluded = driver.includeInRanking === false;
+  const isExcluded = driver.excludedFromRanking === true;
   const rank = isExcluded ? null : rankInfo?.rank;
   const score = isExcluded ? null : rankInfo?.score;
   const isEligible = isExcluded ? false : rankInfo?.eligible;
@@ -140,15 +140,15 @@ export const DriverRow = ({
   };
 
   const handleToggleRanking = async () => {
-    if (!driver.driverId) return;
-    const newValue = !isExcluded; // toggle: false→true or true→false
+    if (!driver.id) return;
+    const newExcluded = !isExcluded;
     setTogglingRank(true);
     try {
       const token = await getToken();
-      const res = await fetch(`${API_URL}/api/drivers/${driver.driverId}`, {
+      const res = await fetch(`${API_URL}/api/scorecard/${driver.id}/exclude-ranking`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ includeInRanking: newValue }),
+        body: JSON.stringify({ excluded: newExcluded }),
       });
       if (!res.ok) throw new Error('Failed to update');
       // Update local state so ranks recompute immediately
@@ -156,12 +156,11 @@ export const DriverRow = ({
         setData(prev => ({
           ...prev,
           drivers: prev.drivers.map(d =>
-            d.driverId === driver.driverId ? { ...d, includeInRanking: newValue } : d
+            d.id === driver.id ? { ...d, excludedFromRanking: newExcluded } : d
           ),
         }));
       }
-      toast.success(newValue ? `${driverName} included in ranking` : `${driverName} removed from ranking`);
-      toast.info('Rankings are updating across all scorecards in the background. This may take a moment to reflect.', { duration: 5000 });
+      toast.success(newExcluded ? `${driverName} removed from this week's ranking` : `${driverName} included in this week's ranking`);
     } catch (err) {
       toast.error('Failed to update ranking status');
     } finally {
