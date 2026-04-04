@@ -1100,7 +1100,7 @@ const SampleScorecard = () => {
               DiveMetric Analytics
             </div>
             <Link
-              to="/home"
+              to="/"
               className="inline-flex items-center gap-2 mt-4 px-6 py-2.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 text-white rounded-xl text-sm font-semibold shadow-lg hover:shadow-xl transition-all"
             >
               Back to Home

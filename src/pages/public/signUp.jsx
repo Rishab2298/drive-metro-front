@@ -33,14 +33,14 @@ const SignUpPage = () => {
       <div className="hidden lg:flex lg:w-1/2 relative z-10 p-12 xl:p-16 flex-col justify-between">
         <div>
           {/* Back to Home */}
-          <Link to="/home" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-12 group">
+          <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-12 group">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm">Back to home</span>
           </Link>
 
           {/* Logo */}
           <div className="mb-16">
-            <Link to="/home" className="flex items-center gap-3 group">
+            <Link to="/" className="flex items-center gap-3 group">
               <div className="relative">
                 <div className="absolute inset-0 bg-linear-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-xl blur-lg opacity-50 group-hover:opacity-80 transition-all duration-500" />
                 <div className="relative bg-linear-to-br from-indigo-500 via-violet-500 to-pink-500 p-2.5 rounded-xl shadow-lg">
