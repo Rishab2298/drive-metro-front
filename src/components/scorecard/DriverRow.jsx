@@ -263,9 +263,8 @@ export const DriverRow = ({
               Score: {score?.toFixed(1) || '-'}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400" />
-              {500 - packages} more to rank
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-500 text-xs font-medium">
+              Not Ranked
             </span>
           )}
         </p>
