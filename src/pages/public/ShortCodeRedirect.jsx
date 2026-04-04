@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
+
 export default function ShortCodeRedirect() {
   const { shortCode } = useParams();
   const navigate = useNavigate();
@@ -9,7 +11,7 @@ export default function ShortCodeRedirect() {
   useEffect(() => {
     async function resolveShortCode() {
       try {
-        const response = await fetch(`/api/s/${shortCode}`);
+        const response = await fetch(`${API_URL}/api/s/${shortCode}`);
         if (!response.ok) {
           setError("Scorecard not found");
           return;
