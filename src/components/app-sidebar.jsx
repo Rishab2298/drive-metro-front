@@ -171,6 +171,17 @@ export function AppSidebar({
         <NavProjects projects={data.quickLinks} />
       </SidebarContent>
       <SidebarFooter>
+        <div className="mx-2 mb-2 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 px-3 py-2.5">
+          <p className="text-[11px] text-blue-600/80 dark:text-blue-300/70 leading-relaxed">
+            For support or queries, contact{' '}
+            <a
+              href="mailto:support@divemetric.com"
+              className="font-semibold text-blue-700 dark:text-blue-300 hover:underline"
+            >
+              support@divemetric.com
+            </a>
+          </p>
+        </div>
         <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>

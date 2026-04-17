@@ -14,7 +14,8 @@ export const fetchMasterScorecard = async (id, getToken) => {
     if (response.status === 404) {
       throw new Error('Scorecard not found');
     }
-    throw new Error('Failed to fetch scorecard');
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.error || `Failed to fetch scorecard (${response.status})`);
   }
 
   return response.json();

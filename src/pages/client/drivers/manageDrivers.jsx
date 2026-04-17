@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
+import { useTutorial } from '@/contexts/TutorialContext';
+import { TutorialStep } from '@/components/tutorial/TutorialStep';
 import {
   Loader2,
   Users,
@@ -52,6 +54,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
 const ManageDrivers = () => {
   const { getToken } = useAuth();
   const navigate = useNavigate();
+  const { startTutorial } = useTutorial();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
@@ -117,6 +120,14 @@ const ManageDrivers = () => {
   useEffect(() => {
     fetchDrivers();
   }, [getToken]);
+
+  // Auto-start tutorial on first visit
+  useEffect(() => {
+    if (!localStorage.getItem('tutorial_done_manage-drivers')) {
+      startTutorial('manage-drivers');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Filter drivers based on search and status
   const filteredDrivers = data?.drivers?.filter((driver) => {
@@ -312,6 +323,7 @@ const ManageDrivers = () => {
       {/* Header */}
       <div className="border-b border-neutral-200 dark:border-neutral-800">
         <div className="max-w-5xl mx-auto px-6 py-10">
+          <TutorialStep page="manage-drivers" stepId="welcome">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
               <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium mb-2">
@@ -323,6 +335,7 @@ const ManageDrivers = () => {
               </p>
             </div>
           </div>
+          </TutorialStep>
         </div>
       </div>
 
@@ -365,6 +378,7 @@ const ManageDrivers = () => {
               className="pl-10"
             />
           </div>
+          <TutorialStep page="manage-drivers" stepId="sync-btn">
           <button
             onClick={() => setSyncModalOpen(true)}
             className={cn(
@@ -376,6 +390,7 @@ const ManageDrivers = () => {
             <RefreshCw className="w-4 h-4" />
             Sync Drivers
           </button>
+          </TutorialStep>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -405,6 +420,7 @@ const ManageDrivers = () => {
 
         {/* Drivers List */}
         {filteredDrivers.length > 0 ? (
+          <TutorialStep page="manage-drivers" stepId="driver-table">
           <div className="border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden">
             {/* Table Header */}
             <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800 text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -419,7 +435,7 @@ const ManageDrivers = () => {
 
             {/* Table Body */}
             <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
-              {filteredDrivers.map((driver) => (
+              {filteredDrivers.map((driver, driverIndex) => (
                 <div
                   key={driver.id}
                   className={cn(
@@ -488,6 +504,7 @@ const ManageDrivers = () => {
                   </div>
 
                   {/* Include in Ranking Toggle */}
+                  <TutorialStep page="manage-drivers" stepId={driverIndex === 0 ? 'ranking-toggle' : '__none__'}>
                   <div className="col-span-2 hidden md:flex items-center gap-2">
                     <Switch
                       checked={driver.includeInRanking !== false}
@@ -502,8 +519,10 @@ const ManageDrivers = () => {
                       {driver.includeInRanking !== false ? 'Ranked' : 'Excluded'}
                     </span>
                   </div>
+                  </TutorialStep>
 
                   {/* Actions */}
+                  <TutorialStep page="manage-drivers" stepId={driverIndex === 0 ? 'edit-driver' : '__none__'}>
                   <div className="col-span-1 flex justify-end">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -529,10 +548,12 @@ const ManageDrivers = () => {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
+                  </TutorialStep>
                 </div>
               ))}
             </div>
           </div>
+          </TutorialStep>
         ) : (
           <div className="text-center py-16">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">

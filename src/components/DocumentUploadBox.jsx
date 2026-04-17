@@ -16,6 +16,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { ExportGuideDialog } from '@/components/ExportGuideDialog';
+import { TutorialStep } from '@/components/tutorial/TutorialStep';
 
 // Generate dynamic Amazon DSP Dashboard URLs based on document type, station code, dsp code, and available scorecard week
 const getAmazonDashboardUrl = (docId, stationCode, dspCode) => {
@@ -176,6 +177,7 @@ export function DocumentUploadBox({
   dspInfo,
   hasPremiumAccess = true,
   cortexVersion = "2",
+  isTutorialTarget = false,
 }) {
   const { getToken } = useAuth();
   const navigate = useNavigate();
@@ -437,16 +439,18 @@ export function DocumentUploadBox({
           </span>
 
           {/* Where to Find Help Button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setGuideOpen(true);
-            }}
-            className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 transition-all"
-            title="Where to find this document"
-          >
-            <HelpCircle className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
-          </button>
+          <TutorialStep page="upload" stepId={isTutorialTarget ? 'required-export-guide' : '__none__'}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setGuideOpen(true);
+              }}
+              className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 transition-all"
+              title="Where to find this document"
+            >
+              <HelpCircle className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
+            </button>
+          </TutorialStep>
 
           <div
             className={cn(
@@ -457,20 +461,22 @@ export function DocumentUploadBox({
             <ChevronDown className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
           </div>
 
-          {/* Amazon Dashboard Link Button */}
+          {/* DSP Dashboard Link Button */}
           {(() => {
             const amazonUrl = getAmazonDashboardUrl(id, dspInfo?.stationCode, dspInfo?.dspCode);
             return amazonUrl ? (
-              <a
-                href={amazonUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="w-9 h-9 rounded-lg bg-violet-100 dark:bg-violet-500/20 border border-violet-200 dark:border-violet-500/30 flex items-center justify-center hover:bg-violet-200 dark:hover:bg-violet-500/30 hover:border-violet-300 dark:hover:border-violet-500/50 transition-all"
-                title="Open in Amazon DSP Dashboard"
-              >
-                <ExternalLink className="w-4 h-4 text-violet-600 dark:text-violet-400" />
-              </a>
+              <TutorialStep page="upload" stepId={isTutorialTarget ? 'required-dsp-link' : '__none__'}>
+                <a
+                  href={amazonUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-9 h-9 rounded-lg bg-violet-100 dark:bg-violet-500/20 border border-violet-200 dark:border-violet-500/30 flex items-center justify-center hover:bg-violet-200 dark:hover:bg-violet-500/30 hover:border-violet-300 dark:hover:border-violet-500/50 transition-all"
+                  title="Open in DSP Dashboard"
+                >
+                  <ExternalLink className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                </a>
+              </TutorialStep>
             ) : null;
           })()}
 

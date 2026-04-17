@@ -22,6 +22,7 @@ export const DriversTable = ({
   hasPremiumAccess,
   promptUpgrade,
   getToken,
+  isTutorialFirstRow = false,
 }) => {
   const totalDrivers = data?.drivers?.length || 0;
 
@@ -90,6 +91,7 @@ export const DriversTable = ({
             hasPremiumAccess={hasPremiumAccess}
             promptUpgrade={promptUpgrade}
             getToken={getToken}
+            isTutorialFirstRow={isTutorialFirstRow && index === 0}
           />
         ))}
       </div>

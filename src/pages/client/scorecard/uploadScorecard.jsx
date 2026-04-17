@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth, useUser } from '@clerk/clerk-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { DocumentUploadBox } from '@/components/DocumentUploadBox';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useTutorial } from '@/contexts/TutorialContext';
+import { TutorialStep } from '@/components/tutorial/TutorialStep';
 import { cn, getAvailableScorecardWeek } from '@/lib/utils';
-import { Upload, CheckCircle2, FileStack, Zap, Star, ChevronDown, Loader2, Lock } from 'lucide-react';
+import { Upload, CheckCircle2, FileStack, Zap, Star, ChevronDown, Loader2, Lock, Users } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
 
@@ -116,6 +118,7 @@ const CollapsibleSection = ({
   dspInfo,
   hasPremiumAccess = true,
   cortexVersion = "2",
+  isRequiredSection = false,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const uploadedCount = docs.filter((d) => uploadedFiles[d.id]).length;
@@ -183,6 +186,7 @@ const CollapsibleSection = ({
                   dspInfo={dspInfo}
                   hasPremiumAccess={hasPremiumAccess}
                   cortexVersion={cortexVersion}
+                  isTutorialTarget={isRequiredSection && index === 0}
                 />
               ))}
             </div>
@@ -201,6 +205,7 @@ const UploadScorecard = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const { hasPremiumAccess, isLoading: subscriptionLoading } = useSubscription();
+  const { startTutorial, isStepActive } = useTutorial();
 
   // Determine cortex version from user metadata (defaults to "2" for new users)
   const cortexVersion = user?.publicMetadata?.cortex || "2";
@@ -242,6 +247,14 @@ const UploadScorecard = () => {
 
     fetchDspInfo();
   }, [getToken]);
+
+  // Auto-start tutorial on first visit
+  useEffect(() => {
+    if (!localStorage.getItem('tutorial_done_upload')) {
+      startTutorial('upload');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleUploadComplete = (docId, { file, key }) => {
     setUploadedFiles((prev) => ({
@@ -346,32 +359,36 @@ const UploadScorecard = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
           <div className="flex flex-col gap-6">
             {/* Title Row */}
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium mb-2">
-                  Week {availableWeek}, {availableYear}
-                </p>
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-                  Upload Weekly Reports
-                </h1>
-                <p className="text-sm sm:text-base text-muted-foreground">
-                  Import your weekly scorecard report to generate driver scorecards and analytics.
-                </p>
-              </div>
-
-              {/* Progress Counter */}
-              <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-                <div className="text-left sm:text-right">
-                  <p className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">
-                    {totalUploaded}<span className="text-neutral-300 dark:text-neutral-600">/{totalDocs}</span>
+            <TutorialStep page="upload" stepId="welcome">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium mb-2">
+                    Week {availableWeek}, {availableYear}
                   </p>
-                  <p className="text-xs text-muted-foreground">documents uploaded</p>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                    Upload Weekly Reports
+                  </h1>
+                  <p className="text-sm sm:text-base text-muted-foreground">
+                    Import your weekly scorecard report to generate driver scorecards and analytics.
+                  </p>
                 </div>
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center">
-                  <FileStack className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-500 dark:text-neutral-400" />
+
+                {/* Progress Counter */}
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="text-left sm:text-right">
+                      <p className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">
+                        {totalUploaded}<span className="text-neutral-300 dark:text-neutral-600">/{totalDocs}</span>
+                      </p>
+                      <p className="text-xs text-muted-foreground">documents uploaded</p>
+                    </div>
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center">
+                      <FileStack className="w-5 h-5 sm:w-6 sm:h-6 text-neutral-500 dark:text-neutral-400" />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </TutorialStep>
 
           </div>
         </div>
@@ -380,50 +397,82 @@ const UploadScorecard = () => {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-3 sm:space-y-4">
         {/* Required Section */}
-        <CollapsibleSection
-          title="Required Documents"
-          description="Essential for generating scorecards"
-          icon={Zap}
-          iconClassName="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900"
-          docs={requiredDocs}
-          uploadedFiles={uploadedFiles}
-          onUploadComplete={handleUploadComplete}
-          indexOffset={0}
-          defaultOpen={true}
-          dspInfo={dspInfo}
-          cortexVersion={cortexVersion}
-        />
+        <TutorialStep page="upload" stepId="required-docs">
+          <CollapsibleSection
+            title="Required Documents"
+            description="Essential for generating scorecards"
+            icon={Zap}
+            iconClassName="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900"
+            docs={requiredDocs}
+            uploadedFiles={uploadedFiles}
+            onUploadComplete={handleUploadComplete}
+            indexOffset={0}
+            defaultOpen={true}
+            dspInfo={dspInfo}
+            cortexVersion={cortexVersion}
+            isRequiredSection={true}
+          />
+        </TutorialStep>
 
         {/* Optional Section */}
-        <CollapsibleSection
-          title="Optional Documents"
-          description="Additional metrics and insights"
-          icon={FileStack}
-          iconClassName="bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300"
-          docs={optionalDocs}
-          uploadedFiles={uploadedFiles}
-          onUploadComplete={handleUploadComplete}
-          indexOffset={requiredDocs.length}
-          defaultOpen={false}
-          dspInfo={dspInfo}
-          cortexVersion={cortexVersion}
-        />
+        <TutorialStep page="upload" stepId="optional-docs">
+          <CollapsibleSection
+            title="Optional Documents"
+            description="Additional metrics and insights"
+            icon={FileStack}
+            iconClassName="bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300"
+            docs={optionalDocs}
+            uploadedFiles={uploadedFiles}
+            onUploadComplete={handleUploadComplete}
+            indexOffset={requiredDocs.length}
+            defaultOpen={false}
+            dspInfo={dspInfo}
+            cortexVersion={cortexVersion}
+          />
+        </TutorialStep>
 
         {/* Premium Section */}
-        <CollapsibleSection
-          title={effectivePremiumAccess ? "Premium Reports" : "Premium Reports (Upgrade Required)"}
-          description={effectivePremiumAccess ? "Advanced analytics for subscribers" : "Upgrade to Pro to unlock these reports"}
-          icon={effectivePremiumAccess ? Star : Lock}
-          iconClassName={effectivePremiumAccess ? "bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400" : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"}
-          docs={premiumDocs}
-          uploadedFiles={uploadedFiles}
-          onUploadComplete={handleUploadComplete}
-          indexOffset={requiredDocs.length + optionalDocs.length}
-          defaultOpen={false}
-          dspInfo={dspInfo}
-          hasPremiumAccess={effectivePremiumAccess}
-          cortexVersion={cortexVersion}
-        />
+        <TutorialStep page="upload" stepId="premium-docs">
+          <CollapsibleSection
+            title={effectivePremiumAccess ? "Premium Reports" : "Premium Reports (Upgrade Required)"}
+            description={effectivePremiumAccess ? "Advanced analytics for subscribers" : "Upgrade to Pro to unlock these reports"}
+            icon={effectivePremiumAccess ? Star : Lock}
+            iconClassName={effectivePremiumAccess ? "bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400" : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"}
+            docs={premiumDocs}
+            uploadedFiles={uploadedFiles}
+            onUploadComplete={handleUploadComplete}
+            indexOffset={requiredDocs.length + optionalDocs.length}
+            defaultOpen={false}
+            dspInfo={dspInfo}
+            hasPremiumAccess={effectivePremiumAccess}
+            cortexVersion={cortexVersion}
+          />
+        </TutorialStep>
+
+        {/* Sync Reminder — only visible during tutorial step */}
+        {isStepActive('upload', 'sync-reminder') && (
+          <TutorialStep page="upload" stepId="sync-reminder">
+            <div className="flex items-start gap-4 p-4 sm:p-5 rounded-xl border border-blue-200 dark:border-blue-800/50 bg-blue-50/70 dark:bg-blue-950/20">
+              <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
+                <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground mb-1">Add Driver Contacts Before Processing</p>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Go to <strong>Manage Drivers</strong> and click <strong>Sync Drivers</strong> to upload{' '}
+                  <code className="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-xs font-mono">associatesdata.csv</code>{' '}
+                  from the Amazon Associates Portal. This adds email &amp; phone numbers so you can send scorecards via SMS or Email.
+                </p>
+                <Link
+                  to="/manage-drivers"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                >
+                  Go to Manage Drivers →
+                </Link>
+              </div>
+            </div>
+          </TutorialStep>
+        )}
 
         {/* Processing Error */}
         {processingError && (
@@ -435,6 +484,7 @@ const UploadScorecard = () => {
         )}
 
         {/* Action Footer */}
+        <TutorialStep page="upload" stepId="process-btn">
         <div
           className={cn(
             'sticky bottom-4 sm:bottom-6 p-4 sm:p-5 rounded-xl sm:rounded-2xl border transition-all duration-500 mt-6 sm:mt-8',
@@ -501,6 +551,7 @@ const UploadScorecard = () => {
             </button>
           </div>
         </div>
+        </TutorialStep>
       </div>
     </div>
   );

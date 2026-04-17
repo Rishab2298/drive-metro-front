@@ -1,8 +1,10 @@
 // MasterScorecardDetail - Main page for viewing master scorecard with all drivers
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { Loader2, ArrowLeft, Download, Search, ChevronRight } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useTutorial } from '@/contexts/TutorialContext';
+import { TutorialStep } from '@/components/tutorial/TutorialStep';
 import UpgradeModal from '@/components/UpgradeModal';
 import AIAddonModal from '@/components/AIAddonModal';
 
@@ -69,6 +71,31 @@ const MasterScorecardDetail = () => {
   // AI addon modal state
   const [showAIAddonModal, setShowAIAddonModal] = useState(false);
   const [aiAddonFeatureName, setAiAddonFeatureName] = useState('');
+
+  const { startTutorial, isStepActive } = useTutorial();
+
+  // Auto-start tutorial on first visit
+  useEffect(() => {
+    if (!localStorage.getItem('tutorial_done_master-scorecard')) {
+      startTutorial('master-scorecard');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-select first driver when bulk-actions tutorial step is active
+  const tutorialAutoSelectedRef = useRef(false);
+  const bulkActionsActive = isStepActive('master-scorecard', 'bulk-actions');
+  useEffect(() => {
+    if (bulkActionsActive && sortedDrivers.length > 0 && selectedDrivers.size === 0) {
+      handleSelectDriver(sortedDrivers[0].id);
+      tutorialAutoSelectedRef.current = true;
+    }
+    if (!bulkActionsActive && tutorialAutoSelectedRef.current) {
+      clearSelection();
+      tutorialAutoSelectedRef.current = false;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bulkActionsActive]);
 
   const promptUpgrade = (featureName) => {
     setUpgradeFeatureName(featureName);
@@ -177,6 +204,7 @@ const MasterScorecardDetail = () => {
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
             {/* Search Input */}
+            <TutorialStep page="master-scorecard" stepId="search-bar">
             <div className="relative flex-1 sm:flex-none sm:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
               <input
@@ -187,6 +215,7 @@ const MasterScorecardDetail = () => {
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent"
               />
             </div>
+            </TutorialStep>
 {showJson && (
               <button
                 onClick={handleDownloadJson}
@@ -212,6 +241,7 @@ const MasterScorecardDetail = () => {
 
         {/* Bulk Actions Toolbar */}
         {selectedDrivers.size > 0 && (
+          <div className={bulkActionsActive ? "relative z-40" : ""}>
           <DriverActionsBar
             selectedDriverObjects={selectedDriverObjects}
             selectedCount={selectedDrivers.size}
@@ -228,28 +258,32 @@ const MasterScorecardDetail = () => {
             setShowBulkNoteModal={setShowBulkNoteModal}
             onAIFeedbackStart={handleAIFeedbackStart}
           />
+          </div>
         )}
 
         {/* Drivers Table */}
-        <DriversTable
-          sortedDrivers={sortedDrivers}
-          driverRanks={driverRanks}
-          rankedCount={rankedCount}
-          data={data}
-          selectedDrivers={selectedDrivers}
-          searchQuery={searchQuery}
-          sortConfig={sortConfig}
-          handleSort={handleSort}
-          handleSelectDriver={handleSelectDriver}
-          handleQuickSelect={handleQuickSelect}
-          setSearchQuery={setSearchQuery}
-          setPreviewDriver={setPreviewDriver}
-          setNoteDriver={setNoteDriver}
-          setData={setData}
-          hasPremiumAccess={hasPremiumAccess}
-          promptUpgrade={promptUpgrade}
-          getToken={getToken}
-        />
+        <TutorialStep page="master-scorecard" stepId="driver-table">
+          <DriversTable
+            sortedDrivers={sortedDrivers}
+            driverRanks={driverRanks}
+            rankedCount={rankedCount}
+            data={data}
+            selectedDrivers={selectedDrivers}
+            searchQuery={searchQuery}
+            sortConfig={sortConfig}
+            handleSort={handleSort}
+            handleSelectDriver={handleSelectDriver}
+            handleQuickSelect={handleQuickSelect}
+            setSearchQuery={setSearchQuery}
+            setPreviewDriver={setPreviewDriver}
+            setNoteDriver={setNoteDriver}
+            setData={setData}
+            hasPremiumAccess={hasPremiumAccess}
+            promptUpgrade={promptUpgrade}
+            getToken={getToken}
+            isTutorialFirstRow={true}
+          />
+        </TutorialStep>
 
         {/* Table Footer Stats */}
         {sortedDrivers.length > 0 && (

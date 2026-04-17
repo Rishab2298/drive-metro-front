@@ -2,23 +2,27 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
-export const Dropdown = ({ trigger, children, align = 'right' }) => {
+export const Dropdown = ({ trigger, children, align = 'right', forceOpen = false }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const effectiveOpen = isOpen || forceOpen;
 
   return (
     <div className="relative">
       <div onClick={() => setIsOpen(!isOpen)}>
         {trigger}
       </div>
-      {isOpen && (
+      {effectiveOpen && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-          />
+          {!forceOpen && (
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setIsOpen(false)}
+            />
+          )}
           <div
             className={cn(
-              'absolute z-50 mt-2 w-48 rounded-xl bg-white dark:bg-neutral-900 shadow-lg border border-neutral-200 dark:border-neutral-700 py-1 overflow-hidden',
+              'absolute mt-2 w-48 rounded-xl bg-white dark:bg-neutral-900 shadow-lg border border-neutral-200 dark:border-neutral-700 py-1 overflow-hidden',
+              forceOpen ? 'z-[200]' : 'z-50',
               align === 'right' ? 'right-0' : 'left-0'
             )}
           >

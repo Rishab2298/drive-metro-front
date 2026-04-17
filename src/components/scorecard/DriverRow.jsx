@@ -24,6 +24,8 @@ import { Dropdown, DropdownItem } from './Dropdown';
 import { downloadScorecardPDF } from '@/lib/generateScorecardPDF.jsx';
 import { sendDriverEmail, sendDriverSms, generateAIFeedback } from '@/services/scorecardService';
 import { STANDING_COLORS, getDriverName, API_URL } from '@/utils/scorecardUtils';
+import { TutorialStep } from '@/components/tutorial/TutorialStep';
+import { useTutorial } from '@/contexts/TutorialContext';
 
 export const DriverRow = ({
   driver,
@@ -41,12 +43,16 @@ export const DriverRow = ({
   hasPremiumAccess,
   promptUpgrade,
   getToken,
+  isTutorialFirstRow = false,
 }) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [sendingSms, setSendingSms] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
   const [togglingRank, setTogglingRank] = useState(false);
+
+  const { isStepActive } = useTutorial();
+  const actionsStepActive = isTutorialFirstRow && isStepActive('master-scorecard', 'actions-btn');
 
   const isExcluded = driver.excludedFromRanking === true;
   const rank = isExcluded ? null : rankInfo?.rank;
@@ -183,6 +189,11 @@ export const DriverRow = ({
       )}
     >
       {/* Checkbox + Rank */}
+      <TutorialStep
+        page="master-scorecard"
+        stepId={isTutorialFirstRow ? 'bulk-actions' : '__none__'}
+        wrapperClassName="col-span-1"
+      >
       <div className="col-span-1 flex items-center gap-3">
         <button
           onClick={() => onSelect(driver.transporterId)}
@@ -214,11 +225,17 @@ export const DriverRow = ({
           {isExcluded ? '—' : isEligible ? rank : '—'}
         </div>
       </div>
+      </TutorialStep>
 
       {/* Driver Name & Score */}
+      <TutorialStep
+        page="master-scorecard"
+        stepId={isTutorialFirstRow ? 'driver-icons' : '__none__'}
+        wrapperClassName="col-span-3"
+      >
       <div className="col-span-3">
-        <div className="flex items-center gap-2">
-          <p className="font-semibold text-foreground truncate">
+        <div className="flex items-center gap-2 min-w-0">
+          <p className="font-semibold text-foreground truncate min-w-0">
             {driverName}
           </p>
           {driver.acknowledgedAt && (
@@ -269,6 +286,7 @@ export const DriverRow = ({
           )}
         </p>
       </div>
+      </TutorialStep>
 
       {/* Overall Tier - Centered */}
       <div className="col-span-2 flex justify-center">
@@ -291,7 +309,9 @@ export const DriverRow = ({
       {/* Actions */}
       <div className="col-span-4 flex items-center justify-end gap-2">
         {/* Actions Dropdown */}
+        <TutorialStep page="master-scorecard" stepId={isTutorialFirstRow ? 'actions-btn' : '__none__'}>
         <Dropdown
+          forceOpen={actionsStepActive}
           trigger={
             <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-600 text-sm font-medium transition-all">
               <MoreHorizontal className="w-4 h-4" />
@@ -321,8 +341,10 @@ export const DriverRow = ({
             </>
           )}
         </Dropdown>
+        </TutorialStep>
 
         {/* Share Dropdown */}
+        <TutorialStep page="master-scorecard" stepId={isTutorialFirstRow ? 'share-btn' : '__none__'}>
         <Dropdown
           trigger={
             <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-600 text-sm font-medium transition-all">
@@ -360,8 +382,10 @@ export const DriverRow = ({
             </>
           )}
         </Dropdown>
+        </TutorialStep>
 
         {/* Preview Button */}
+        <TutorialStep page="master-scorecard" stepId={isTutorialFirstRow ? 'preview-btn' : '__none__'}>
         <button
           onClick={() => onPreview(driver)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 text-sm font-medium transition-colors"
@@ -369,6 +393,7 @@ export const DriverRow = ({
           <Eye className="w-4 h-4" />
           <span className="hidden sm:inline">Preview</span>
         </button>
+        </TutorialStep>
       </div>
     </div>
   );
