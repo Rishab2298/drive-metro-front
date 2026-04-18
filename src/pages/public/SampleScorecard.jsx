@@ -817,7 +817,7 @@ const SampleScorecard = () => {
               </div>
             </div>
             <Link
-              to="/home"
+              to="/"
               className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center shadow-sm hover:from-red-500 hover:to-red-600 group transition-all"
             >
               <X size={16} className="text-slate-400 group-hover:text-white transition-colors" />
