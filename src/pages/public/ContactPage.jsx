@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   Mail, Phone, Send, CheckCircle2, Building2,
-  User, MessageSquare, Clock, ArrowRight, Users, Zap, Star,
+  User, MessageSquare, Clock, ArrowRight, Users, Zap,
 } from 'lucide-react'
 import Header from '@/components/public/Header'
 import Footer from '@/components/public/Footer'
@@ -281,7 +281,7 @@ const ContactPage = () => {
                 {/* Email */}
                 <Reveal delay={80}>
                   <a
-                    href="mailto:hello@divemetric.com"
+                    href="mailto:support@divemetric.com"
                     className="flex items-center gap-4 bg-white rounded-3xl p-6 shadow-apple hover:shadow-apple-lg border border-apple-border/40 hover:border-apple-blue/20 transition-all duration-300 group"
                   >
                     <div className="w-11 h-11 bg-blue-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
@@ -289,33 +289,10 @@ const ContactPage = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[15px] font-bold text-apple-dark">Email Us</p>
-                      <p className="text-[13px] text-apple-blue truncate">hello@divemetric.com</p>
+                      <p className="text-[13px] text-apple-blue truncate">support@divemetric.com</p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-apple-light group-hover:text-apple-blue group-hover:translate-x-0.5 transition-all shrink-0" />
                   </a>
-                </Reveal>
-
-                {/* Testimonial */}
-                <Reveal delay={160}>
-                  <div className="bg-white rounded-3xl p-6 shadow-apple border border-apple-border/40">
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                      ))}
-                    </div>
-                    <p className="text-[13px] text-apple-mid leading-relaxed mb-4 italic">
-                      "The team was super responsive — had a demo booked same day. Within a week we were sending scorecards to all 47 drivers automatically."
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-apple-blue flex items-center justify-center text-white text-[11px] font-bold shrink-0">
-                        MR
-                      </div>
-                      <div>
-                        <p className="text-[13px] font-semibold text-apple-dark">Michael R.</p>
-                        <p className="text-[11px] text-apple-light">DSP Owner · Sumner, WA</p>
-                      </div>
-                    </div>
-                  </div>
                 </Reveal>
 
                 {/* FAQ */}

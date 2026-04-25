@@ -183,12 +183,14 @@ export default function Home() {
                   >
                     Try for 30 Days Free →
                   </Link>
-                  <Link
-                    to="/features"
+                  <a
+                    href="https://calendly.com/divemetric-support/30min"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="px-7 py-4 bg-apple-gray text-apple-dark font-semibold text-[16px] rounded-full hover:bg-apple-border/30 transition-all duration-200"
                   >
-                    See All Features
-                  </Link>
+                    Book a Demo
+                  </a>
                 </div>
 
                 <p className="text-[13px] text-apple-light animate-fade-up" style={{ animationDelay: '320ms' }}>
@@ -380,15 +382,25 @@ export default function Home() {
             </Reveal>
 
             <Reveal delay={200}>
-              <Link
-                to="/sample-scorecard"
-                className="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-apple-dark text-white text-[14px] font-semibold rounded-full hover:bg-white hover:text-apple-dark transition-all duration-200"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                See an example Scorecard
-              </Link>
+              <div className="mt-8 flex flex-wrap justify-center gap-3">
+                <Link
+                  to="/sample-scorecard"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-apple-dark text-white text-[14px] font-semibold rounded-full hover:bg-white hover:text-apple-dark transition-all duration-200"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  See an example Scorecard
+                </Link>
+                <a
+                  href="https://calendly.com/divemetric-support/30min"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/15 backdrop-blur-sm border border-white/30 text-white text-[14px] font-semibold rounded-full hover:bg-white/25 transition-all duration-200"
+                >
+                  Book a Demo
+                </a>
+              </div>
             </Reveal>
           </div>
         </section>
@@ -450,6 +462,14 @@ export default function Home() {
                 <Link to="/pricing" className="px-7 py-3.5 border-2 border-apple-blue bg-apple-blue text-white font-semibold text-[15px] rounded-full hover:bg-apple-blueDark transition-all duration-200">
                   Learn About Pricing
                 </Link>
+                <a
+                  href="https://calendly.com/divemetric-support/30min"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-7 py-3.5 border-2 border-apple-border text-apple-mid font-semibold text-[15px] rounded-full hover:border-apple-dark hover:text-apple-dark transition-all duration-200"
+                >
+                  Book a Demo
+                </a>
               </div>
             </Reveal>
           </div>
@@ -590,12 +610,14 @@ export default function Home() {
                   We're happy to give you a demo, walk you through the product, and answer any of your questions.
                 </p>
                 <div className="flex flex-wrap gap-4 mb-10">
-                  <Link
-                    to="/contact"
+                  <a
+                    href="https://calendly.com/divemetric-support/30min"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="px-8 py-4 bg-apple-dark text-white font-semibold text-[16px] rounded-full hover:bg-black transition-all duration-200 shadow-apple hover:shadow-apple-lg active:scale-95"
                   >
-                    Schedule a Demo
-                  </Link>
+                    Book a Demo
+                  </a>
                   <Link
                     to="/contact"
                     className="px-8 py-4 border-2 border-apple-dark text-apple-dark font-semibold text-[16px] rounded-full hover:bg-apple-dark hover:text-white transition-all duration-200"
