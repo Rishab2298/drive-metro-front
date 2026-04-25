@@ -143,9 +143,9 @@ export default function FAQ() {
               Our team is available Monday–Friday 9am–6pm PT. We typically respond within 2 hours.
             </p>
             <div className="flex justify-center gap-4 flex-wrap">
-              <Link to="/contact" className="px-8 py-4 bg-apple-dark text-white font-semibold rounded-full hover:bg-black transition">
+              <a href="https://calendly.com/divemetric-support/30min" target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-apple-dark text-white font-semibold rounded-full hover:bg-black transition">
                 Schedule a Demo
-              </Link>
+              </a>
               <Link to="/contact" className="px-8 py-4 border-2 border-white/40 text-white font-semibold rounded-full hover:bg-white/10 transition">
                 Contact Support
               </Link>

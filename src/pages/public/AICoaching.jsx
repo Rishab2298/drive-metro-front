@@ -268,12 +268,14 @@ export default function AICoaching() {
               >
                 Start Free Trial →
               </Link>
-              <Link
-                to="/contact"
+              <a
+                href="https://calendly.com/divemetric-support/30min"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-8 py-4 border-2 border-white/40 text-white font-semibold text-[16px] rounded-full hover:bg-white/10 transition"
               >
                 Schedule a Demo
-              </Link>
+              </a>
             </div>
           </Reveal>
         </div>

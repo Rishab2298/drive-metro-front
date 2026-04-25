@@ -203,12 +203,14 @@ export default function Features() {
               >
                 Start Free Trial →
               </Link>
-              <Link
-                to="/contact"
+              <a
+                href="https://calendly.com/divemetric-support/30min"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-7 py-4 bg-apple-gray text-apple-dark font-semibold text-[16px] rounded-full hover:bg-apple-border/30 transition-all duration-200"
               >
                 Schedule a Demo
-              </Link>
+              </a>
             </div>
 
             <p className="text-[13px] text-apple-light mt-5 animate-fade-up" style={{ animationDelay: '320ms' }}>
@@ -714,12 +716,14 @@ export default function Features() {
                 >
                   Start Free Trial →
                 </Link>
-                <Link
-                  to="/contact"
+                <a
+                  href="https://calendly.com/divemetric-support/30min"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-8 py-4 border-2 border-apple-dark text-apple-dark font-semibold text-[16px] rounded-full hover:bg-apple-dark hover:text-white transition-all duration-200"
                 >
                   Schedule a Demo
-                </Link>
+                </a>
               </div>
             </Reveal>
 
