@@ -79,7 +79,6 @@ function Testimonial({ quote, name, role, initials, color }) {
       <div className="flex items-center gap-3">
         <div className={`w-10 h-10 rounded-full ${color} flex items-center justify-center text-[13px] font-bold text-white shrink-0`}>{initials}</div>
         <div>
-          <p className="text-[14px] font-semibold text-apple-dark">{name}</p>
           <p className="text-[12px] text-apple-light">{role}</p>
         </div>
       </div>

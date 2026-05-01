@@ -220,6 +220,27 @@ const UploadScorecard = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingError, setProcessingError] = useState(null);
 
+  // Pre-fill from extension URL params (?prefilled=docType:key,docType:key)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const prefilled = params.get('prefilled');
+    if (prefilled) {
+      const entries = {};
+      for (const pair of prefilled.split(',')) {
+        const colonIdx = pair.indexOf(':');
+        if (colonIdx === -1) continue;
+        const docType = pair.slice(0, colonIdx);
+        const key = pair.slice(colonIdx + 1);
+        if (docType && key) {
+          entries[docType] = { key, uploadedAt: new Date() };
+        }
+      }
+      if (Object.keys(entries).length > 0) {
+        setUploadedFiles(entries);
+      }
+    }
+  }, []);
+
   // Fetch DSP info on mount
   useEffect(() => {
     const fetchDspInfo = async () => {
