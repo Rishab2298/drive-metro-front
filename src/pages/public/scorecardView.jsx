@@ -36,6 +36,7 @@ import {
   formatValue,
   formatLabel,
 } from '@/utils/scorecardUtils';
+import { tScorecard, METRIC_LABELS_ES } from '@/utils/scorecardTranslations';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
 
@@ -70,7 +71,7 @@ const useAntiScraping = () => {
 };
 
 // Metric Detail Modal - Matches DriverPreviewModal style
-const MetricDetailModal = ({ data, onClose }) => {
+const MetricDetailModal = ({ data, onClose, T = tScorecard('en') }) => {
   const getExplanation = (key) => {
     const keyLower = key.toLowerCase();
     for (const [explKey, expl] of Object.entries(METRIC_EXPLANATIONS)) {
@@ -135,7 +136,7 @@ const MetricDetailModal = ({ data, onClose }) => {
 
           <div className="mb-5">
             <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              Calculation
+              {T.calculation}
             </div>
             <p className="text-[13px] text-slate-700 leading-snug p-3 bg-slate-50 rounded-lg border-l-[3px] border-slate-300">
               {info.calc}
@@ -145,7 +146,7 @@ const MetricDetailModal = ({ data, onClose }) => {
           {info.tips?.length > 0 && (
             <div>
               <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2.5">
-                Tips for Improvement
+                {T.tipsForImprovement}
               </div>
               {info.tips.map((tip, i) => (
                 <div key={i} className="flex items-center gap-2.5 mb-2">
@@ -163,7 +164,7 @@ const MetricDetailModal = ({ data, onClose }) => {
             onClick={onClose}
             className="w-full py-3 bg-slate-800 text-white rounded-lg text-sm font-semibold hover:bg-slate-900 transition-colors"
           >
-            Close
+            {T.close}
           </button>
         </div>
       </div>
@@ -172,7 +173,7 @@ const MetricDetailModal = ({ data, onClose }) => {
 };
 
 // Feedback Detail Modal - For viewing detailed feedback items
-const FeedbackDetailModal = ({ data, onClose }) => {
+const FeedbackDetailModal = ({ data, onClose, T = tScorecard('en') }) => {
   if (!data) return null;
 
   return (
@@ -201,7 +202,7 @@ const FeedbackDetailModal = ({ data, onClose }) => {
           </div>
           <div className="inline-flex items-center gap-2 px-3.5 py-2 bg-white rounded-lg">
             <span className="text-sm text-red-700 font-semibold">
-              {data.items?.length || 0} incident{data.items?.length !== 1 ? 's' : ''}
+              {T.incidents(data.items?.length || 0)}
             </span>
           </div>
         </div>
@@ -236,7 +237,7 @@ const FeedbackDetailModal = ({ data, onClose }) => {
             ))
           ) : (
             <div className="text-center py-5 text-slate-400">
-              No feedback details available
+              {T.noFeedbackDetails}
             </div>
           )}
         </div>
@@ -245,7 +246,7 @@ const FeedbackDetailModal = ({ data, onClose }) => {
             onClick={onClose}
             className="w-full py-3 bg-slate-800 text-white rounded-lg text-sm font-semibold hover:bg-slate-900 transition-colors"
           >
-            Close
+            {T.close}
           </button>
         </div>
       </div>
@@ -254,7 +255,7 @@ const FeedbackDetailModal = ({ data, onClose }) => {
 };
 
 // Safety Event Detail Modal - For viewing detailed safety events
-const SafetyEventDetailModal = ({ data, onClose }) => {
+const SafetyEventDetailModal = ({ data, onClose, T = tScorecard('en') }) => {
   if (!data) return null;
 
   return (
@@ -278,7 +279,7 @@ const SafetyEventDetailModal = ({ data, onClose }) => {
                   {data.label}
                 </h3>
                 <span className="text-xs text-red-600 font-semibold">
-                  {data.events?.length || 0} event{data.events?.length !== 1 ? 's' : ''} recorded
+                  {T.eventsRecorded(data.events?.length || 0)}
                 </span>
               </div>
             </div>
@@ -304,7 +305,7 @@ const SafetyEventDetailModal = ({ data, onClose }) => {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
-                        Event #{idx + 1}
+                        {T.eventLabel(idx + 1)}
                       </span>
                       {event.eventId && (
                         <span className="text-[11px] font-mono text-slate-500 px-2 py-0.5 bg-slate-100 rounded">
@@ -332,13 +333,13 @@ const SafetyEventDetailModal = ({ data, onClose }) => {
                   <div className="grid grid-cols-2 gap-2 mb-3">
                     {event.source && (
                       <div className="p-2 bg-slate-50 rounded-lg">
-                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Source</div>
+                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">{T.source}</div>
                         <div className="text-xs font-medium text-slate-700">{event.source}</div>
                       </div>
                     )}
                     {event.reviewDetails && (
                       <div className="p-2 bg-slate-50 rounded-lg">
-                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Review Status</div>
+                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">{T.reviewStatus}</div>
                         <div className={cn(
                           "text-xs font-medium",
                           event.reviewDetails.toLowerCase().includes('approved') ? "text-emerald-600" :
@@ -350,13 +351,13 @@ const SafetyEventDetailModal = ({ data, onClose }) => {
                     )}
                     {event.programImpact && (
                       <div className="p-2 bg-slate-50 rounded-lg">
-                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Impact</div>
+                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">{T.impact}</div>
                         <div className="text-xs font-medium text-slate-700">{event.programImpact}</div>
                       </div>
                     )}
                     {event.vin && (
                       <div className="p-2 bg-slate-50 rounded-lg">
-                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Vehicle</div>
+                        <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">{T.vehicle}</div>
                         <div className="text-xs font-mono text-slate-600">{event.vin.slice(-6)}</div>
                       </div>
                     )}
@@ -367,7 +368,7 @@ const SafetyEventDetailModal = ({ data, onClose }) => {
           ) : (
             <div className="text-center py-8 text-slate-400">
               <ShieldAlert size={32} className="mx-auto mb-2 opacity-30" />
-              <p className="text-sm">No event details available</p>
+              <p className="text-sm">{T.noEventDetails}</p>
             </div>
           )}
         </div>
@@ -378,7 +379,7 @@ const SafetyEventDetailModal = ({ data, onClose }) => {
             onClick={onClose}
             className="w-full py-3 bg-slate-800 text-white rounded-xl text-sm font-semibold hover:bg-slate-900 transition-colors"
           >
-            Close
+            {T.close}
           </button>
         </div>
       </div>
@@ -445,7 +446,7 @@ const FeedbackCategoryRow = ({ category, onClick }) => (
 );
 
 // Metric Row Component - Matches DriverPreviewModal styling with severity highlights
-const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, isPodBreakdown, onOpenMetricModal }) => {
+const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, isPodBreakdown, onOpenMetricModal, lang = 'en', T = tScorecard('en') }) => {
   const isDvicTime = metricKey?.toLowerCase().startsWith('dvictime');
   const isPpsBreakdown = metricKey?.toLowerCase().startsWith('pps') && metricKey?.toLowerCase() !== 'ppscompliancerate';
   const isSafetyEvent = ['distractionsrate', 'speedingeventrate', 'seatbeltoffrate', 'followingdistancerate', 'signalviolationsrate'].includes(metricKey?.toLowerCase());
@@ -490,7 +491,8 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, is
   }
 
   const sevColor = severity ? SEVERITY_COLORS[severity] : null;
-  const displayLabel = label || formatLabel(metricKey);
+  const rawLabel = label || formatLabel(metricKey);
+  const displayLabel = lang === 'es' ? (METRIC_LABELS_ES[rawLabel] || rawLabel) : rawLabel;
   const shouldHighlight = severity === 'poor' || severity === 'fair';
   const isSevere = severity === 'poor';
   const isConcerning = severity === 'fair';
@@ -551,7 +553,7 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, is
       <div className="flex items-center gap-2.5">
         {isSevere && showSevereHighlight && (
           <span className="text-[10px] font-extrabold text-red-900 py-1.5 px-3 bg-linear-to-br from-red-200 to-red-300 rounded-full uppercase tracking-wide shadow-md border border-white/30">
-            {SEVERITY_LABELS[severity]}
+            {T.severityLabels[severity] || SEVERITY_LABELS[severity]}
           </span>
         )}
         {isConcerning && showSevereHighlight && (
@@ -559,7 +561,7 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, is
             className="text-[9px] font-extrabold text-white py-1 px-2.5 rounded-xl uppercase tracking-wide shadow-md"
             style={{ background: `linear-gradient(135deg, ${sevColor.dot} 0%, ${sevColor.text} 100%)` }}
           >
-            {SEVERITY_LABELS[severity]}
+            {T.severityLabels[severity] || SEVERITY_LABELS[severity]}
           </span>
         )}
         {/* Tier badge with tier-specific colors */}
@@ -572,7 +574,7 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, is
               border: `1px solid ${tierColor.border}40`
             }}
           >
-            {value}
+            {T.tiers[value] || value}
           </span>
         ) : (
           <span
@@ -600,7 +602,7 @@ const SubSectionHeader = ({ title }) => (
 );
 
 // Section Component - Matches DriverPreviewModal with collapsible sections
-const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSectionTitle, subMetrics, additionalSubSections, expandedSections, toggleSection, onOpenMetricModal }) => {
+const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSectionTitle, subMetrics, additionalSubSections, expandedSections, toggleSection, onOpenMetricModal, lang = 'en', T = tScorecard('en') }) => {
   const isOpen = expandedSections[id];
   const sev = defaultSev || 'great';
   const sevColor = SEVERITY_COLORS[sev];
@@ -650,13 +652,13 @@ const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSe
       {isOpen && (
         <div className="bg-white rounded-b-[14px] border border-slate-200 border-t-0 overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
           {metrics?.map(({ key, value, label, type }) => (
-            <MetricRow key={key} metricKey={key} value={value} label={label} isTier={type === 'tier'} onOpenMetricModal={onOpenMetricModal} />
+            <MetricRow key={key} metricKey={key} value={value} label={label} isTier={type === 'tier'} onOpenMetricModal={onOpenMetricModal} lang={lang} T={T} />
           ))}
           {subSection && subMetrics?.length > 0 && (
             <>
               <SubSectionHeader title={subSectionTitle || subSection} />
               {subMetrics.map(({ key, value, label }) => (
-                <MetricRow key={key} metricKey={key} value={value} label={label} indent onOpenMetricModal={onOpenMetricModal} />
+                <MetricRow key={key} metricKey={key} value={value} label={label} indent onOpenMetricModal={onOpenMetricModal} lang={lang} T={T} />
               ))}
             </>
           )}
@@ -665,7 +667,7 @@ const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSe
               <div key={idx}>
                 <SubSectionHeader title={sub.title} />
                 {sub.metrics.map(({ key, value, label }) => (
-                  <MetricRow key={key} metricKey={key} value={value} label={label} indent onOpenMetricModal={onOpenMetricModal} />
+                  <MetricRow key={key} metricKey={key} value={value} label={label} indent onOpenMetricModal={onOpenMetricModal} lang={lang} T={T} />
                 ))}
               </div>
             )
@@ -754,17 +756,19 @@ const ScorecardView = () => {
   };
 
   if (loading) {
+    const Tload = tScorecard('en');
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
-          <p className="text-sm text-slate-500">Loading scorecard...</p>
+          <p className="text-sm text-slate-500">{Tload.loadingScorecard}</p>
         </div>
       </div>
     );
   }
 
   if (error) {
+    const Terr = tScorecard('en');
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4 text-center max-w-md px-4">
@@ -773,14 +777,14 @@ const ScorecardView = () => {
           </div>
           <h2 className="text-xl font-semibold text-slate-800">{error}</h2>
           <p className="text-sm text-slate-500">
-            This scorecard link may have expired or is invalid.
+            {Terr.scorecardExpired}
           </p>
           <Link
             to="/"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-slate-800 text-white hover:bg-slate-900 transition-colors"
           >
             <ArrowLeft size={16} />
-            Go Home
+            {Terr.goHome}
           </Link>
         </div>
       </div>
@@ -788,6 +792,8 @@ const ScorecardView = () => {
   }
 
   const { driver, dsp, metrics } = scorecard;
+  const lang = scorecard?.dsp?.language || 'en';
+  const T = tScorecard(lang);
   const standing = metrics?.overallStanding || metrics?.tier || 'N/A';
   const packages = parseInt(metrics?.packagesDelivered) || 0;
   const rank = scorecard.rank;
@@ -884,21 +890,21 @@ const ScorecardView = () => {
               <div className="grid grid-cols-3 gap-2.5">
                 {[
                   {
-                    l: 'Rank',
+                    l: T.rank,
                     v: rank ? `#${rank}` : '-',
                     sub: rankedCount ? `of ${rankedCount}` : '',
                     accent: '#A5B4FC'
                   },
                   {
-                    l: 'Score',
+                    l: T.score,
                     v: score ? score.toFixed(1) : '-',
-                    sub: 'out of 100',
+                    sub: T.outOf100,
                     accent: score >= 80 ? '#6EE7B7' : score >= 50 ? '#FCD34D' : '#FCA5A5'
                   },
                   {
-                    l: 'Packages',
+                    l: T.packages,
                     v: packages || '-',
-                    sub: 'delivered',
+                    sub: T.delivered,
                     accent: '#C4B5FD'
                   }
                 ].map((x, i) => (
@@ -924,8 +930,8 @@ const ScorecardView = () => {
           {/* View Tabs */}
           <div className="flex bg-slate-100 rounded-xl p-1 mb-4 border border-black/5 ">
             {[
-              { id: 'current', l: 'Current Week', icon: '📊' },
-              { id: 'trailing', l: '6-Week Trailing', icon: '📈' }
+              { id: 'current', l: T.currentWeek, icon: '📊' },
+              { id: 'trailing', l: T.trailingWeeks, icon: '📈' }
             ].map(x => (
               <button
                 key={x.id}
@@ -957,7 +963,7 @@ const ScorecardView = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-bold text-indigo-700 uppercase tracking-wide mb-1.5">
-                  Note from your DSP
+                  {T.noteFromDsp}
                 </div>
                 {scorecard.dspNote && (
                   <div className="text-[13px] text-slate-700 leading-relaxed">
@@ -972,7 +978,7 @@ const ScorecardView = () => {
                     className="inline-flex items-center gap-2 mt-2.5 px-3 py-2 bg-white rounded-lg border border-indigo-200 text-sm font-medium text-indigo-600 hover:bg-indigo-50 transition-colors shadow-sm"
                   >
                     <Paperclip size={14} />
-                    View Attachment
+                    {T.viewAttachment}
                   </a>
                 )}
               </div>
@@ -988,10 +994,10 @@ const ScorecardView = () => {
             </div>
             <div>
               <div className="text-[13px] font-bold text-indigo-800">
-                6-Week Trailing Averages
+                {T.trailingNoticeTitle}
               </div>
               <div className="text-[11px] text-indigo-600 mt-0.5">
-                Showing averaged metrics from the past 6 weeks
+                {T.trailingNoticeBody}
               </div>
             </div>
           </div>
@@ -1001,48 +1007,54 @@ const ScorecardView = () => {
         {categories.isTrailing && categories.overall?.length > 0 && (
           <Section
             id="overall"
-            title="Overall Performance"
+            title={T.overallPerformance}
             icon={Star}
             metrics={categories.overall}
             defaultSev="great"
             expandedSections={expandedSections}
             toggleSection={toggleSection}
             onOpenMetricModal={setMetricModal}
+            lang={lang}
+            T={T}
           />
         )}
 
         {/* Safety Section */}
         <Section
           id="safety"
-          title="Driving Safety"
+          title={T.drivingSafety}
           icon={Shield}
           metrics={categories.safety}
           defaultSev="fantastic"
           subSection={!categories.isTrailing && categories.ppsBreakdown?.length > 0}
-          subSectionTitle="PPS Non-Compliance Breakdown"
+          subSectionTitle={T.ppsBreakdown}
           subMetrics={categories.ppsBreakdown}
           additionalSubSections={!categories.isTrailing && categories.safetyEvents?.length > 0
-            ? [{ title: 'Events (Per 100 Deliveries)', metrics: categories.safetyEvents }]
+            ? [{ title: T.eventsPerHundred, metrics: categories.safetyEvents }]
             : undefined
           }
           expandedSections={expandedSections}
           toggleSection={toggleSection}
           onOpenMetricModal={setMetricModal}
+          lang={lang}
+          T={T}
         />
 
         {/* Delivery Section */}
         <Section
           id="delivery"
-          title="Delivery Quality"
+          title={T.deliveryQuality}
           icon={Package}
           metrics={categories.delivery}
           defaultSev="great"
           subSection={!categories.isTrailing && categories.podBreakdown?.length > 0}
-          subSectionTitle="Photo-On-Delivery Rejects"
+          subSectionTitle={T.podRejectsBreakdown}
           subMetrics={categories.podBreakdown}
           expandedSections={expandedSections}
           toggleSection={toggleSection}
           onOpenMetricModal={setMetricModal}
+          lang={lang}
+          T={T}
         />
 
         {/* Customer Feedback Section */}
@@ -1059,7 +1071,7 @@ const ScorecardView = () => {
                 <div className="w-8 h-8 rounded-lg bg-linear-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-md">
                   <MessageCircle size={16} className="text-white" />
                 </div>
-                <span className="text-sm font-bold text-orange-700">Customer Feedback</span>
+                <span className="text-sm font-bold text-orange-700">{T.customerFeedback}</span>
                 <span className="text-[10px] font-bold text-white py-0.5 px-2 rounded-lg bg-orange-500">
                   {(categories.customer?.length || 0) + (categories.customerFeedbackBreakdown?.length || 0)}
                 </span>
@@ -1072,11 +1084,11 @@ const ScorecardView = () => {
             {expandedSections.customer && (
               <div className="bg-white rounded-b-[14px] border border-slate-200 border-t-0 overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
                 {categories.customer?.map(({ key, value, label, type }) => (
-                  <MetricRow key={key} metricKey={key} value={value} label={label} isTier={type === 'tier'} onOpenMetricModal={setMetricModal} />
+                  <MetricRow key={key} metricKey={key} value={value} label={label} isTier={type === 'tier'} onOpenMetricModal={setMetricModal} lang={lang} T={T} />
                 ))}
                 {!categories.isTrailing && categories.customerFeedbackBreakdown?.length > 0 && (
                   <>
-                    <SubSectionHeader title="Negative Feedback Breakdown" />
+                    <SubSectionHeader title={T.negativeFeedbackBreakdown} />
                     {categories.customerFeedbackBreakdown.map((category) => (
                       <FeedbackCategoryRow
                         key={category.key}
@@ -1095,16 +1107,18 @@ const ScorecardView = () => {
         {!categories.isTrailing && (categories.dvic?.length > 0 || categories.dvicTimes?.length > 0) && (
           <Section
             id="dvic"
-            title="Vehicle Inspection Times (DVIC)"
+            title={T.vehicleInspection}
             icon={Wrench}
             metrics={categories.dvic}
             defaultSev="great"
             subSection={categories.dvicTimes?.length > 0}
-            subSectionTitle="Inspection Times"
+            subSectionTitle={T.inspectionTimes}
             subMetrics={categories.dvicTimes}
             expandedSections={expandedSections}
             toggleSection={toggleSection}
             onOpenMetricModal={setMetricModal}
+            lang={lang}
+            T={T}
           />
         )}
 
@@ -1112,13 +1126,15 @@ const ScorecardView = () => {
         {categories.isTrailing && categories.standing?.length > 0 && (
           <Section
             id="standing"
-            title="Overall Standing"
+            title={T.overallStanding}
             icon={Trophy}
             metrics={categories.standing}
             defaultSev="fantastic"
             expandedSections={expandedSections}
             toggleSection={toggleSection}
             onOpenMetricModal={setMetricModal}
+            lang={lang}
+            T={T}
           />
         )}
 
@@ -1187,7 +1203,7 @@ const ScorecardView = () => {
                   <div className="w-8 h-8 rounded-lg bg-linear-to-br from-red-500 to-red-600 flex items-center justify-center shadow-md">
                     <ShieldAlert size={16} className="text-white" />
                   </div>
-                  <span className="text-sm font-bold text-red-700">Driver Safety Events</span>
+                  <span className="text-sm font-bold text-red-700">{T.driverSafetyEvents}</span>
                   <span className="text-[10px] font-bold text-white py-0.5 px-2 rounded-lg bg-red-500">
                     {eventTypes.reduce((sum, t) => sum + t.count, 0)}
                   </span>
@@ -1220,7 +1236,7 @@ const ScorecardView = () => {
                 <Lightbulb size={16} className="text-white" />
               </div>
               <span className="text-sm font-bold text-white">
-                AI Feedback to Improve
+                {T.aiFeedback}
               </span>
               <Sparkles size={14} className="text-white/80" />
             </div>
@@ -1256,17 +1272,17 @@ const ScorecardView = () => {
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-bold text-emerald-800">
-                    Scorecard Acknowledged
+                    {T.scorecardAcknowledged}
                   </div>
                   <div className="text-xs text-emerald-600 mt-0.5">
-                    Confirmed on {new Date(scorecard.acknowledgedAt).toLocaleDateString('en-US', {
+                    {T.confirmedOn(new Date(scorecard.acknowledgedAt).toLocaleDateString(lang === 'es' ? 'es-US' : 'en-US', {
                       weekday: 'long',
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
-                    })}
+                    }))}
                   </div>
                 </div>
               </div>
@@ -1293,10 +1309,10 @@ const ScorecardView = () => {
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-semibold text-amber-900 group-hover:text-amber-950 transition-colors">
-                    I acknowledge that I have thoroughly reviewed this scorecard
+                    {T.acknowledgeTitle}
                   </div>
                   <div className="text-xs text-amber-700 mt-1">
-                    By checking this box, you confirm that you have read and understood all performance metrics and feedback provided in this scorecard.
+                    {T.acknowledgeBody}
                   </div>
                 </div>
               </button>
@@ -1314,11 +1330,11 @@ const ScorecardView = () => {
         <div className="text-center pt-4 pb-6">
           <div className="text-[10px] text-slate-400 font-medium flex items-center justify-center gap-2">
             <span className="w-1 h-1 rounded-full bg-linear-to-r from-indigo-500 to-violet-500" />
-            Tap any metric for details
+            {T.tapForDetails}
             <span className="w-1 h-1 rounded-full bg-linear-to-r from-indigo-500 to-violet-500" />
           </div>
           <div className="text-[11px] mt-1.5 text-gradient-brand font-bold tracking-wide">
-            Powered by DiveMetric Analytics
+            {T.poweredBy}
           </div>
         </div>
         </div>
@@ -1329,6 +1345,7 @@ const ScorecardView = () => {
         <MetricDetailModal
           data={metricModal}
           onClose={() => setMetricModal(null)}
+          T={T}
         />
       )}
 
@@ -1337,6 +1354,7 @@ const ScorecardView = () => {
         <FeedbackDetailModal
           data={feedbackModal}
           onClose={() => setFeedbackModal(null)}
+          T={T}
         />
       )}
 
@@ -1345,6 +1363,7 @@ const ScorecardView = () => {
         <SafetyEventDetailModal
           data={safetyEventModal}
           onClose={() => setSafetyEventModal(null)}
+          T={T}
         />
       )}
     </div>

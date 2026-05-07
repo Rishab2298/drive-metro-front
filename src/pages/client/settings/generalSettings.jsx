@@ -26,6 +26,11 @@ import { PhoneInput, countries } from '@/components/ui/phone-input';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
 
+const languages = [
+  { value: 'en', label: 'English' },
+  { value: 'es', label: 'Español (Spanish)' },
+];
+
 const timezones = [
   { value: 'America/New_York', label: 'Eastern Time (ET)', offset: 'UTC-5' },
   { value: 'America/Chicago', label: 'Central Time (CT)', offset: 'UTC-6' },
@@ -74,6 +79,7 @@ const GeneralSettings = () => {
     phoneNumber: '',
     countryCode: 'US',
     timezone: 'America/Los_Angeles',
+    language: 'en',
   });
 
   // Track if form has been modified
@@ -108,6 +114,7 @@ const GeneralSettings = () => {
           phoneNumber: phoneNumber,
           countryCode: countryCode,
           timezone: data.timezone || 'America/Los_Angeles',
+          language: data.language || 'en',
         });
       } catch (err) {
         console.error('Error fetching DSP data:', err);
@@ -152,6 +159,7 @@ const GeneralSettings = () => {
           contactEmail: form.contactEmail,
           phoneNumber: fullPhoneNumber,
           timezone: form.timezone,
+          language: form.language,
         }),
       });
 
@@ -375,6 +383,35 @@ const GeneralSettings = () => {
                         <span>{tz.label}</span>
                         <span className="text-xs text-slate-400 font-mono">{tz.offset}</span>
                       </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Driver Scorecard Language */}
+          <div className="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+            <h3 className="text-base font-semibold text-foreground mb-1 flex items-center gap-2">
+              <Globe className="w-4 h-4 text-neutral-500" />
+              Driver Scorecard Language
+            </h3>
+            <p className="text-sm text-muted-foreground mb-5">
+              Scorecards, emails, and SMS messages sent to drivers will use this language.
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="language">Language</Label>
+              <Select
+                value={form.language}
+                onValueChange={(value) => handleFormChange('language', value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a language" />
+                </SelectTrigger>
+                <SelectContent>
+                  {languages.map((lang) => (
+                    <SelectItem key={lang.value} value={lang.value} className="py-2.5">
+                      {lang.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
