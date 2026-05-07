@@ -1,35 +1,94 @@
 // Dropdown Component
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
 export const Dropdown = ({ trigger, children, align = 'right', forceOpen = false }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [menuStyle, setMenuStyle] = useState({});
+  const triggerRef = useRef(null);
   const effectiveOpen = isOpen || forceOpen;
 
+  useEffect(() => {
+    if (!effectiveOpen || !triggerRef.current) return;
+
+    const rect = triggerRef.current.getBoundingClientRect();
+    const menuWidth = 192; // w-48 = 12rem = 192px
+    const menuHeight = 140; // approximate
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const openUpward = spaceBelow < menuHeight + 8 && rect.top > menuHeight + 8;
+
+    const top = openUpward
+      ? rect.top - menuHeight - 8
+      : rect.bottom + 8;
+
+    const right = align === 'right'
+      ? window.innerWidth - rect.right
+      : undefined;
+    const left = align === 'left'
+      ? rect.left
+      : undefined;
+
+    setMenuStyle({ top, right, left, position: 'fixed', width: menuWidth });
+  }, [effectiveOpen, align]);
+
+  // Recalculate on scroll/resize
+  useEffect(() => {
+    if (!effectiveOpen) return;
+    const update = () => {
+      if (!triggerRef.current) return;
+      const rect = triggerRef.current.getBoundingClientRect();
+      const menuWidth = 192;
+      const menuHeight = 140;
+      const viewportHeight = window.innerHeight;
+      const spaceBelow = viewportHeight - rect.bottom;
+      const openUpward = spaceBelow < menuHeight + 8 && rect.top > menuHeight + 8;
+
+      const top = openUpward
+        ? rect.top - menuHeight - 8
+        : rect.bottom + 8;
+
+      const right = align === 'right' ? window.innerWidth - rect.right : undefined;
+      const left = align === 'left' ? rect.left : undefined;
+
+      setMenuStyle({ top, right, left, position: 'fixed', width: menuWidth });
+    };
+
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
+  }, [effectiveOpen, align]);
+
+  const menu = effectiveOpen ? (
+    <>
+      {!forceOpen && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+      <div
+        style={menuStyle}
+        className={cn(
+          'rounded-xl bg-white dark:bg-neutral-900 shadow-lg border border-neutral-200 dark:border-neutral-700 py-1 overflow-hidden',
+          forceOpen ? 'z-[200]' : 'z-50'
+        )}
+      >
+        {typeof children === 'function' ? children(() => setIsOpen(false)) : children}
+      </div>
+    </>
+  ) : null;
+
   return (
-    <div className="relative">
+    <div className="relative" ref={triggerRef}>
       <div onClick={() => setIsOpen(!isOpen)}>
         {trigger}
       </div>
-      {effectiveOpen && (
-        <>
-          {!forceOpen && (
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setIsOpen(false)}
-            />
-          )}
-          <div
-            className={cn(
-              'absolute mt-2 w-48 rounded-xl bg-white dark:bg-neutral-900 shadow-lg border border-neutral-200 dark:border-neutral-700 py-1 overflow-hidden',
-              forceOpen ? 'z-[200]' : 'z-50',
-              align === 'right' ? 'right-0' : 'left-0'
-            )}
-          >
-            {typeof children === 'function' ? children(() => setIsOpen(false)) : children}
-          </div>
-        </>
-      )}
+      {createPortal(menu, document.body)}
     </div>
   );
 };
