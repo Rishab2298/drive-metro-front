@@ -36,7 +36,7 @@ import {
   formatValue,
   formatLabel,
 } from '@/utils/scorecardUtils';
-import { tScorecard, METRIC_LABELS_ES } from '@/utils/scorecardTranslations';
+import { tScorecard, METRIC_LABELS_ES, METRIC_EXPLANATIONS_ES } from '@/utils/scorecardTranslations';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
 
@@ -71,19 +71,22 @@ const useAntiScraping = () => {
 };
 
 // Metric Detail Modal - Matches DriverPreviewModal style
-const MetricDetailModal = ({ data, onClose, T = tScorecard('en') }) => {
+const MetricDetailModal = ({ data, onClose, T = tScorecard('en'), lang = 'en' }) => {
   const getExplanation = (key) => {
     const keyLower = key.toLowerCase();
-    for (const [explKey, expl] of Object.entries(METRIC_EXPLANATIONS)) {
+    const sourceEn = METRIC_EXPLANATIONS;
+    const sourceEs = METRIC_EXPLANATIONS_ES;
+
+    for (const [explKey, expl] of Object.entries(sourceEn)) {
       if (keyLower.includes(explKey.toLowerCase()) || explKey.toLowerCase().includes(keyLower)) {
-        return expl;
+        return lang === 'es' ? (sourceEs[explKey] || expl) : expl;
       }
     }
     return {
       title: formatLabel(key),
-      desc: `Metric tracking ${formatLabel(key).toLowerCase()} performance.`,
-      calc: 'Calculated based on collected data.',
-      tips: ['Focus on improvement', 'Review weekly']
+      desc: lang === 'es' ? `Métrica de desempeño: ${formatLabel(key).toLowerCase()}.` : `Metric tracking ${formatLabel(key).toLowerCase()} performance.`,
+      calc: lang === 'es' ? 'Calculado en base a los datos recopilados.' : 'Calculated based on collected data.',
+      tips: lang === 'es' ? ['Enfócate en mejorar', 'Revisa semanalmente'] : ['Focus on improvement', 'Review weekly'],
     };
   };
 
@@ -1346,6 +1349,7 @@ const ScorecardView = () => {
           data={metricModal}
           onClose={() => setMetricModal(null)}
           T={T}
+          lang={lang}
         />
       )}
 
