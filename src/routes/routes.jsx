@@ -37,6 +37,7 @@ const NewFeaturesPage = lazy(() => import("../pages/public/Features"));
 const NewAIFeaturesPage = lazy(() => import("../pages/public/AICoaching"));
 const NewPricingPage = lazy(() => import("../pages/public/Pricing"));
 const NewFAQPage = lazy(() => import("../pages/public/FAQ"));
+const UploadsDashboard = lazy(() => import("../pages/super-admin/UploadsDashboard"));
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -84,6 +85,7 @@ const routeConfig = [
   { path: "/ai-features", component: NewAIFeaturesPage, wrapper: PublicRoute },
   { path: "/pricing", component: NewPricingPage, wrapper: PublicRoute },
   { path: "/faq", component: NewFAQPage, wrapper: PublicRoute },
+  { path: "/super-admin/uploads", component: UploadsDashboard, wrapper: ProtectedRoute },
 ];
 
 export const router = createBrowserRouter(

@@ -20,6 +20,11 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/sign-in" replace />;
   }
 
+  // Super-admin paths skip onboarding/role checks (auth enforced by backend)
+  if (location.pathname.startsWith("/super-admin/")) {
+    return children;
+  }
+
   // Get user metadata
   const publicMetadata = user?.publicMetadata || {};
   const role = publicMetadata.role;
