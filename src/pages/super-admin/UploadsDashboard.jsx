@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@clerk/clerk-react";
-import { useTheme } from "@/components/theme-provider";
+import { useTheme } from "next-themes";
 import {
   Search,
   ChevronLeft,
