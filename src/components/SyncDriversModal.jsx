@@ -24,13 +24,43 @@ import { Label } from '@/components/ui/label';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
 
+// NOTE: Keep in sync with backend/utils/phone-formatter.js (dialCodes)
+// and frontend/src/components/ui/phone-input.jsx (countries)
 const COUNTRIES = [
+  // North America
   { code: 'US', name: 'United States', dialCode: '+1', flag: '\u{1F1FA}\u{1F1F8}' },
   { code: 'CA', name: 'Canada', dialCode: '+1', flag: '\u{1F1E8}\u{1F1E6}' },
   { code: 'MX', name: 'Mexico', dialCode: '+52', flag: '\u{1F1F2}\u{1F1FD}' },
+  // Europe
   { code: 'GB', name: 'United Kingdom', dialCode: '+44', flag: '\u{1F1EC}\u{1F1E7}' },
   { code: 'DE', name: 'Germany', dialCode: '+49', flag: '\u{1F1E9}\u{1F1EA}' },
   { code: 'FR', name: 'France', dialCode: '+33', flag: '\u{1F1EB}\u{1F1F7}' },
+  { code: 'IT', name: 'Italy', dialCode: '+39', flag: '\u{1F1EE}\u{1F1F9}' },
+  { code: 'ES', name: 'Spain', dialCode: '+34', flag: '\u{1F1EA}\u{1F1F8}' },
+  { code: 'NL', name: 'Netherlands', dialCode: '+31', flag: '\u{1F1F3}\u{1F1F1}' },
+  { code: 'BE', name: 'Belgium', dialCode: '+32', flag: '\u{1F1E7}\u{1F1EA}' },
+  { code: 'CH', name: 'Switzerland', dialCode: '+41', flag: '\u{1F1E8}\u{1F1ED}' },
+  { code: 'AT', name: 'Austria', dialCode: '+43', flag: '\u{1F1E6}\u{1F1F9}' },
+  { code: 'SE', name: 'Sweden', dialCode: '+46', flag: '\u{1F1F8}\u{1F1EA}' },
+  { code: 'NO', name: 'Norway', dialCode: '+47', flag: '\u{1F1F3}\u{1F1F4}' },
+  { code: 'DK', name: 'Denmark', dialCode: '+45', flag: '\u{1F1E9}\u{1F1F0}' },
+  { code: 'FI', name: 'Finland', dialCode: '+358', flag: '\u{1F1EB}\u{1F1EE}' },
+  { code: 'IE', name: 'Ireland', dialCode: '+353', flag: '\u{1F1EE}\u{1F1EA}' },
+  { code: 'PT', name: 'Portugal', dialCode: '+351', flag: '\u{1F1F5}\u{1F1F9}' },
+  { code: 'PL', name: 'Poland', dialCode: '+48', flag: '\u{1F1F5}\u{1F1F1}' },
+  { code: 'CZ', name: 'Czech Republic', dialCode: '+420', flag: '\u{1F1E8}\u{1F1FF}' },
+  { code: 'RO', name: 'Romania', dialCode: '+40', flag: '\u{1F1F7}\u{1F1F4}' },
+  { code: 'HU', name: 'Hungary', dialCode: '+36', flag: '\u{1F1ED}\u{1F1FA}' },
+  { code: 'GR', name: 'Greece', dialCode: '+30', flag: '\u{1F1EC}\u{1F1F7}' },
+  { code: 'HR', name: 'Croatia', dialCode: '+385', flag: '\u{1F1ED}\u{1F1F7}' },
+  { code: 'BG', name: 'Bulgaria', dialCode: '+359', flag: '\u{1F1E7}\u{1F1EC}' },
+  { code: 'SK', name: 'Slovakia', dialCode: '+421', flag: '\u{1F1F8}\u{1F1F0}' },
+  { code: 'SI', name: 'Slovenia', dialCode: '+386', flag: '\u{1F1F8}\u{1F1EE}' },
+  { code: 'LT', name: 'Lithuania', dialCode: '+370', flag: '\u{1F1F1}\u{1F1F9}' },
+  { code: 'LV', name: 'Latvia', dialCode: '+371', flag: '\u{1F1F1}\u{1F1FB}' },
+  { code: 'EE', name: 'Estonia', dialCode: '+372', flag: '\u{1F1EA}\u{1F1EA}' },
+  { code: 'LU', name: 'Luxembourg', dialCode: '+352', flag: '\u{1F1F1}\u{1F1FA}' },
+  // Asia Pacific
   { code: 'AU', name: 'Australia', dialCode: '+61', flag: '\u{1F1E6}\u{1F1FA}' },
   { code: 'IN', name: 'India', dialCode: '+91', flag: '\u{1F1EE}\u{1F1F3}' },
 ];
