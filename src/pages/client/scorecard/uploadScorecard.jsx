@@ -10,7 +10,50 @@ import { Upload, CheckCircle2, FileStack, Zap, Star, ChevronDown, Loader2, Lock,
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004';
 
-const getDocumentConfigs = (region = 'US') => [
+const getEuDocumentConfigs = () => [
+  {
+    id: 'scorecard',
+    title: 'DSP Scorecard',
+    description: 'Weekly performance scorecard PDF (EU format)',
+    metricsIncluded: 'Driver-level DCR, DSC DPMO, LoR DPMO, POD, Contact Compliance, Customer Escalations, and CDF DPMO.',
+    acceptedFileTypes: ['pdf'],
+    exampleFileName: 'EU_IRDS_DCZ3_Week21_2026_en_DSPScorecard.pdf',
+    required: true,
+    premium: false,
+  },
+  {
+    id: 'weekly-overview',
+    title: 'Weekly Overview Report',
+    description: 'DSP Overview Dashboard export with EU driver metrics',
+    metricsIncluded: 'DCR, DNR DPMO, DSC DPMO, LOR DPMO, SWC-POD, SWC-CC, CE, CDF, DNR, Packages Delivered',
+    acceptedFileTypes: ['csv'],
+    exampleFileName: 'DSP_Overview_Dashboard_IRDS_DCZ3_2026-W20.csv',
+    required: false,
+    premium: false,
+  },
+  {
+    id: 'pod-quality',
+    title: 'POD Quality Report',
+    description: 'Photo on Delivery quality metrics (EU format)',
+    metricsIncluded: 'POD opportunities, success, bypass, rejects, and reject category breakdown per driver.',
+    acceptedFileTypes: ['pdf'],
+    exampleFileName: 'EU-IRDS-DCZ3-Week21-2026NA-DA-POD-Details.pdf',
+    required: false,
+    premium: false,
+  },
+  {
+    id: 'negative-feedback',
+    title: 'Delivery Performance Report',
+    description: 'Daily delivery metrics per driver (EU format)',
+    metricsIncluded: 'Daily Packages Delivered, Routes Completed, DCR, SWC-POD, and DNR per driver.',
+    acceptedFileTypes: ['csv'],
+    exampleFileName: 'DSP_Customer_Delivery_Feedback_negative_DCZ3_2026-W21.csv',
+    required: false,
+    premium: false,
+  },
+];
+
+const getUsDocumentConfigs = (region = 'US') => [
   {
     id: 'scorecard',
     title: 'DSP Scorecard',
@@ -104,6 +147,13 @@ const getDocumentConfigs = (region = 'US') => [
     premium: true,
   },
 ];
+
+const getDocumentConfigs = (region = 'US') => {
+  if (region === 'EU') {
+    return getEuDocumentConfigs();
+  }
+  return getUsDocumentConfigs(region);
+};
 
 const CollapsibleSection = ({
   title,

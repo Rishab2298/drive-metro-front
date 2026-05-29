@@ -12,6 +12,7 @@ import {
   Users,
   UserPlus,
   UserCheck,
+  Download,
 } from 'lucide-react';
 import {
   Select,
@@ -64,6 +65,38 @@ const COUNTRIES = [
   { code: 'AU', name: 'Australia', dialCode: '+61', flag: '\u{1F1E6}\u{1F1FA}' },
   { code: 'IN', name: 'India', dialCode: '+91', flag: '\u{1F1EE}\u{1F1F3}' },
 ];
+
+function downloadSampleCsv() {
+  const headers = [
+    'Name and ID',
+    'TransporterID',
+    'Position',
+    'Qualifications',
+    'ID expiration',
+    'Personal Phone Number',
+    'Work Phone Number',
+    'Email',
+    'Status',
+  ];
+  const sampleRows = [
+    ['John Smith', 'A1B2C3D4E5F6G7', 'DA', 'Class C', '2027-06-15', '5551234567', '', 'john.smith@email.com', 'Active'],
+    ['Jane Doe', 'H8I9J0K1L2M3N4', 'DA', 'Class C', '2027-09-20', '5559876543', '', 'jane.doe@email.com', 'Active'],
+    ['Mike Johnson', 'O5P6Q7R8S9T0U1', 'DA', '', '2026-12-01', '5555551234', '', '', 'Inactive'],
+  ];
+
+  const csvContent = [
+    headers.join(','),
+    ...sampleRows.map(row => row.map(v => `"${v}"`).join(',')),
+  ].join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'AssociateData_Sample.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export default function SyncDriversModal({ isOpen, onClose, onSyncComplete }) {
   const { getToken } = useAuth();
@@ -439,9 +472,18 @@ export default function SyncDriversModal({ isOpen, onClose, onSyncComplete }) {
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Supports Cortex 2.0 (AssociateData.csv) and Cortex 1.0 (Associate Data.csv)
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    Supports Cortex 2.0 (AssociateData.csv) and Cortex 1.0 (Associate Data.csv)
+                  </p>
+                  <button
+                    onClick={downloadSampleCsv}
+                    className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline shrink-0 ml-2"
+                  >
+                    <Download className="w-3 h-3" />
+                    Sample CSV
+                  </button>
+                </div>
               </div>
 
               {/* Error Message */}

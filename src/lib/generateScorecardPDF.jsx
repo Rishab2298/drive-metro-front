@@ -3,6 +3,7 @@ import { Document, Page, View, Text, Svg, Rect, Defs, LinearGradient, Stop, pdf 
 import {
   categorizeMetrics,
   getSeverityLevel,
+  getEuSeverityLevel,
   getDvicTimeSeverity,
   formatValue,
   formatLabel,
@@ -91,16 +92,16 @@ const FEEDBACK_CATEGORY_KEYS = [
 // ═══════════════════════════════════════════════════════════════════════════
 // METRIC ROW - Refined with better spacing and visual hierarchy
 // ═══════════════════════════════════════════════════════════════════════════
-const MetricRow = ({ metric, indent = false, isLast = false }) => {
+const MetricRow = ({ metric, indent = false, isLast = false, severityFn: resolveSeverity = getSeverityLevel }) => {
   const keyLower = metric.key?.toLowerCase() || '';
   const isDvicTime = keyLower.startsWith('dvictime');
   const isFeedbackCategory = FEEDBACK_CATEGORY_KEYS.includes(keyLower);
 
   const sev = metric.type === 'tier'
-    ? getSeverityLevel('tier', metric.value)
+    ? resolveSeverity('tier', metric.value)
     : (isDvicTime
       ? getDvicTimeSeverity(metric.value)
-      : getSeverityLevel(metric.key, metric.value));
+      : resolveSeverity(metric.key, metric.value));
 
   const isTier = metric.type === 'tier';
 
@@ -228,7 +229,7 @@ const SubHeader = ({ title }) => (
 // ═══════════════════════════════════════════════════════════════════════════
 // METRIC SECTION - Premium card with layered depth
 // ═══════════════════════════════════════════════════════════════════════════
-const MetricSection = ({ title, metrics, subSections, sevKey = 'fantastic' }) => {
+const MetricSection = ({ title, metrics, subSections, sevKey = 'fantastic', severityFn }) => {
   const sevStyles = {
     fantastic: C.sevFantastic,
     great: C.sevGreat,
@@ -309,6 +310,7 @@ const MetricSection = ({ title, metrics, subSections, sevKey = 'fantastic' }) =>
             key={m.key || i}
             metric={m}
             isLast={i === metrics.length - 1 && allSubs.length === 0}
+            severityFn={severityFn}
           />
         ))}
         {allSubs.map((sub, si) => (
@@ -320,6 +322,7 @@ const MetricSection = ({ title, metrics, subSections, sevKey = 'fantastic' }) =>
                 metric={m}
                 indent
                 isLast={si === allSubs.length - 1 && i === sub.items.length - 1}
+                severityFn={severityFn}
               />
             ))}
           </View>
@@ -373,14 +376,15 @@ const StatCard = ({ label, value, subtitle, color, isLast }) => (
 // MAIN SCORECARD DOCUMENT
 // ═══════════════════════════════════════════════════════════════════════════
 const ScorecardDocument = ({ driver, options }) => {
-  const { rank, score, rankedCount, weekNumber, year, dspName, stationCode, aiFeedback } = options;
+  const { rank, score, rankedCount, weekNumber, year, dspName, stationCode, aiFeedback, region = 'US' } = options;
+  const severityFn = region === 'EU' ? getEuSeverityLevel : getSeverityLevel;
 
   const name = getDriverName(driver);
   const standing = driver.overallStanding || driver.tier || '-';
   const pkgs = parseInt(driver.packagesDelivered) || 0;
   const dspNote = driver.dspNote || driver.note || options.dspNote || null;
   const aiFb = aiFeedback || driver.aiFeedback || null;
-  const categories = categorizeMetrics(driver, false, null);
+  const categories = categorizeMetrics(driver, false, null, region);
 
   const scoreColor = score >= 80 ? C.emerald : score >= 50 ? C.amber : '#F87171';
   const initials = (driver.firstName?.[0] || '').toUpperCase() + (driver.lastName?.[0] || '').toUpperCase() || '?';
@@ -571,6 +575,7 @@ const ScorecardDocument = ({ driver, options }) => {
                 { title: 'Events (Per 100 Deliveries)', items: categories.safetyEvents },
               ]}
               sevKey="fantastic"
+              severityFn={severityFn}
             />
             <MetricSection
               title="Customer Feedback"
@@ -579,6 +584,7 @@ const ScorecardDocument = ({ driver, options }) => {
                 { title: 'Negative Categories', items: categories.customerFeedbackBreakdown },
               ]}
               sevKey="fair"
+              severityFn={severityFn}
             />
           </View>
 
@@ -591,6 +597,7 @@ const ScorecardDocument = ({ driver, options }) => {
                 { title: 'POD Rejection Details', items: categories.podBreakdown },
               ]}
               sevKey="great"
+              severityFn={severityFn}
             />
             {(categories.dvic?.length > 0 || categories.dvicTimes?.length > 0) && (
               <MetricSection
@@ -600,6 +607,7 @@ const ScorecardDocument = ({ driver, options }) => {
                   { title: 'Inspection Times', items: categories.dvicTimes },
                 ]}
                 sevKey="great"
+                severityFn={severityFn}
               />
             )}
           </View>
@@ -734,7 +742,9 @@ export const downloadCombinedPDF = async (drivers, options = {}, rankMap = {}) =
         const pkgs = parseInt(driver.packagesDelivered) || 0;
         const dspNote = driver.dspNote || driver.note || opts.dspNote || null;
         const aiFb = opts.aiFeedback || driver.aiFeedback || null;
-        const categories = categorizeMetrics(driver, false, null);
+        const combinedRegion = options.region || 'US';
+        const combinedSeverityFn = combinedRegion === 'EU' ? getEuSeverityLevel : getSeverityLevel;
+        const categories = categorizeMetrics(driver, false, null, combinedRegion);
         const scoreColor = opts.score >= 80 ? C.emerald : opts.score >= 50 ? C.amber : '#F87171';
         const initials = (driver.firstName?.[0] || '').toUpperCase() + (driver.lastName?.[0] || '').toUpperCase() || '?';
         const standingStyle = TIER_STYLES[standing] || TIER_STYLES['N/A'];
@@ -801,13 +811,13 @@ export const downloadCombinedPDF = async (drivers, options = {}, rankMap = {}) =
             {/* Metrics */}
             <View style={{ flexDirection: 'row' }}>
               <View style={{ flex: 1, marginRight: 6 }}>
-                <MetricSection title="Driving Safety" metrics={categories.safety} subSections={[{ title: 'PPS Breakdown', items: categories.ppsBreakdown }, { title: 'Events (Per 100)', items: categories.safetyEvents }]} sevKey="fantastic" />
-                <MetricSection title="Customer Feedback" metrics={categories.customer} subSections={[{ title: 'Negative Categories', items: categories.customerFeedbackBreakdown }]} sevKey="fair" />
+                <MetricSection title="Driving Safety" metrics={categories.safety} subSections={[{ title: 'PPS Breakdown', items: categories.ppsBreakdown }, { title: 'Events (Per 100)', items: categories.safetyEvents }]} sevKey="fantastic" severityFn={combinedSeverityFn} />
+                <MetricSection title="Customer Feedback" metrics={categories.customer} subSections={[{ title: 'Negative Categories', items: categories.customerFeedbackBreakdown }]} sevKey="fair" severityFn={combinedSeverityFn} />
               </View>
               <View style={{ flex: 1 }}>
-                <MetricSection title="Delivery Quality" metrics={categories.delivery} subSections={[{ title: 'POD Rejection Details', items: categories.podBreakdown }]} sevKey="great" />
+                <MetricSection title="Delivery Quality" metrics={categories.delivery} subSections={[{ title: 'POD Rejection Details', items: categories.podBreakdown }]} sevKey="great" severityFn={combinedSeverityFn} />
                 {(categories.dvic?.length > 0 || categories.dvicTimes?.length > 0) && (
-                  <MetricSection title="Vehicle Inspection" metrics={categories.dvic} subSections={[{ title: 'Inspection Times', items: categories.dvicTimes }]} sevKey="great" />
+                  <MetricSection title="Vehicle Inspection" metrics={categories.dvic} subSections={[{ title: 'Inspection Times', items: categories.dvicTimes }]} sevKey="great" severityFn={combinedSeverityFn} />
                 )}
               </View>
             </View>

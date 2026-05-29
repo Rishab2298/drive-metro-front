@@ -67,6 +67,7 @@ export const DriverActionsBar = ({
         weekStart: data?.weekStart,
         weekEnd: data?.weekEnd,
         dspName: data?.dsp?.companyName || data?.dsp?.dspCode,
+        region: data?.dsp?.region || 'US',
       },
       driverRanks
     );
@@ -88,6 +89,7 @@ export const DriverActionsBar = ({
         weekStart: data?.weekStart,
         weekEnd: data?.weekEnd,
         dspName: data?.dsp?.companyName || data?.dsp?.dspCode,
+        region: data?.dsp?.region || 'US',
       },
       driverRanks
     );

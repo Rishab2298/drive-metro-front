@@ -332,6 +332,7 @@ const MasterScorecardDetail = () => {
             weekNumber: data?.weekNumber,
             year: data?.year,
           }}
+          region={data?.dsp?.region || 'US'}
           getToken={getToken}
         />
       )}

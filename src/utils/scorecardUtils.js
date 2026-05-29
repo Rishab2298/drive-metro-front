@@ -177,6 +177,42 @@ export const KEY_METRICS = {
   ],
 };
 
+// EU-specific KEY METRICS (different metric structure from US)
+export const EU_KEY_METRICS = {
+  delivery: [
+    { key: 'deliveryCompletionRate', label: 'Delivery Completion Rate (DCR)', format: 'percent' },
+    { key: 'dscDpmo', label: 'Delivery Success Conditions (DSC DPMO)' },
+    { key: 'lorDpmo', label: 'Lost on Road (LoR DPMO)' },
+    { key: 'podAcceptanceRate', label: 'Photo-On-Delivery (POD)', format: 'percent' },
+    { key: 'contactCompliance', label: 'Contact Compliance (CC)', format: 'percent' },
+    { key: 'packagesDelivered', label: 'Total Packages Delivered' },
+  ],
+  customer: [
+    { key: 'customerEscalationDefect', label: 'Customer Escalations (CE)' },
+    { key: 'cdfDpmo', label: 'Customer Delivery Feedback (CDF DPMO)' },
+  ],
+  podRejectsBreakdown: [
+    { key: 'podRejectsBreakdown_blurryPhoto', label: 'Blurry Photo' },
+    { key: 'podRejectsBreakdown_noPackageDetected', label: 'No Package Detected' },
+    { key: 'podRejectsBreakdown_packageInCar', label: 'Package In Car' },
+    { key: 'podRejectsBreakdown_packageTooClose', label: 'Package Too Close' },
+    { key: 'podRejectsBreakdown_photoTooDark', label: 'Photo Too Dark' },
+  ],
+  standing: ['overallStanding', 'tier'],
+};
+
+// EU Performance Standards — Target and Minimum thresholds from EU scorecard page 6
+// Used for severity highlighting: >= target = fantastic, >= minimum = fair, < minimum = poor
+export const EU_METRIC_THRESHOLDS = {
+  deliveryCompletionRate: { target: 98.75, minimum: 97, higherIsBetter: true },
+  dscDpmo: { target: 770, minimum: 1260, higherIsBetter: false },
+  lorDpmo: { target: 35, minimum: 110, higherIsBetter: false },
+  podAcceptanceRate: { target: 95, minimum: 92, higherIsBetter: true },
+  contactCompliance: { target: 98, minimum: 95, higherIsBetter: true },
+  customerEscalationDefect: { target: 0, minimum: 135, higherIsBetter: false },
+  cdfDpmo: { target: 4420, minimum: 6120, higherIsBetter: false },
+};
+
 // Metric explanations database (based on Amazon DSP scorecard documentation)
 export const METRIC_EXPLANATIONS = {
   ficoScore: {
@@ -341,6 +377,25 @@ export const METRIC_EXPLANATIONS = {
     desc: "Customer reported receiving someone else's package. This occurs when packages are mixed up or delivered to the wrong customer.",
     calc: "Count of customer reports for this category. Target: 0",
     tips: ["Double-check tracking ID before delivery", "Don't deliver multiple customers' packages at once", "Verify package matches delivery address"]
+  },
+  // EU-specific metric explanations
+  dscDpmo: {
+    title: "Delivery Success Conditions (DSC DPMO)",
+    desc: "The number of packages delivered but not received (DNR) by customers where concessions fall into root-cause buckets: delivered to household member, receptionist, neighbor, >25m from location, unattended without POD, not following preferences, or simultaneous group stop.",
+    calc: "Defects per Million Opportunities. Target: ≤770 DPMO for Fantastic",
+    tips: ["Follow customer delivery preferences", "Always take POD for unattended deliveries", "Avoid using simultaneous group stop function"]
+  },
+  lorDpmo: {
+    title: "Lost on Road (LoR DPMO)",
+    desc: "The number of packages dispatched to drivers but not delivered to the customer and not returned to the station, on a per million opportunities / dispatched (DPMO) basis.",
+    calc: "Defects per Million Opportunities. Target: ≤35 DPMO for Fantastic",
+    tips: ["Account for all packages at end of route", "Return undelivered packages to station", "Secure packages in vehicle to prevent loss"]
+  },
+  contactCompliance: {
+    title: "Contact Compliance (CC)",
+    desc: "The count of all calls and texts made by a driver through the Amazon Flex app vs the total packages delivered with a call or text, as well as packages not delivered due to UTA, UTL, or NSL reasons.",
+    calc: "(Compliant contacts ÷ Total required contacts) × 100. Target: ≥98% for Fantastic",
+    tips: ["Always use the Flex app for customer contact", "Call or text before marking unable to deliver", "Follow contact protocol for every delivery attempt"]
   }
 };
 
@@ -418,6 +473,10 @@ export const METRIC_DISPLAY_NAMES = {
   ppsDidNotShiftGearToPark: 'Did Not Shift Gear to Park',
   pawPrintComplianceRate: 'Paw Print Notification Rate',
   tier: 'Performance Tier',
+  // EU-specific metric names
+  dscDpmo: 'Delivery Success Conditions (DSC DPMO)',
+  lorDpmo: 'Lost on Road (LoR DPMO)',
+  contactCompliance: 'Contact Compliance',
 };
 
 // Reverse key map for fallbacks
@@ -693,6 +752,40 @@ export const getSeverityLevel = (key, value) => {
   return null;
 };
 
+// EU-specific severity using Performance Standards thresholds from EU scorecard
+export const getEuSeverityLevel = (key, value) => {
+  const numValue = typeof value === 'number' ? value : parseFloat(value);
+  if (isNaN(numValue)) {
+    // Handle tier strings
+    if (typeof value === 'string') {
+      const tier = value.toLowerCase();
+      if (tier === 'platinum' || tier === 'fantastic') return 'fantastic';
+      if (tier === 'gold' || tier === 'great') return 'great';
+      if (tier === 'silver' || tier === 'fair') return 'fair';
+      if (tier === 'bronze' || tier === 'poor') return 'poor';
+    }
+    return null;
+  }
+
+  const threshold = EU_METRIC_THRESHOLDS[key];
+  if (threshold) {
+    if (threshold.higherIsBetter) {
+      // Higher is better (DCR, POD, CC): >= target = fantastic, >= minimum = fair, < minimum = poor
+      if (numValue >= threshold.target) return 'fantastic';
+      if (numValue >= threshold.minimum) return 'fair';
+      return 'poor';
+    } else {
+      // Lower is better (DPMO metrics): <= target = fantastic, <= minimum = fair, > minimum = poor
+      if (numValue <= threshold.target) return 'fantastic';
+      if (numValue <= threshold.minimum) return 'fair';
+      return 'poor';
+    }
+  }
+
+  // Fall back to generic severity for unthresholded metrics
+  return getSeverityLevel(key, value);
+};
+
 // Parse DVIC time "M:SS" format to seconds
 export const parseDvicTimeToSeconds = (timeStr) => {
   if (!timeStr || typeof timeStr !== 'string') return null;
@@ -751,7 +844,7 @@ export const formatLabel = (key) => {
 };
 
 // Categorize driver metrics into sections
-export const categorizeMetrics = (driver, useHistorical = false, historicalData = null) => {
+export const categorizeMetrics = (driver, useHistorical = false, historicalData = null, region = 'US') => {
   const overall = [];  // Overall performance metrics (for trailing view)
   const safety = [];
   const safetyEvents = [];
@@ -842,79 +935,87 @@ export const categorizeMetrics = (driver, useHistorical = false, historicalData 
     }
   };
 
-  if (useHistorical) {
+  const isEU = region === 'EU';
+  const metricsConfig = isEU ? EU_KEY_METRICS : KEY_METRICS;
+
+  if (useHistorical && !isEU) {
     KEY_METRICS.overallTrailing.forEach(def => addMetricFromDef(overall, def));
     KEY_METRICS.safetyTrailing.forEach(def => addMetricFromDef(safety, def));
     KEY_METRICS.deliveryTrailing.forEach(def => addMetricFromDef(delivery, def));
     KEY_METRICS.customerTrailing.forEach(def => addMetricFromDef(customer, def));
     KEY_METRICS.standingTrailing.forEach(def => addMetricFromDef(standing, def));
   } else {
-    KEY_METRICS.safety.forEach(def => addMetricFromDef(safety, def));
-    KEY_METRICS.safetyEvents.forEach(def => addMetricFromDef(safetyEvents, def));
+    // Safety section — EU scorecard doesn't have per-driver safety metrics
+    if (!isEU) {
+      KEY_METRICS.safety.forEach(def => addMetricFromDef(safety, def));
+      KEY_METRICS.safetyEvents.forEach(def => addMetricFromDef(safetyEvents, def));
 
-    // PPS Breakdown: show "stops / total" format
-    KEY_METRICS.ppsBreakdown.forEach(def => {
-      const stops = getValue(def.stopsKey);
-      const total = getValue(def.totalKey);
-      if (stops !== null && stops !== undefined && total !== null && total !== undefined) {
-        ppsBreakdown.push({
-          key: def.key,
-          value: `${stops}/${total}`,
-          label: def.label
-        });
-      }
-    });
-
-    KEY_METRICS.delivery.forEach(def => addMetricFromDef(delivery, def));
-    KEY_METRICS.podRejectsBreakdown.forEach(def => addMetricFromDef(podBreakdown, def));
-    KEY_METRICS.customer.forEach(def => addMetricFromDef(customer, def));
-
-    // Customer Feedback Breakdown: extract categories from flattened keys
-    // Data comes as: feedbackCategories_deliveredToWrongAddress_count, feedbackCategories_deliveredToWrongAddress_items_0_trackingId, etc.
-    KEY_METRICS.customerFeedbackCategories.forEach(def => {
-      const countKey = `feedbackCategories_${def.key}_count`;
-      const displayNameKey = `feedbackCategories_${def.key}_displayName`;
-      const count = parseInt(driver[countKey]) || 0;
-
-      if (count > 0) {
-        // Reconstruct items array from flattened keys
-        const items = [];
-        for (let i = 0; i < count; i++) {
-          const trackingIdKey = `feedbackCategories_${def.key}_items_${i}_trackingId`;
-          const feedbackDetailsKey = `feedbackCategories_${def.key}_items_${i}_feedbackDetails`;
-          const deliveryDateKey = `feedbackCategories_${def.key}_items_${i}_deliveryDate`;
-
-          if (driver[trackingIdKey] !== undefined) {
-            items.push({
-              trackingId: driver[trackingIdKey] || '',
-              feedbackDetails: driver[feedbackDetailsKey] || '',
-              deliveryDate: driver[deliveryDateKey] || ''
-            });
-          }
+      // PPS Breakdown: show "stops / total" format
+      KEY_METRICS.ppsBreakdown.forEach(def => {
+        const stops = getValue(def.stopsKey);
+        const total = getValue(def.totalKey);
+        if (stops !== null && stops !== undefined && total !== null && total !== undefined) {
+          ppsBreakdown.push({
+            key: def.key,
+            value: `${stops}/${total}`,
+            label: def.label
+          });
         }
+      });
+    }
 
-        customerFeedbackBreakdown.push({
-          key: def.key,
-          value: count,
-          label: driver[displayNameKey] || def.label,
-          items: items
-        });
-      }
-    });
+    metricsConfig.delivery.forEach(def => addMetricFromDef(delivery, def));
+    metricsConfig.podRejectsBreakdown.forEach(def => addMetricFromDef(podBreakdown, def));
+    metricsConfig.customer.forEach(def => addMetricFromDef(customer, def));
 
-    KEY_METRICS.dvic.forEach(def => addMetricFromDef(dvic, def));
+    if (!isEU) {
+      // Customer Feedback Breakdown: extract categories from flattened keys
+      // Data comes as: feedbackCategories_deliveredToWrongAddress_count, feedbackCategories_deliveredToWrongAddress_items_0_trackingId, etc.
+      KEY_METRICS.customerFeedbackCategories.forEach(def => {
+        const countKey = `feedbackCategories_${def.key}_count`;
+        const displayNameKey = `feedbackCategories_${def.key}_displayName`;
+        const count = parseInt(driver[countKey]) || 0;
 
-    KEY_METRICS.dvicTimes.forEach(def => {
-      const timeValue = getValue(def.key);
-      const dayLabel = def.labelKey ? dataSource[def.labelKey] : null;
-      if (timeValue !== null && timeValue !== undefined && timeValue !== '') {
-        dvicTimes.push({
-          key: def.key,
-          value: timeValue,
-          label: dayLabel || def.key.replace('dvicTime', 'Day ')
-        });
-      }
-    });
+        if (count > 0) {
+          // Reconstruct items array from flattened keys
+          const items = [];
+          for (let i = 0; i < count; i++) {
+            const trackingIdKey = `feedbackCategories_${def.key}_items_${i}_trackingId`;
+            const feedbackDetailsKey = `feedbackCategories_${def.key}_items_${i}_feedbackDetails`;
+            const deliveryDateKey = `feedbackCategories_${def.key}_items_${i}_deliveryDate`;
+
+            if (driver[trackingIdKey] !== undefined) {
+              items.push({
+                trackingId: driver[trackingIdKey] || '',
+                feedbackDetails: driver[feedbackDetailsKey] || '',
+                deliveryDate: driver[deliveryDateKey] || ''
+              });
+            }
+          }
+
+          customerFeedbackBreakdown.push({
+            key: def.key,
+            value: count,
+            label: driver[displayNameKey] || def.label,
+            items: items
+          });
+        }
+      });
+
+      KEY_METRICS.dvic.forEach(def => addMetricFromDef(dvic, def));
+
+      KEY_METRICS.dvicTimes.forEach(def => {
+        const timeValue = getValue(def.key);
+        const dayLabel = def.labelKey ? dataSource[def.labelKey] : null;
+        if (timeValue !== null && timeValue !== undefined && timeValue !== '') {
+          dvicTimes.push({
+            key: def.key,
+            value: timeValue,
+            label: dayLabel || def.key.replace('dvicTime', 'Day ')
+          });
+        }
+      });
+    }
   }
 
   return {

@@ -31,6 +31,7 @@ import {
   parseHistoricalData,
   categorizeMetrics,
   getSeverityLevel,
+  getEuSeverityLevel,
   getDvicTimeSeverity,
   formatValue,
   formatLabel,
@@ -427,7 +428,8 @@ const FeedbackCategoryRow = ({ category, onClick }) => (
 );
 
 // Metric Row Component
-const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, isPodBreakdown, onOpenMetricModal }) => {
+const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, isPodBreakdown, onOpenMetricModal, severityFn: customSeverityFn }) => {
+  const resolveSeverity = customSeverityFn || getSeverityLevel;
   const isDvicTime = metricKey?.toLowerCase().startsWith('dvictime');
   const isPpsBreakdown = metricKey?.toLowerCase().startsWith('pps') && metricKey?.toLowerCase() !== 'ppscompliancerate';
   const isSafetyEvent = ['distractionsrate', 'speedingeventrate', 'seatbeltoffrate', 'followingdistancerate', 'signalviolationsrate'].includes(metricKey?.toLowerCase());
@@ -454,7 +456,7 @@ const MetricRow = ({ metricKey, value, label, indent, isTier, forceHighlight, is
   // Get base severity
   let severity = isDvicTime
     ? getDvicTimeSeverity(value)
-    : (isTier ? getSeverityLevel('tier', value) : getSeverityLevel(metricKey, value));
+    : (isTier ? resolveSeverity('tier', value) : resolveSeverity(metricKey, value));
 
   // Force severity to 'poor' for PPS breakdown items with non-compliance
   if (hasPpsNonCompliance) {
@@ -582,7 +584,7 @@ const SubSectionHeader = ({ title }) => (
 );
 
 // Section Component with optional subsections
-const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSectionTitle, subMetrics, additionalSubSections, expandedSections, toggleSection, onOpenMetricModal }) => {
+const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSectionTitle, subMetrics, additionalSubSections, expandedSections, toggleSection, onOpenMetricModal, severityFn }) => {
   const isOpen = expandedSections[id];
   const sev = defaultSev || 'great';
   const sevColor = SEVERITY_COLORS[sev];
@@ -632,13 +634,13 @@ const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSe
       {isOpen && (
         <div className="bg-white rounded-b-[14px] border border-slate-200 border-t-0 overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
           {metrics?.map(({ key, value, label, type }) => (
-            <MetricRow key={key} metricKey={key} value={value} label={label} isTier={type === 'tier'} onOpenMetricModal={onOpenMetricModal} />
+            <MetricRow key={key} metricKey={key} value={value} label={label} isTier={type === 'tier'} onOpenMetricModal={onOpenMetricModal} severityFn={severityFn} />
           ))}
           {subSection && subMetrics?.length > 0 && (
             <>
               <SubSectionHeader title={subSectionTitle || subSection} />
               {subMetrics.map(({ key, value, label }) => (
-                <MetricRow key={key} metricKey={key} value={value} label={label} indent onOpenMetricModal={onOpenMetricModal} />
+                <MetricRow key={key} metricKey={key} value={value} label={label} indent onOpenMetricModal={onOpenMetricModal} severityFn={severityFn} />
               ))}
             </>
           )}
@@ -647,7 +649,7 @@ const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSe
               <div key={idx}>
                 <SubSectionHeader title={sub.title} />
                 {sub.metrics.map(({ key, value, label }) => (
-                  <MetricRow key={key} metricKey={key} value={value} label={label} indent onOpenMetricModal={onOpenMetricModal} />
+                  <MetricRow key={key} metricKey={key} value={value} label={label} indent onOpenMetricModal={onOpenMetricModal} severityFn={severityFn} />
                 ))}
               </div>
             )
@@ -659,7 +661,7 @@ const Section = ({ id, title, icon: Icon, metrics, defaultSev, subSection, subSe
 };
 
 // Main Driver Preview Modal
-export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, scorecardInfo, getToken }) => {
+export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, scorecardInfo, region = 'US', getToken }) => {
   const [view, setView] = useState('current');
   const [metricModal, setMetricModal] = useState(null);
   const [feedbackModal, setFeedbackModal] = useState(null);
@@ -672,7 +674,8 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
   const historicalData = parseHistoricalData(driver);
   const hasHistoricalData = historicalData.length > 0;
 
-  const categories = categorizeMetrics(driver, view === 'trailing', historicalData);
+  const categories = categorizeMetrics(driver, view === 'trailing', historicalData, region);
+  const severityFn = region === 'EU' ? getEuSeverityLevel : getSeverityLevel;
 
   const standing = driver.overallStanding || driver.tier || 'N/A';
 
@@ -902,6 +905,7 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
               expandedSections={expandedSections}
               toggleSection={toggleSection}
               onOpenMetricModal={setMetricModal}
+              severityFn={severityFn}
             />
           )}
 
@@ -922,6 +926,7 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
             expandedSections={expandedSections}
             toggleSection={toggleSection}
             onOpenMetricModal={setMetricModal}
+            severityFn={severityFn}
           />
 
           {/* Delivery Section */}
@@ -937,6 +942,7 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
             expandedSections={expandedSections}
             toggleSection={toggleSection}
             onOpenMetricModal={setMetricModal}
+            severityFn={severityFn}
           />
 
           {/* Customer Feedback Section */}
@@ -966,7 +972,7 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
               {expandedSections.customer && (
                 <div className="bg-white rounded-b-[14px] border border-slate-200 border-t-0 overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
                   {categories.customer?.map(({ key, value, label, type }) => (
-                    <MetricRow key={key} metricKey={key} value={value} label={label} isTier={type === 'tier'} onOpenMetricModal={setMetricModal} />
+                    <MetricRow key={key} metricKey={key} value={value} label={label} isTier={type === 'tier'} onOpenMetricModal={setMetricModal} severityFn={severityFn} />
                   ))}
                   {!categories.isTrailing && categories.customerFeedbackBreakdown?.length > 0 && (
                     <>
@@ -999,6 +1005,7 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
               expandedSections={expandedSections}
               toggleSection={toggleSection}
               onOpenMetricModal={setMetricModal}
+              severityFn={severityFn}
             />
           )}
 
@@ -1013,6 +1020,7 @@ export const DriverPreviewModal = ({ driver, onClose, rankData, rankedCount, sco
               expandedSections={expandedSections}
               toggleSection={toggleSection}
               onOpenMetricModal={setMetricModal}
+              severityFn={severityFn}
             />
           )}
 
